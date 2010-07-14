@@ -1,0 +1,30 @@
+# - Find box2d
+# Find the Box2d includes and library
+#
+#  BOX2D_INCLUDE_DIR - where to find zlib.h, etc.
+#  BOX2D_LIBRARIES   - List of libraries when using zlib.
+#  BOX2D_FOUND       - True if zlib found.
+
+
+IF (BOX2D_INCLUDE_DIR)
+  # Already in cache, be silent
+  SET(BOX2D_FIND_QUIETLY TRUE)
+ENDIF (BOX2D_INCLUDE_DIR)
+
+FIND_PATH(BOX2D_INCLUDE_DIR Box2D/Box2D.h)
+
+SET(BOX2D_NAMES Box2D)
+FIND_LIBRARY(BOX2D_LIBRARY NAMES ${BOX2D_NAMES} )
+
+# handle the QUIETLY and REQUIRED arguments and set BOX2D_FOUND to TRUE if 
+# all listed variables are TRUE
+INCLUDE(FindPackageHandleStandardArgs)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(BOX2D DEFAULT_MSG BOX2D_LIBRARY BOX2D_INCLUDE_DIR)
+
+IF(BOX2D_FOUND)
+  SET( BOX2D_LIBRARIES ${BOX2D_LIBRARY} )
+ELSE(BOX2D_FOUND)
+  SET( BOX2D_LIBRARIES )
+ENDIF(BOX2D_FOUND)
+
+MARK_AS_ADVANCED( BOX2D_LIBRARY BOX2D_INCLUDE_DIR )
