@@ -59,14 +59,16 @@ int main(int argc, char* argv[]){
 	int dev_count = 0;
 	cudaGetDeviceCount(&dev_count);
 	
-	cout << "CUDA devices found: " << dev_count << endl;
+	cout << "CUDA devices found: " << dev_count << '\n' << endl;
 	
 	cudaDeviceProp temp;
 	cudaError_t err;
 	for(int i = 0; i < dev_count; ++i){
 		err = cudaGetDeviceProperties(&temp, i);
 		if(err == cudaSuccess){
+			cout << "Device: " << i+1 << endl;
 			print_details(temp);
+			cout << "\n\n\n";
 		}
 	}
 	return 0;
