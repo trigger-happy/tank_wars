@@ -18,5 +18,6 @@ bullets on the field not owned by the tank
 -controlling the tanks are dealt with using an array of input states
 -for the time being, attempt to dump the game state in each frame for debugging
 -for future works, change it into one that relies on determinism
+-one game instance per block for the evasion test bed
 
 -for non-thesis purposes, add some code that checks if Nvidia CUDA is available
