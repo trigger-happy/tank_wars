@@ -1,12 +1,12 @@
 -a game is contained in a single instance of a game class
 -there should be a pure CPU and pure GPU based versions of everything of the
-game
+	game
 	-dealing with the gpu will require a sort of proxy class to interact
-with the classes that are hosted on the gpu. (cpu <-> proxy <-> gpu)
+		with the classes that are hosted on the gpu. (cpu <-> proxy <-> gpu)
 -for the purpose of the thesis, there should be a higher level containment for
-multiple instances of the game
+	multiple instances of the game
 -keep things as transparent as possible so that there's no apparent clue when
-dealing with the cpu implementation and gpu implementation
+	dealing with the cpu implementation and gpu implementation
 -collision detection will just be a cheap shot for now
 	-each tank instance will test with everything on the field
 	-or for the time being, the lone tank instance will test with all
