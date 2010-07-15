@@ -58,11 +58,11 @@ include_directories("${PROJECT_SOURCE_DIR}/include"
 					
 link_directories(${Boost_LIBRARY_DIRS})
 
+#uncomment clanlib later
 link_libraries(${CMAKE_THREAD_LIBS_INIT}
-				${GLUT_LIBRARIES}
 				${OPENGL_LIBRARIES}
 				${Boost_LIBRARIES}
-				${ClanLib_LIBRARIES}
+				#${ClanLib_LIBRARIES}
 				${ZLIB_LIBRARIES}
 				${PNG_LIBRARIES}
 				${JPEG_LIBRARIES}
