@@ -7,11 +7,8 @@
 	-GPU: each game instance is run on a single threadblock
 -keep things as transparent as possible so that there's no apparent clue when
 	dealing with the cpu implementation and gpu implementation
--collision detection will just be a cheap shot for now
-	-each tank instance will test with everything on the field
-	-or for the time being, the lone tank instance will test with all
-bullets on the field not owned by the tank
-	-GPU: all bullets on the field will test with each tank instance
+-use broadphase for collision testing.
+	-for game logic, keep track of team membership of tanks and bullets
 
 -develop a sort of client-server model
 -server deals with the simulation
