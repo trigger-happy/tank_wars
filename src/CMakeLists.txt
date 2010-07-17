@@ -1,6 +1,13 @@
-cuda_add_library(twgame twgame_gpu.cu twgame_cpu.cpp)
+list(APPEND TWGAME_SOURCES twgame_cpu.cpp)
 
-cuda_add_executable(quick_check qcheck.cu)
+if(CUDA_FOUND)
+	list(APPEND TWGAME_SOURCES twgame_gpu.cu)
+	cuda_add_library(twgame ${TWGAME_SOURCES})
+	cuda_add_executable(quick_check qcheck.cu)
+else(CUDA_FOUND)
+	message("CUDA not found, apps that use CUDA will not be built")
+	add_library(twgame ${TWGAME_SOURCES})
+endif(CUDA_FOUND)
 
 add_executable(evolver evolver.cpp)
-target_link_libraries(evolver ${Boost_LIBRARIES})
+target_link_libraries(evolver twgame)
