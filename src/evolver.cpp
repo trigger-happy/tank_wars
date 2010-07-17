@@ -24,10 +24,24 @@ namespace po = boost::program_options;
 int main(int argc, char* argv[]){
 	po::options_description desc;
 	desc.add_options()
-		("help", "display this help message");
+		("help", "display this help message")
+		("cpu", "evolve the AI using the cpu")
+		("gpu", "evolve the AI using the gpu");
 		
 	po::variables_map vm;
 	po::store(po::parse_command_line(argc, argv, desc), vm);
 	po::notify(vm);
+	
+	if(vm.count("help")){
+		std::cout << desc << std::endl;
+		return 0;
+	}
+	
+	if(vm.count("cpu")){
+		//TODO: code here for evolving the AI on the cpu
+	}else if(vm.count("gpu")){
+		//TODO: code here for evolving the AI on the gpu
+	}
+	
 	return 0;
 }
