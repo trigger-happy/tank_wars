@@ -1,8 +1,14 @@
-list(APPEND TWGAME_SOURCES twgame_cpu.cpp)
+list(APPEND TWGAME_SOURCES
+			evolvers/evolver_cpu.cpp
+			twgame_cpu.cpp)
 
 if(CUDA_FOUND)
-	list(APPEND TWGAME_SOURCES twgame_gpu.cu)
+	list(APPEND TWGAME_SOURCES
+				twgame_gpu.cu
+				evolvers/evolver_gpu.cu)
+				
 	cuda_add_library(twgame ${TWGAME_SOURCES})
+	
 	cuda_add_executable(quick_check qcheck.cu)
 else(CUDA_FOUND)
 	message("CUDA not found, apps that use CUDA will not be built")

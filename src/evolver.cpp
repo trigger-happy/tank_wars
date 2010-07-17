@@ -18,8 +18,32 @@
 #include <string>
 #include <vector>
 #include <boost/program_options.hpp>
+#include "evolvers/evolver_cpu.h"
+#include "evolvers/evolver_gpu.h"
+
+#define MAX_GENERATIONS	10
+#define MAX_FRAMESTEPS	18000 // 5 minutes
+#define TIME_STEP		0.0166666667 // 60 fps
 
 namespace po = boost::program_options;
+
+template<typename T>
+void perform_evolution(iEvolver<T>& evl){
+	evl.initialize();
+	
+	//TODO: change this to the appropriate terminating condition
+	// terminating condition will be the score of the best individual in the
+	// latest generation
+	for(int i = 0; i < MAX_GENERATIONS; ++i){
+		for(int j = 0; j < MAX_FRAMESTEPS; ++j){
+			evl.frame_step(TIME_STEP);
+			evl.retrieve_state();
+		}
+		//TODO: perform some GA magic here
+	}
+	
+	evl.cleanup();
+}
 
 int main(int argc, char* argv[]){
 	po::options_description desc("Available options");
@@ -38,9 +62,11 @@ int main(int argc, char* argv[]){
 	}
 	
 	if(vm.count("cpu")){
-		//TODO: code here for evolving the AI on the cpu
+		Evolver_cpu evc;
+		perform_evolution(evc);
 	}else if(vm.count("gpu")){
-		//TODO: code here for evolving the AI on the gpu
+		Evolver_gpu evg;
+		perform_evolution(evg);
 	}
 	
 	return 0;
