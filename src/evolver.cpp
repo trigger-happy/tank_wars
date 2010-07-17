@@ -22,7 +22,7 @@
 namespace po = boost::program_options;
 
 int main(int argc, char* argv[]){
-	po::options_description desc;
+	po::options_description desc("Available options");
 	desc.add_options()
 		("help", "display this help message")
 		("cpu", "evolve the AI using the cpu")

@@ -11,3 +11,6 @@ endif(CUDA_FOUND)
 
 add_executable(evolver evolver.cpp)
 target_link_libraries(evolver twgame)
+
+add_executable(event_replay event_replay.cpp)
+target_link_libraries(event_replay twgame)
