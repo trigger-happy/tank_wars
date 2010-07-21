@@ -22,7 +22,10 @@
 #include <ClanLib/application.h>
 #include <boost/lambda/lambda.hpp>
 #include <boost/timer.hpp>
-#include <game_scene/igamescene.h>
+
+#include "game_scene/igamescene.h"
+
+#include "game_scene/gsmenu.h"
 
 // in milliseconds
 #define FRAME_TIME 1000.0/60.0
@@ -30,6 +33,10 @@
 class GameDisplay{
 public:
 	static int main(const std::vector<CL_String>& args);
+	
+private:
+	static void scene_init();
+	static void scene_cleanup();
 	
 private:
 	static boost::timer s_frame_timer;
@@ -41,7 +48,19 @@ double					GameDisplay::s_deltatime = 0.0;
 boost::timer			GameDisplay::s_frame_timer;
 std::stack<iGameScene*>	GameDisplay::s_scene_stack;
 
+
 CL_ClanApplication app(&GameDisplay::main);
+
+void GameDisplay::scene_init(){
+	s_scene_stack.push(new GSMenu());
+}
+
+void GameDisplay::scene_cleanup(){
+	while(!s_scene_stack.empty()){
+		delete s_scene_stack.top();
+		s_scene_stack.pop();
+	}
+}
 
 int GameDisplay::main(const std::vector<CL_String>& args){
 	CL_SetupCore setup_core;
@@ -54,6 +73,8 @@ int GameDisplay::main(const std::vector<CL_String>& args){
 		CL_GraphicContext& gc = window.get_gc();
 		CL_InputDevice& keyboard = window.get_ic().get_keyboard();
 		CL_InputDevice& mouse = window.get_ic().get_mouse();
+		
+		scene_init();
 		
 		while(!keyboard.get_keycode(CL_KEY_ESCAPE)){
 			// restart the frame timer
@@ -95,4 +116,6 @@ int GameDisplay::main(const std::vector<CL_String>& args){
 		console.display_close_message();
 		return -1;
 	}
+	
+	scene_cleanup();
 }
