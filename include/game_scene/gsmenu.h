@@ -30,6 +30,9 @@ public:
 
 private:
 	CL_Sprite m_titlesprite;
+	CL_Sprite m_playgame_btn;
+	CL_Sprite m_option_btn;
+	CL_Sprite m_quit_btn;
 };
 
 #endif // GSMENU_H

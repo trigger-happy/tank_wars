@@ -5,5 +5,26 @@
 			<image file="title.png" />
 			<translation origin="center" />
 		</sprite>
+		
+		<sprite name="playgame_btn">
+			<image file="menu_buttons/play_game/play_neutral.png" />
+			<image file="menu_buttons/play_game/play_click.png" />
+			<image file="menu_buttons/play_game/play_mouse_over.png" />
+			<translation origin="center" />
+		</sprite>
+		
+		<sprite name="option_btn">
+			<image file="menu_buttons/options/options_neutral.png" />
+			<image file="menu_buttons/options/options_click.png" />
+			<image file="menu_buttons/options/options_mouse_over.png" />
+			<translation origin="center" />
+		</sprite>
+		
+		<sprite name="quit_btn">
+			<image file="menu_buttons/quit/quit_neutral.png" />
+			<image file="menu_buttons/quit/quit_click.png" />
+			<image file="menu_buttons/quit/quit_mouse_over.png" />
+			<translation origin="center" />
+		</sprite>
 	</section>
 </resources>
