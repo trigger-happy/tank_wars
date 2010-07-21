@@ -48,6 +48,10 @@ int GameDisplay::main(const std::vector<CL_String>& args){
 			//TODO: change this to be based per frame
 			CL_System::sleep(10);
 		}
-	}catch(...){
+	}catch(CL_Exception& e){
+		CL_ConsoleWindow console("error console", 80, 160);
+		CL_Console::write_line("Exception: " + e.get_message_and_stack_trace());
+		console.display_close_message();
+		return -1;
 	}
 }
