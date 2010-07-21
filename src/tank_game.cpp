@@ -15,12 +15,14 @@
 */
 
 #include <vector>
+#include <stack>
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
 #include <ClanLib/gl.h>
 #include <ClanLib/application.h>
 #include <boost/lambda/lambda.hpp>
 #include <boost/timer.hpp>
+#include <game_scene/igamescene.h>
 
 // in milliseconds
 #define FRAME_TIME 1000.0/60.0
@@ -28,13 +30,16 @@
 class GameDisplay{
 public:
 	static int main(const std::vector<CL_String>& args);
+	
 private:
 	static boost::timer s_frame_timer;
 	static double s_deltatime;
+	static std::stack<iGameScene*> s_scene_stack;
 };
 
-boost::timer GameDisplay::s_frame_timer;
-double GameDisplay::s_deltatime = 0.0;
+double					GameDisplay::s_deltatime = 0.0;
+boost::timer			GameDisplay::s_frame_timer;
+std::stack<iGameScene*>	GameDisplay::s_scene_stack;
 
 CL_ClanApplication app(&GameDisplay::main);
 
