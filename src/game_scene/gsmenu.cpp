@@ -19,13 +19,17 @@
 #include <ClanLib/gl.h>
 #include "game_scene/gsmenu.h"
 
+GSMenu::GSMenu(CL_GraphicContext& gc, CL_ResourceManager& resources)
+: m_titlesprite(gc, "main_menu/title_sprite", &resources){
+}
+
 void GSMenu::onFrameRender(CL_GraphicContext* gc){
-	
+	m_titlesprite.draw(*gc, 400, 100);
 }
 
 void GSMenu::onFrameUpdate(double dt,
 						   CL_InputDevice* keyboard,
 						   CL_InputDevice* mouse){
-	
+	m_titlesprite.update();
 }
 

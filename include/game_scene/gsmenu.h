@@ -16,19 +16,20 @@
 
 #ifndef GSMENU_H
 #define GSMENU_H
-
+#include <ClanLib/core.h>
+#include <ClanLib/display.h>
 #include "game_scene/igamescene.h"
 
-class GSMenu : public iGameScene
-{
+class GSMenu : public iGameScene{
 public:
+	GSMenu(CL_GraphicContext& gc, CL_ResourceManager& resources);
     virtual void onFrameRender(CL_GraphicContext* gc);
     virtual void onFrameUpdate(double dt,
 							   CL_InputDevice* keyboard,
 							   CL_InputDevice* mouse);
 
 private:
-	
+	CL_Sprite m_titlesprite;
 };
 
 #endif // GSMENU_H

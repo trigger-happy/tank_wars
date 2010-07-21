@@ -35,7 +35,6 @@ public:
 	static int main(const std::vector<CL_String>& args);
 	
 private:
-	static void scene_init();
 	static void scene_cleanup();
 	
 private:
@@ -50,10 +49,6 @@ std::stack<iGameScene*>	GameDisplay::s_scene_stack;
 
 
 CL_ClanApplication app(&GameDisplay::main);
-
-void GameDisplay::scene_init(){
-	s_scene_stack.push(new GSMenu());
-}
 
 void GameDisplay::scene_cleanup(){
 	while(!s_scene_stack.empty()){
@@ -74,7 +69,8 @@ int GameDisplay::main(const std::vector<CL_String>& args){
 		CL_InputDevice& keyboard = window.get_ic().get_keyboard();
 		CL_InputDevice& mouse = window.get_ic().get_mouse();
 		
-		scene_init();
+		CL_ResourceManager resources("resources/game_resource.xml");
+		s_scene_stack.push(new GSMenu(gc, resources));
 		
 		while(!keyboard.get_keycode(CL_KEY_ESCAPE)){
 			// restart the frame timer
