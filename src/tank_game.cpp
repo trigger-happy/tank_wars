@@ -19,11 +19,22 @@
 #include <ClanLib/display.h>
 #include <ClanLib/gl.h>
 #include <ClanLib/application.h>
+#include <boost/lambda/lambda.hpp>
+#include <boost/timer.hpp>
+
+// in milliseconds
+#define FRAME_TIME 1000.0/60.0
 
 class GameDisplay{
 public:
 	static int main(const std::vector<CL_String>& args);
+private:
+	static boost::timer s_frame_timer;
+	static double s_deltatime;
 };
+
+boost::timer GameDisplay::s_frame_timer;
+double GameDisplay::s_deltatime = 0.0;
 
 CL_ClanApplication app(&GameDisplay::main);
 
@@ -37,16 +48,28 @@ int GameDisplay::main(const std::vector<CL_String>& args){
 		
 		CL_GraphicContext& gc = window.get_gc();
 		CL_InputDevice& keyboard = window.get_ic().get_keyboard();
+		CL_InputDevice& mouse = window.get_ic().get_mouse();
 		
 		while(!keyboard.get_keycode(CL_KEY_ESCAPE)){
+			// restart the frame timer
+			s_frame_timer.restart();
+			
+			// clear the screen
 			gc.clear(CL_Colorf::black);
+			
 			//TODO: drawing code here
 			
+			// flip screens
 			window.flip();
 			
+			// read windowing messages
 			CL_KeepAlive::process();
-			//TODO: change this to be based per frame
-			CL_System::sleep(10);
+			
+			// get the elapsed frame time
+			s_deltatime = s_frame_timer.elapsed()*1000.0;
+			
+			// sleep until we reach the next frame time iteration
+			CL_System::sleep(FRAME_TIME - s_deltatime);
 		}
 	}catch(CL_Exception& e){
 		CL_ConsoleWindow console("error console", 80, 160);
