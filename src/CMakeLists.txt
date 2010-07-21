@@ -20,3 +20,5 @@ target_link_libraries(evolver twgame)
 
 add_executable(event_replay event_replay.cpp)
 target_link_libraries(event_replay twgame)
+
+add_executable(tank_game tank_game.cpp)
