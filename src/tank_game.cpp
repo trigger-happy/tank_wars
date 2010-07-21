@@ -62,7 +62,20 @@ int GameDisplay::main(const std::vector<CL_String>& args){
 			// clear the screen
 			gc.clear(CL_Colorf::black);
 			
-			//TODO: drawing code here
+			if(!s_scene_stack.empty()){
+				// use the real delta time if the frame rate is slow
+				// otherwise, we hard lock to default frame rate
+				double dt = FRAME_TIME;
+				if(s_deltatime > FRAME_TIME){
+					dt = s_deltatime;
+				}
+				
+				// perform a frame update
+				s_scene_stack.top()->onFrameUpdate(dt, &keyboard, &mouse);
+				
+				// render
+				s_scene_stack.top()->onFrameRender(&gc);
+			}
 			
 			// flip screens
 			window.flip();
