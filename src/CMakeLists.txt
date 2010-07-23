@@ -22,5 +22,6 @@ add_executable(event_replay event_replay.cpp)
 target_link_libraries(event_replay twgame)
 
 add_executable(tank_game
+				ui/button.cpp
 				game_scene/gsmenu.cpp
 				tank_game.cpp)

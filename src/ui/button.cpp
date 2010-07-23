@@ -14,26 +14,34 @@
    Boston, MA 02110-1301, USA.
 */
 
-#ifndef GSMENU_H
-#define GSMENU_H
-#include <ClanLib/core.h>
-#include <ClanLib/display.h>
-#include "game_scene/igamescene.h"
 #include "ui/button.h"
 
-class GSMenu : public iGameScene{
-public:
-	GSMenu(CL_GraphicContext& gc, CL_ResourceManager& resources);
-    virtual void onFrameRender(CL_GraphicContext* gc);
-    virtual void onFrameUpdate(double dt,
-							   CL_InputDevice* keyboard,
-							   CL_InputDevice* mouse);
 
-private:
-	CL_Sprite m_titlesprite;
-	Button m_playgame_btn;
-	Button m_option_btn;
-	Button m_quit_btn;
-};
+Button::~Button(){
+	cleanup();
+}
 
-#endif // GSMENU_H
+void Button::initialize(CL_GraphicContext& gc,
+			   CL_ResourceManager& resources,
+			   const CL_String& name,
+			   const CL_Vec2<float> pos){
+	m_sprite = new CL_Sprite(gc, name, &resources);
+	m_pos = pos;
+}
+
+void Button::cleanup(){
+	if(m_sprite){
+		delete m_sprite;
+	}
+}
+	   
+void Button::render(CL_GraphicContext& gc){
+	m_sprite->draw(gc, m_pos.x, m_pos.y);
+}
+
+int Button::mouse_check(CL_InputDevice& mouse){
+}
+
+void Button::frame_update(double dt){
+	m_sprite->update(dt);
+}

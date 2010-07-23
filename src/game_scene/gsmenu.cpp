@@ -20,25 +20,38 @@
 #include "game_scene/gsmenu.h"
 
 GSMenu::GSMenu(CL_GraphicContext& gc, CL_ResourceManager& resources)
-: m_titlesprite(gc, "main_menu/title_sprite", &resources),
-	m_playgame_btn(gc, "main_menu/playgame_btn", &resources),
-	m_option_btn(gc, "main_menu/option_btn", &resources),
-	m_quit_btn(gc, "main_menu/quit_btn", &resources){
+: m_titlesprite(gc, "main_menu/title_sprite", &resources){
+	m_playgame_btn.initialize(gc,
+							  resources,
+							  "main_menu/playgame_btn",
+							  CL_Vec2<float>(400, 200));
+							  
+	m_option_btn.initialize(gc,
+							resources,
+							"main_menu/option_btn",
+							CL_Vec2<float>(400, 300));
+							
+	m_quit_btn.initialize(gc,
+						  resources,
+						  "main_menu/quit_btn",
+						  CL_Vec2<float>(400, 400));
 }
 
 void GSMenu::onFrameRender(CL_GraphicContext* gc){
 	m_titlesprite.draw(*gc, 400, 100);
-	m_playgame_btn.draw(*gc, 400, 200);
-	m_option_btn.draw(*gc, 400, 300);
-	m_quit_btn.draw(*gc, 400, 400);
+	
+	m_playgame_btn.render(*gc);
+	m_option_btn.render(*gc);
+	m_quit_btn.render(*gc);
 }
 
 void GSMenu::onFrameUpdate(double dt,
 						   CL_InputDevice* keyboard,
 						   CL_InputDevice* mouse){
 	m_titlesprite.update();
-	m_playgame_btn.update(0);
-	m_option_btn.update(0);
-	m_quit_btn.update(0);
+	
+	m_playgame_btn.frame_update(0);
+	m_option_btn.frame_update(0);
+	m_quit_btn.frame_update(0);
 }
 
