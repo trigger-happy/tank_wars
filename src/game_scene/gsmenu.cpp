@@ -20,6 +20,8 @@
 #include <ClanLib/gl.h>
 #include "game_scene/gsmenu.h"
 
+extern bool s_running;
+
 GSMenu::GSMenu(CL_GraphicContext& gc, CL_ResourceManager& resources)
 : m_titlesprite(gc, "main_menu/title_sprite", &resources){
 	m_playgame_btn.initialize(gc,
@@ -85,6 +87,7 @@ void GSMenu::onFrameUpdate(double dt,
 			break;
 		case 1:
 			// TODO: code here for quitting
+			s_running = false;
 			break;
 		case 2:
 			// do nothing

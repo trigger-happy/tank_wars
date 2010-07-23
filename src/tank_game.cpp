@@ -47,6 +47,9 @@ double					GameDisplay::s_deltatime = 0.0;
 boost::timer			GameDisplay::s_frame_timer;
 std::stack<iGameScene*>	GameDisplay::s_scene_stack;
 
+// bad design, but no choice for the time being. Keep things simple.
+bool					s_running = true;
+
 CL_ClanApplication app(&GameDisplay::main);
 
 void GameDisplay::scene_cleanup(){
@@ -71,7 +74,7 @@ int GameDisplay::main(const std::vector<CL_String>& args){
 		CL_ResourceManager resources("resources/game_resource.xml");
 		s_scene_stack.push(new GSMenu(gc, resources));
 		
-		while(!keyboard.get_keycode(CL_KEY_ESCAPE)){
+		while(!keyboard.get_keycode(CL_KEY_ESCAPE) && s_running){
 			// restart the frame timer
 			s_frame_timer.restart();
 			
