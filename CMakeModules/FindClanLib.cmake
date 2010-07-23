@@ -18,7 +18,7 @@ ENDIF(ClanLib_INCLUDE_DIRS)
 IF(ClanLib_VERSION)
 	#don't do anything
 ELSE(ClanLib_VERSION)
-	SET(ClanLIB_VERSION 21)
+	SET(ClanLIB_VERSION 22)
 ENDIF(ClanLib_VERSION)
 
 IF(NOT ClanLib_FIND_COMPONENTS)
@@ -28,13 +28,15 @@ IF(NOT ClanLib_FIND_COMPONENTS)
     GL
     GL1
     GUI
-    GDI
+    SWRenderer
     MikMod
     Network
     SDL
     Signals
     Sound
-    Vorbis)
+    Vorbis
+    CSSLayout
+    Database)
 ENDIF(NOT ClanLib_FIND_COMPONENTS)
 
 MACRO(ClanLib_MSG MSG)
@@ -72,9 +74,9 @@ ENDMACRO(ClanLib_FIND_COMPONENT)
 ClanLib_MSG("Checking for ClanLib")
 
 FIND_PATH(ClanLib_INCLUDE_DIRS ClanLib/core.h
-  ${ClanLib_ROOT_DIR}/include ${ClanLib_ROOT_DIR}/include/ClanLib-2.1
-  /usr/local/include          /usr/local/include/ClanLib-2.1
-  /usr/include                /usr/include/ClanLib-2.1
+  ${ClanLib_ROOT_DIR}/include ${ClanLib_ROOT_DIR}/include/ClanLib-2.2
+  /usr/local/include          /usr/local/include/ClanLib-2.2
+  /usr/include                /usr/include/ClanLib-2.2
   DOC "Where to find the ClanLib includes.")
 IF(ClanLib_INCLUDE_DIRS)
   ClanLib_MSG("Checking for ClanLib -- headers")
