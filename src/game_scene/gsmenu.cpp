@@ -14,6 +14,7 @@
    Boston, MA 02110-1301, USA.
 */
 
+#include <cassert>
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
 #include <ClanLib/gl.h>
@@ -49,6 +50,48 @@ void GSMenu::onFrameUpdate(double dt,
 						   CL_InputDevice* keyboard,
 						   CL_InputDevice* mouse){
 	m_titlesprite.update();
+	
+	switch(m_playgame_btn.mouse_check(*mouse)){
+		case 0:
+			//TODO: do nothing
+			break;
+		case 1:
+			//TODO: code here for starting the game
+			break;
+		case 2:
+			// do nothing
+			break;
+		default:
+			assert(false && "Bad return code");
+	}
+	
+	switch(m_option_btn.mouse_check(*mouse)){
+		case 0:
+			//TODO: do nothing
+			break;
+		case 1:
+			//TODO: code here for showing options
+			break;
+		case 2:
+			// do nothing
+			break;
+		default:
+			assert(false && "Bad return code");
+	}
+	
+	switch(m_quit_btn.mouse_check(*mouse)){
+		case 0:
+			//TODO: do nothing
+			break;
+		case 1:
+			// TODO: code here for quitting
+			break;
+		case 2:
+			// do nothing
+			break;
+		default:
+			assert(false && "Bad return code");
+	}
 	
 	m_playgame_btn.frame_update(0);
 	m_option_btn.frame_update(0);

@@ -47,7 +47,6 @@ double					GameDisplay::s_deltatime = 0.0;
 boost::timer			GameDisplay::s_frame_timer;
 std::stack<iGameScene*>	GameDisplay::s_scene_stack;
 
-
 CL_ClanApplication app(&GameDisplay::main);
 
 void GameDisplay::scene_cleanup(){

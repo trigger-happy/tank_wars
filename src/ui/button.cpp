@@ -40,6 +40,27 @@ void Button::render(CL_GraphicContext& gc){
 }
 
 int Button::mouse_check(CL_InputDevice& mouse){
+	CL_Vec2<float> pos(mouse.get_x(), mouse.get_y());
+	CL_Size s = m_sprite->get_size();
+	if(pos.x >= (m_pos.x - s.width/2)
+		&& pos.x <= (m_pos.x + s.width/2)
+		&& pos.y >= m_pos.y - (s.height/2)
+		&& pos.y <= m_pos.y + (s.height/2)){
+		
+		// it's inside the hitbox
+		if(mouse.get_keycode(CL_MOUSE_LEFT)){
+			// the user clicked in here
+			m_sprite->set_frame(1);
+			return 1;
+		}else{
+			// the mouse is just hovering here
+			m_sprite->set_frame(2);
+			return 2;
+		}
+	}else{
+		m_sprite->set_frame(0);
+		return 0;
+	}
 }
 
 void Button::frame_update(double dt){
