@@ -37,8 +37,8 @@ void GSMenu::onFrameUpdate(double dt,
 						   CL_InputDevice* keyboard,
 						   CL_InputDevice* mouse){
 	m_titlesprite.update();
-	m_playgame_btn.update();
-	m_option_btn.update();
-	m_quit_btn.update();
+	m_playgame_btn.update(0);
+	m_option_btn.update(0);
+	m_quit_btn.update(0);
 }
 
