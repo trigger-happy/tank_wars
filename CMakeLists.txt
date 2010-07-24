@@ -10,7 +10,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	set(BOOST_LIBRARYDIR /usr/local/lib)
 	set(BOOST_INCLUDEDIR /usr/local/include)
 	FIND_PACKAGE(X11 REQUIRED)
-	set(LINK_LIBS ${LINK_LIBS} fontconfig)
+	list(APPEND LINK_LIBS ${LINK_LIBS} fontconfig)
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	set(CMAKE_LIBRARY_PATH "C:\\Boost\\lib")
 	set(CMAKE_INCLUDE_PATH "C:\\Boost\\include")
@@ -59,16 +59,18 @@ include_directories("${PROJECT_SOURCE_DIR}/include"
 link_directories(${Boost_LIBRARY_DIRS})
 
 #uncomment clanlib later
-link_libraries(${CMAKE_THREAD_LIBS_INIT}
-				${OPENGL_LIBRARIES}
-				${Boost_LIBRARIES}
-				${ClanLib_LIBRARIES}
-				${ZLIB_LIBRARIES}
-				${PNG_LIBRARIES}
-				${JPEG_LIBRARIES}
-				${FREETYPE_LIBRARIES}
-				${X11_LIBRARIES}
-				fontconfig)
+list(APPEND LINK_LIBS ${LINK_LIBS}
+			${CMAKE_THREAD_LIBS_INIT}
+			${OPENGL_LIBRARIES}
+			${Boost_LIBRARIES}
+			${ClanLib_LIBRARIES}
+			${ZLIB_LIBRARIES}
+			${PNG_LIBRARIES}
+			${JPEG_LIBRARIES}
+			${FREETYPE_LIBRARIES}
+			${X11_LIBRARIES})
+
+link_libraries(${LINK_LIBS})
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
