@@ -32,7 +32,7 @@
 
 class GameDisplay{
 public:
-	static int main(const std::vector<CL_String>& args);
+	static int main();
 	
 private:
 	static void scene_cleanup();
@@ -50,8 +50,6 @@ std::stack<iGameScene*>	GameDisplay::s_scene_stack;
 // bad design, but no choice for the time being. Keep things simple.
 bool					s_running = true;
 
-CL_ClanApplication app(&GameDisplay::main);
-
 void GameDisplay::scene_cleanup(){
 	while(!s_scene_stack.empty()){
 		delete s_scene_stack.top();
@@ -59,7 +57,7 @@ void GameDisplay::scene_cleanup(){
 	}
 }
 
-int GameDisplay::main(const std::vector<CL_String>& args){
+int GameDisplay::main(){
 	CL_SetupCore setup_core;
 	CL_SetupDisplay setup_display;
 	CL_SetupGL setup_gl;
@@ -106,7 +104,7 @@ int GameDisplay::main(const std::vector<CL_String>& args){
 			s_deltatime = s_frame_timer.elapsed()*1000.0;
 			
 			// sleep until we reach the next frame time iteration
-			CL_System::sleep(FRAME_TIME - s_deltatime);
+			//CL_System::sleep(FRAME_TIME - s_deltatime);
 		}
 	}catch(CL_Exception& e){
 		CL_ConsoleWindow console("error console", 80, 160);
@@ -116,4 +114,8 @@ int GameDisplay::main(const std::vector<CL_String>& args){
 	}
 	
 	scene_cleanup();
+}
+
+int main(int argc, char* argv[]){
+	GameDisplay::main();
 }
