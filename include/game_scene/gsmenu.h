@@ -25,6 +25,8 @@
 class GSMenu : public iGameScene{
 public:
 	GSMenu(CL_GraphicContext& gc, CL_ResourceManager& resources);
+	virtual ~GSMenu();
+	
     virtual void onFrameRender(CL_GraphicContext* gc);
     virtual void onFrameUpdate(double dt,
 							   CL_InputDevice* keyboard,
@@ -38,7 +40,7 @@ private:
 	Button m_option_btn;
 	Button m_quit_btn;
 	
-	GSLobby m_gslobby;
+	GSLobby* m_gslobby;
 };
 
 #endif // GSMENU_H

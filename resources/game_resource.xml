@@ -27,4 +27,20 @@
 			<translation origin="center" />
 		</sprite>
 	</section>
+	
+	<section name="game_lobby">
+		<sprite name="play_btn">
+			<image file="menu_buttons/play/play_neutral.png" />
+			<image file="menu_buttons/play/play_click.png" />
+			<image file="menu_buttons/play/play_mouse_over.png" />
+			<translation origin="center" />
+		</sprite>
+		
+		<sprite name="back_btn">
+			<image file="menu_buttons/back/back_neutral.png" />
+			<image file="menu_buttons/back/back_click.png" />
+			<image file="menu_buttons/back/back_mouse_over.png" />
+			<translation origin="center" />
+		</sprite>
+	</section>
 </resources>

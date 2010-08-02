@@ -19,6 +19,7 @@
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
 #include "igamescene.h"
+#include "ui/button.h"
 
 class GSLobby : public iGameScene{
 public:
@@ -36,6 +37,8 @@ private:
 	CL_Font_System* m_font;
 	int m_xpos;
 	int m_ypos;
+	Button m_playbtn;
+	Button m_backbtn;
 };
 
 #endif // GSLOBBY_H

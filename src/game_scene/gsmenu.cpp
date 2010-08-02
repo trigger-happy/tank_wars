@@ -24,8 +24,7 @@
 extern bool s_running;
 
 GSMenu::GSMenu(CL_GraphicContext& gc, CL_ResourceManager& resources)
-: m_titlesprite(gc, "main_menu/title_sprite", &resources),
-	m_gslobby(gc, resources){
+: m_titlesprite(gc, "main_menu/title_sprite", &resources){
 	m_playgame_btn.initialize(gc,
 							  resources,
 							  "main_menu/playgame_btn",
@@ -40,6 +39,14 @@ GSMenu::GSMenu(CL_GraphicContext& gc, CL_ResourceManager& resources)
 						  resources,
 						  "main_menu/quit_btn",
 						  CL_Vec2<float>(400, 400));
+
+	m_gslobby = new GSLobby(gc, resources);
+}
+
+GSMenu::~GSMenu(){
+	if(m_gslobby){
+		delete m_gslobby;
+	}
 }
 
 void GSMenu::onFrameRender(CL_GraphicContext* gc){
@@ -61,7 +68,7 @@ void GSMenu::onFrameUpdate(double dt,
 			break;
 		case 1:
 			// show the lobby
-			GameDisplay::push_scene(&m_gslobby);
+			GameDisplay::push_scene(m_gslobby);
 			break;
 		case 2:
 			// do nothing
