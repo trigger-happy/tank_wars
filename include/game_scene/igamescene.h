@@ -37,6 +37,16 @@ public:
 	\param gc - Pointer to the CL_GraphicContext to draw on
 	*/
 	virtual void onFrameRender(CL_GraphicContext* gc) = 0;
+	
+	/*!
+	Called when the scene gets activated
+	*/
+	virtual void onSceneActivate() = 0;
+	
+	/*!
+	Called when the scene gets deactivated
+	*/
+	virtual void onSceneDeactivate() = 0;
 };
 
 #endif //IGAMESCENE_H

@@ -18,12 +18,14 @@
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
 #include <ClanLib/gl.h>
+#include "game_display.h"
 #include "game_scene/gsmenu.h"
 
 extern bool s_running;
 
 GSMenu::GSMenu(CL_GraphicContext& gc, CL_ResourceManager& resources)
-: m_titlesprite(gc, "main_menu/title_sprite", &resources){
+: m_titlesprite(gc, "main_menu/title_sprite", &resources),
+	m_gslobby(gc, resources){
 	m_playgame_btn.initialize(gc,
 							  resources,
 							  "main_menu/playgame_btn",
@@ -55,10 +57,11 @@ void GSMenu::onFrameUpdate(double dt,
 	
 	switch(m_playgame_btn.mouse_check(*mouse)){
 		case 0:
-			//TODO: do nothing
+			// do nothing
 			break;
 		case 1:
-			//TODO: code here for starting the game
+			// show the lobby
+			GameDisplay::push_scene(&m_gslobby);
 			break;
 		case 2:
 			// do nothing
@@ -69,7 +72,7 @@ void GSMenu::onFrameUpdate(double dt,
 	
 	switch(m_option_btn.mouse_check(*mouse)){
 		case 0:
-			//TODO: do nothing
+			// do nothing
 			break;
 		case 1:
 			//TODO: code here for showing options
@@ -83,10 +86,10 @@ void GSMenu::onFrameUpdate(double dt,
 	
 	switch(m_quit_btn.mouse_check(*mouse)){
 		case 0:
-			//TODO: do nothing
+			// do nothing
 			break;
 		case 1:
-			// TODO: code here for quitting
+			// quit the game
 			s_running = false;
 			break;
 		case 2:

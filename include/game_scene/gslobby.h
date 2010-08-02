@@ -14,31 +14,28 @@
    Boston, MA 02110-1301, USA.
 */
 
-#ifndef GSMENU_H
-#define GSMENU_H
+#ifndef GSLOBBY_H
+#define GSLOBBY_H
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
-#include "game_scene/igamescene.h"
-#include "game_scene/gslobby.h"
-#include "ui/button.h"
+#include "igamescene.h"
 
-class GSMenu : public iGameScene{
+class GSLobby : public iGameScene{
 public:
-	GSMenu(CL_GraphicContext& gc, CL_ResourceManager& resources);
-    virtual void onFrameRender(CL_GraphicContext* gc);
-    virtual void onFrameUpdate(double dt,
+	GSLobby(CL_GraphicContext& gc, CL_ResourceManager& resources);
+	virtual ~GSLobby();
+	
+	virtual void onFrameUpdate(double dt,
 							   CL_InputDevice* keyboard,
 							   CL_InputDevice* mouse);
-	virtual void onSceneActivate(){}
-	virtual void onSceneDeactivate(){}
-
-private:
-	CL_Sprite m_titlesprite;
-	Button m_playgame_btn;
-	Button m_option_btn;
-	Button m_quit_btn;
+	virtual void onFrameRender(CL_GraphicContext* gc);
+	virtual void onSceneActivate();
+	virtual void onSceneDeactivate();
 	
-	GSLobby m_gslobby;
+private:
+	CL_Font_System* m_font;
+	int m_xpos;
+	int m_ypos;
 };
 
-#endif // GSMENU_H
+#endif // GSLOBBY_H

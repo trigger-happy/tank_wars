@@ -14,31 +14,35 @@
    Boston, MA 02110-1301, USA.
 */
 
-#ifndef GSMENU_H
-#define GSMENU_H
-#include <ClanLib/core.h>
-#include <ClanLib/display.h>
-#include "game_scene/igamescene.h"
 #include "game_scene/gslobby.h"
-#include "ui/button.h"
 
-class GSMenu : public iGameScene{
-public:
-	GSMenu(CL_GraphicContext& gc, CL_ResourceManager& resources);
-    virtual void onFrameRender(CL_GraphicContext* gc);
-    virtual void onFrameUpdate(double dt,
-							   CL_InputDevice* keyboard,
-							   CL_InputDevice* mouse);
-	virtual void onSceneActivate(){}
-	virtual void onSceneDeactivate(){}
+GSLobby::GSLobby(CL_GraphicContext& gc, CL_ResourceManager& resources){
+	CL_FontDescription desc;
+	desc.set_typeface_name("tahoma");
+	desc.set_height(32);
+	m_font = new CL_Font_System(gc, desc);
+	m_xpos = gc.get_width()/2-100;
+	m_ypos = gc.get_height()/4;
+}
 
-private:
-	CL_Sprite m_titlesprite;
-	Button m_playgame_btn;
-	Button m_option_btn;
-	Button m_quit_btn;
-	
-	GSLobby m_gslobby;
-};
+GSLobby::~GSLobby(){
+	if(m_font){
+		delete m_font;
+		m_font = NULL;
+	}
+}
 
-#endif // GSMENU_H
+void GSLobby::onFrameUpdate(double dt,
+						   CL_InputDevice* keyboard,
+						   CL_InputDevice* mouse){
+}
+						   
+void GSLobby::onFrameRender(CL_GraphicContext* gc){
+	m_font->draw_text(*gc, m_xpos, m_ypos, "Nothing here yet");
+}
+
+void GSLobby::onSceneActivate(){
+}
+
+void GSLobby::onSceneDeactivate(){
+}

@@ -22,6 +22,7 @@
 #include <ClanLib/application.h>
 #include <boost/lambda/lambda.hpp>
 #include <boost/timer.hpp>
+#include "game_display.h"
 
 #include "game_scene/igamescene.h"
 
@@ -30,19 +31,6 @@
 // in milliseconds
 #define FRAME_TIME 1000.0/60.0
 
-class GameDisplay{
-public:
-	static int main();
-	
-private:
-	static void scene_cleanup();
-	
-private:
-	static boost::timer s_frame_timer;
-	static double s_deltatime;
-	static std::stack<iGameScene*> s_scene_stack;
-};
-
 double					GameDisplay::s_deltatime = 0.0;
 boost::timer			GameDisplay::s_frame_timer;
 std::stack<iGameScene*>	GameDisplay::s_scene_stack;
@@ -50,10 +38,21 @@ std::stack<iGameScene*>	GameDisplay::s_scene_stack;
 // bad design, but no choice for the time being. Keep things simple.
 bool					s_running = true;
 
-void GameDisplay::scene_cleanup(){
-	while(!s_scene_stack.empty()){
-		delete s_scene_stack.top();
+void GameDisplay::push_scene(iGameScene* scene){
+	if(!s_scene_stack.empty()){
+		s_scene_stack.top()->onSceneDeactivate();
+	}
+	s_scene_stack.push(scene);
+	scene->onSceneActivate();
+}
+
+void GameDisplay::pop_scene(){
+	if(!s_scene_stack.empty()){
+		s_scene_stack.top()->onSceneDeactivate();
 		s_scene_stack.pop();
+	}
+	if(!s_scene_stack.empty()){
+		s_scene_stack.top()->onSceneActivate();
 	}
 }
 
@@ -61,6 +60,8 @@ int GameDisplay::main(){
 	CL_SetupCore setup_core;
 	CL_SetupDisplay setup_display;
 	CL_SetupGL setup_gl;
+	
+	GSMenu* menu_scene = NULL;
 	
 	try{
 		CL_DisplayWindow window("TankWars", 800, 600);
@@ -70,7 +71,8 @@ int GameDisplay::main(){
 		CL_InputDevice& mouse = window.get_ic().get_mouse();
 		
 		CL_ResourceManager resources("resources/game_resource.xml");
-		s_scene_stack.push(new GSMenu(gc, resources));
+		menu_scene = new GSMenu(gc, resources);
+		s_scene_stack.push(menu_scene);
 		
 		while(!keyboard.get_keycode(CL_KEY_ESCAPE) && s_running){
 			// restart the frame timer
@@ -112,8 +114,7 @@ int GameDisplay::main(){
 		console.display_close_message();
 		return -1;
 	}
-	
-	scene_cleanup();
+	delete menu_scene;
 }
 
 int main(int argc, char* argv[]){
