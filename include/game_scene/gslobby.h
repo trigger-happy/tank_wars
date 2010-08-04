@@ -22,6 +22,8 @@
 #include "igamescene.h"
 #include "ui/button.h"
 
+class GSGame;
+
 class GSLobby : public iGameScene{
 public:
 	GSLobby(CL_GraphicContext& gc, CL_ResourceManager& resources);
@@ -40,6 +42,8 @@ private:
 	int m_ypos;
 	Button m_playbtn;
 	Button m_backbtn;
+	
+	boost::scoped_ptr<GSGame> m_gsgame;
 };
 
 #endif // GSLOBBY_H

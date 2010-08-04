@@ -26,4 +26,5 @@ add_executable(tank_game
 				game_scene/gsmenu.cpp
 				game_scene/gslobby.cpp
 				game_scene/gsoptions.cpp
+				game_scene/gsgame.cpp
 				tank_game.cpp)

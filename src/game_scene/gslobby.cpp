@@ -16,8 +16,10 @@
 #include <cassert>
 #include "game_display.h"
 #include "game_scene/gslobby.h"
+#include "game_scene/gsgame.h"
 
-GSLobby::GSLobby(CL_GraphicContext& gc, CL_ResourceManager& resources){
+GSLobby::GSLobby(CL_GraphicContext& gc, CL_ResourceManager& resources)
+: m_gsgame(new GSGame(gc, resources)){
 	CL_FontDescription desc;
 	desc.set_typeface_name("tahoma");
 	desc.set_height(32);
