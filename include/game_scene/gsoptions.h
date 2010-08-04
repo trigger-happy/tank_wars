@@ -21,6 +21,7 @@
 #include <ClanLib/display.h>
 #include <boost/scoped_ptr.hpp>
 #include "game_scene/igamescene.h"
+#include "ui/button.h"
 
 class GSOptions : public iGameScene{
 public:
@@ -36,6 +37,7 @@ public:
 	
 private:
 	boost::scoped_ptr<CL_Font_System> m_font;
+	Button m_backbtn;
 	//TODO: add more stuff here for the options screen
 };
 
