@@ -23,13 +23,19 @@
 
 using namespace Physics;
 
-#define VERLET_BLOCK 64
-#define VERLET_GRID MAX_ARRAY_SIZE/VERLET_BLOCK
 
-
-__host__ vec2_array::vec2_array(){
-	std::fill(x, x + MAX_ARRAY_SIZE, 0);
-	std::fill(y, y + MAX_ARRAY_SIZE, 0);
+__host__ __device__ vec2_array::vec2_array(){
+	#if __CUDA_ARCH__
+		// device code
+		for(int i = 0; i < MAX_ARRAY_SIZE; ++i){
+			x[i] = 0;
+			y[i] = 0;
+		}
+	#elif !defined(__CUDA_ARCH__)
+		// host code
+		std::fill(x, x + MAX_ARRAY_SIZE, 0);
+		std::fill(y, y + MAX_ARRAY_SIZE, 0);
+	#endif
 }
 
 __host__ __device__ vec2 vec2_array::get_vec2(u32 id){
@@ -49,75 +55,117 @@ __host__ PhysRunner::~PhysRunner(){
 	// 	cudaFree(m_pdevshapes);
 }
 
-__host__ void PhysRunner::initialize(){
-	// initialize the device memory
-	// 	cudaMalloc(reinterpret_cast<void**>(&m_pdevbodies), sizeof(physBody));
-	// 	cudaMalloc(reinterpret_cast<void**>(&m_pdevshapes), sizeof(physShape));
-	
-	// copy over to the gpu
-	// 	copy_to_device();
-}
+// __host__ void PhysRunner::initialize(){
+// 	// initialize the device memory
+// 	cudaMalloc(reinterpret_cast<void**>(&m_pdevbodies), sizeof(physBody));
+// 	cudaMalloc(reinterpret_cast<void**>(&m_pdevshapes), sizeof(physShape));
+// 	
+// 	// copy over to the gpu
+// 	copy_to_device();
+// }
 
-//TODO: we may need to reconfigure this
-__global__ void update_verlet(f32 dt,
+__host__ __device__ void update_verlet(f32 dt,
 							  physBody* bodies,
 							  physShape* shapes){
-	u32 idx = blockDim.x * blockIdx.x + threadIdx.x;
-	
-	vec2 temp = bodies->cur_pos.get_vec2(idx);
-	vec2 newpos;
-	
-	newpos.x = bodies->cur_pos.x[idx] - bodies->old_pos.x[idx] 
-	+ bodies->acceleration.x[idx] * dt * dt;
-	
-	newpos.y = bodies->cur_pos.y[idx] - bodies->old_pos.y[idx] 
-	+ bodies->acceleration.y[idx] * dt * dt;
-	
-	// don't let the object exceed maximum velocity
-	vec2 maxvel;
-	maxvel.x = fabsf(dt * bodies->max_vel[idx]
-	* cosf(bodies->rotation[idx]
-	* (static_cast<float>(PI)/180)));
-	
-	maxvel.y = fabsf(dt * bodies->max_vel[idx]
-	* sinf(bodies->rotation[idx]
-	* (static_cast<float>(PI)/180)));
-	
-	if(fabsf(newpos.x) > fabsf(maxvel.x)){
-		if(bodies->acceleration.x[idx] < 0){
-			newpos.x = -maxvel.x;
-		}else{
-			newpos.x = maxvel.x;
+	#if __CUDA_ARCH__
+		// device code
+		u32 idx = threadIdx.x;
+		
+		vec2 temp = bodies->cur_pos.get_vec2(idx);
+		vec2 newpos;
+		
+		newpos.x = bodies->cur_pos.x[idx] - bodies->old_pos.x[idx] 
+		+ bodies->acceleration.x[idx] * dt * dt;
+		
+		newpos.y = bodies->cur_pos.y[idx] - bodies->old_pos.y[idx] 
+		+ bodies->acceleration.y[idx] * dt * dt;
+		
+		// don't let the object exceed maximum velocity
+		vec2 maxvel;
+		maxvel.x = fabsf(dt * bodies->max_vel[idx]
+		* cosf(bodies->rotation[idx]
+		* (static_cast<float>(PI)/180)));
+		
+		maxvel.y = fabsf(dt * bodies->max_vel[idx]
+		* sinf(bodies->rotation[idx]
+		* (static_cast<float>(PI)/180)));
+		
+		if(fabsf(newpos.x) > fabsf(maxvel.x)){
+			if(bodies->acceleration.x[idx] < 0){
+				newpos.x = -maxvel.x;
+			}else{
+				newpos.x = maxvel.x;
+			}
 		}
-	}
-	if(fabsf(newpos.y) > fabsf(maxvel.y)){
-		if(bodies->acceleration.y[idx] < 0){
-			newpos.y = -maxvel.y;
-		}else{
-			newpos.y = maxvel.y;
+		if(fabsf(newpos.y) > fabsf(maxvel.y)){
+			if(bodies->acceleration.y[idx] < 0){
+				newpos.y = -maxvel.y;
+			}else{
+				newpos.y = maxvel.y;
+			}
 		}
-	}
-	
-	bodies->cur_pos.x[idx] += newpos.x;
-	bodies->cur_pos.y[idx] += newpos.y;
-	bodies->old_pos.x[idx] = temp.x;
-	bodies->old_pos.y[idx] = temp.y;
+		
+		bodies->cur_pos.x[idx] += newpos.x;
+		bodies->cur_pos.y[idx] += newpos.y;
+		bodies->old_pos.x[idx] = temp.x;
+		bodies->old_pos.y[idx] = temp.y;
+	#elif !defined(__CUDA_ARCH__)
+		// host code, this is completely serialized
+		for(u32 idx = 0; idx < MAX_ARRAY_SIZE; ++idx){
+			vec2 temp = bodies->cur_pos.get_vec2(idx);
+			vec2 newpos;
+			
+			newpos.x = bodies->cur_pos.x[idx] - bodies->old_pos.x[idx] 
+			+ bodies->acceleration.x[idx] * dt * dt;
+			
+			newpos.y = bodies->cur_pos.y[idx] - bodies->old_pos.y[idx] 
+			+ bodies->acceleration.y[idx] * dt * dt;
+			
+			// don't let the object exceed maximum velocity
+			vec2 maxvel;
+			maxvel.x = fabsf(dt * bodies->max_vel[idx]
+			* cosf(bodies->rotation[idx]
+			* (static_cast<float>(PI)/180)));
+			
+			maxvel.y = fabsf(dt * bodies->max_vel[idx]
+			* sinf(bodies->rotation[idx]
+			* (static_cast<float>(PI)/180)));
+			
+			if(fabsf(newpos.x) > fabsf(maxvel.x)){
+				if(bodies->acceleration.x[idx] < 0){
+					newpos.x = -maxvel.x;
+				}else{
+					newpos.x = maxvel.x;
+				}
+			}
+			if(fabsf(newpos.y) > fabsf(maxvel.y)){
+				if(bodies->acceleration.y[idx] < 0){
+					newpos.y = -maxvel.y;
+				}else{
+					newpos.y = maxvel.y;
+				}
+			}
+			
+			bodies->cur_pos.x[idx] += newpos.x;
+			bodies->cur_pos.y[idx] += newpos.y;
+			bodies->old_pos.x[idx] = temp.x;
+			bodies->old_pos.y[idx] = temp.y;
+		}
+	#endif
 }
 
-//TODO: we may need to reconfigure this
-void PhysRunner::timestep(f32 dt){
-
-// 	if(m_update_dev_mem){
-// 		copy_to_device();
-// 		m_update_dev_mem = false;
-// 	}
+__host__ __device__ void PhysRunner::timestep(f32 dt){
+	// 	if(m_update_dev_mem){
+	// 		copy_to_device();
+	// 		m_update_dev_mem = false;
+	// 	}
 	
 	// convert from millisecond to seconds
 	dt /= 1000.0f;
 	
-	update_verlet<<<VERLET_BLOCK, VERLET_GRID>>>(dt, &m_bodies,
-												 &m_shapes);
-												 // 	copy_from_device();
+	update_verlet(dt, &m_bodies, &m_shapes);
+	
+	// 	copy_from_device();
 }
 
 /*
@@ -138,8 +186,8 @@ __host__ void PhysRunner::copy_from_device(){
 	}
 */
 
-__host__ void PhysRunner::find_next_free_slot_host(){
-	// keep incremenenting 
+__host__ __device__ void PhysRunner::find_next_free_slot(){
+	// keep incrementing 
 	for(u32 i = 0; i < MAX_ARRAY_SIZE; ++i){
 		if(!m_free_slots[i]){
 			m_first_free_slot = i;
@@ -149,47 +197,34 @@ __host__ void PhysRunner::find_next_free_slot_host(){
 	m_first_free_slot = MAX_ARRAY_SIZE;
 }
 
-__device__ void PhysRunner::find_next_free_slot_dev(){
-	// keep incremenenting 
-	for(u32 i = 0; i < MAX_ARRAY_SIZE; ++i){
-		if(!m_free_slots[i]){
-			m_first_free_slot = i;
-			return;
-		}
-	}
-	m_first_free_slot = MAX_ARRAY_SIZE;
-}
+// __device__ void PhysRunner::find_next_free_slot_dev(){
+// 	// keep incrementing 
+// 	for(u32 i = 0; i < MAX_ARRAY_SIZE; ++i){
+// 		if(!m_free_slots[i]){
+// 			m_first_free_slot = i;
+// 			return;
+// 		}
+// 	}
+// 	m_first_free_slot = MAX_ARRAY_SIZE;
+// }
 
-__host__ u32 PhysRunner::get_slot_host(){
+__host__ __device__ u32 PhysRunner::get_slot(){
 	if(!m_free_slots[m_first_free_slot]){
 		m_free_slots[m_first_free_slot] = true;
 		return m_first_free_slot++;
 	}
 	
-	find_next_free_slot_host();
+	find_next_free_slot();
 	
-	assert(m_first_free_slot < MAX_ARRAY_SIZE);
+	#if !defined(__CUDA_ARCH__)
+		// host code
+		assert(m_first_free_slot < MAX_ARRAY_SIZE);
+	#endif
 	
 	return m_first_free_slot++;
 }
 
-__device__ u32 PhysRunner::get_slot_dev(){
-	if(!m_free_slots[m_first_free_slot]){
-		m_free_slots[m_first_free_slot] = true;
-		return m_first_free_slot++;
-	}
-	
-	find_next_free_slot_dev();
-	
-	//NOTE: be warned that we might end up returning MAX_ARRAY_SIZE or greater
-	return m_first_free_slot++;
-}
-
-__host__ void PhysRunner::free_slot_host(u32 id){
-	m_free_slots[id] = false;
-}
-
-__device__ void PhysRunner::free_slot_dev(u32 id){
+__host__ __device__ void PhysRunner::free_slot(u32 id){
 	m_free_slots[id] = false;
 }
 
@@ -211,23 +246,11 @@ __host__ __device__ physBody::physBody(){
 }
 
 __host__ __device__ PhysObject::PhysObject(PhysRunner* p) : m_runner(p){
-	#if __CUDA_ARCH__
-		// device code
-		m_objid = m_runner->get_slot_dev();
-	#elif !defined(__CUDA_ARCH__)
-		// host code
-		m_objid = m_runner->get_slot_host();
-	#endif
+	m_objid = m_runner->get_slot();
 }
 
 __host__ __device__ PhysObject::~PhysObject(){
-	#if __CUDA_ARCH__
-		// device code
-		m_runner->free_slot_dev(m_objid);
-	#elif !defined(__CUDA_ARCH__)
-		// host code
-		m_runner->free_slot_host(m_objid);
-	#endif
+	m_runner->free_slot(m_objid);
 }
 
 __host__ __device__ vec2 PhysObject::get_cur_pos(){

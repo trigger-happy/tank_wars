@@ -94,7 +94,7 @@ class PhysRunner{
 public:
 	PhysRunner();
 	~PhysRunner();
-	void initialize();
+// 	void initialize();
 	void timestep(f32 dt);
 	
 	/*
@@ -111,13 +111,13 @@ private:
 	
 private:
 	friend class PhysObject;
-	u32 get_slot_host();
-	void free_slot_host(u32 id);
-	void find_next_free_slot_host();
+	u32 get_slot();
+	void free_slot(u32 id);
+	void find_next_free_slot();
 	
-	u32 get_slot_dev();
-	void free_slot_dev(u32 id);
-	void find_next_free_slot_dev();
+// 	u32 get_slot_dev();
+// 	void free_slot_dev(u32 id);
+// 	void find_next_free_slot_dev();
 	
 private:
 	physBody					m_bodies;
