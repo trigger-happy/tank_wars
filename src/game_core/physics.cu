@@ -51,18 +51,7 @@ __host__ PhysRunner::PhysRunner()
 }
 
 __host__ PhysRunner::~PhysRunner(){
-	// 	cudaFree(m_pdevbodies);
-	// 	cudaFree(m_pdevshapes);
 }
-
-// __host__ void PhysRunner::initialize(){
-// 	// initialize the device memory
-// 	cudaMalloc(reinterpret_cast<void**>(&m_pdevbodies), sizeof(physBody));
-// 	cudaMalloc(reinterpret_cast<void**>(&m_pdevshapes), sizeof(physShape));
-// 	
-// 	// copy over to the gpu
-// 	copy_to_device();
-// }
 
 __host__ __device__ void update_verlet(f32 dt,
 							  physBody* bodies,
@@ -155,36 +144,11 @@ __host__ __device__ void update_verlet(f32 dt,
 }
 
 __host__ __device__ void PhysRunner::timestep(f32 dt){
-	// 	if(m_update_dev_mem){
-	// 		copy_to_device();
-	// 		m_update_dev_mem = false;
-	// 	}
-	
 	// convert from millisecond to seconds
 	dt /= 1000.0f;
 	
 	update_verlet(dt, &m_bodies, &m_shapes);
-	
-	// 	copy_from_device();
 }
-
-/*
-__host__ void PhysRunner::copy_from_device(){
-	cudaMemcpy(&m_hostbodies, m_pdevbodies, sizeof(physBody),
-	cudaMemcpyDeviceToHost);
-	
-	cudaMemcpy(&m_hostshapes, m_pdevshapes, sizeof(physShape),
-	cudaMemcpyDeviceToHost);
-	}
-	
-	__host__ void PhysRunner::copy_to_device(){
-		cudaMemcpy(m_pdevbodies, &m_hostbodies, sizeof(physBody),
-		cudaMemcpyHostToDevice);
-		
-		cudaMemcpy(m_pdevshapes, &m_hostshapes, sizeof(physShape),
-		cudaMemcpyHostToDevice);
-	}
-*/
 
 __host__ __device__ void PhysRunner::find_next_free_slot(){
 	// keep incrementing 
@@ -196,17 +160,6 @@ __host__ __device__ void PhysRunner::find_next_free_slot(){
 	}
 	m_first_free_slot = MAX_ARRAY_SIZE;
 }
-
-// __device__ void PhysRunner::find_next_free_slot_dev(){
-// 	// keep incrementing 
-// 	for(u32 i = 0; i < MAX_ARRAY_SIZE; ++i){
-// 		if(!m_free_slots[i]){
-// 			m_first_free_slot = i;
-// 			return;
-// 		}
-// 	}
-// 	m_first_free_slot = MAX_ARRAY_SIZE;
-// }
 
 __host__ __device__ u32 PhysRunner::get_slot(){
 	if(!m_free_slots[m_first_free_slot]){
