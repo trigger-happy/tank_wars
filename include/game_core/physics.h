@@ -97,26 +97,34 @@ public:
 	void initialize();
 	void timestep(f32 dt);
 	
+	/*
 	inline void update_dev_mem(){
 		m_update_dev_mem = true;
 	}
+	*/
 	
 private:
+	/*
 	void copy_from_device();
 	void copy_to_device();
+	*/
 	
 private:
 	friend class PhysObject;
-	u32 get_slot();
-	void free_slot(u32 id);
-	void find_next_free_slot();
+	u32 get_slot_host();
+	void free_slot_host(u32 id);
+	void find_next_free_slot_host();
+	
+	u32 get_slot_dev();
+	void free_slot_dev(u32 id);
+	void find_next_free_slot_dev();
 	
 private:
-	physBody					m_hostbodies;
-	physShape					m_hostshapes;
-	physBody*					m_pdevbodies;
-	physShape*					m_pdevshapes;
-	bool						m_update_dev_mem;
+	physBody					m_bodies;
+	physShape					m_shapes;
+	//physBody*					m_pdevbodies;
+	//physShape*				m_pdevshapes;
+	//bool						m_update_dev_mem;
 	std::bitset<MAX_ARRAY_SIZE>	m_free_slots;
 	u32							m_first_free_slot;
 };
