@@ -47,6 +47,8 @@ void GSGame::onFrameUpdate(double dt,
 	
 	//TODO: code here for handling the keyboard controls
 	
-	//TODO: code here for updating the game state
+	// update the game state
+	//TODO: add support for running on the gpu when possible.
+	m_physrunner->timestep(dt);
 }
 
