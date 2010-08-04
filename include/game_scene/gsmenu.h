@@ -18,9 +18,12 @@
 #define GSMENU_H
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
+#include <boost/scoped_ptr.hpp>
 #include "game_scene/igamescene.h"
-#include "game_scene/gslobby.h"
 #include "ui/button.h"
+
+class GSOptions;
+class GSLobby;
 
 class GSMenu : public iGameScene{
 public:
@@ -40,7 +43,8 @@ private:
 	Button m_option_btn;
 	Button m_quit_btn;
 	
-	GSLobby* m_gslobby;
+	boost::scoped_ptr<GSLobby> m_gslobby;
+	boost::scoped_ptr<GSOptions> m_gsoptions;
 };
 
 #endif // GSMENU_H
