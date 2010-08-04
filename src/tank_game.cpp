@@ -22,6 +22,7 @@
 #include <ClanLib/application.h>
 #include <boost/lambda/lambda.hpp>
 #include <boost/timer.hpp>
+#include <boost/scoped_ptr.hpp>
 #include "game_display.h"
 
 #include "game_scene/igamescene.h"
@@ -61,7 +62,7 @@ int GameDisplay::main(){
 	CL_SetupDisplay setup_display;
 	CL_SetupGL setup_gl;
 	
-	GSMenu* menu_scene = NULL;
+	boost::scoped_ptr<GSMenu> menu_scene;
 	
 	try{
 		CL_DisplayWindow window("TankWars", 800, 600);
@@ -71,8 +72,8 @@ int GameDisplay::main(){
 		CL_InputDevice& mouse = window.get_ic().get_mouse();
 		
 		CL_ResourceManager resources("resources/game_resource.xml");
-		menu_scene = new GSMenu(gc, resources);
-		s_scene_stack.push(menu_scene);
+		menu_scene.reset(new GSMenu(gc, resources));
+		s_scene_stack.push(menu_scene.get());
 		
 		while(!keyboard.get_keycode(CL_KEY_ESCAPE) && s_running){
 			// restart the frame timer
@@ -114,7 +115,6 @@ int GameDisplay::main(){
 		console.display_close_message();
 		return -1;
 	}
-	delete menu_scene;
 }
 
 int main(int argc, char* argv[]){

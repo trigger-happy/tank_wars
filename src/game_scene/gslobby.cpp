@@ -21,7 +21,7 @@ GSLobby::GSLobby(CL_GraphicContext& gc, CL_ResourceManager& resources){
 	CL_FontDescription desc;
 	desc.set_typeface_name("tahoma");
 	desc.set_height(32);
-	m_font = new CL_Font_System(gc, desc);
+	m_font.reset(new CL_Font_System(gc, desc));
 	m_xpos = gc.get_width()/2-100;
 	m_ypos = gc.get_height()/4;
 	m_playbtn.initialize(gc, resources, "game_lobby/play_btn",
@@ -31,10 +31,6 @@ GSLobby::GSLobby(CL_GraphicContext& gc, CL_ResourceManager& resources){
 }
 
 GSLobby::~GSLobby(){
-	if(m_font){
-		delete m_font;
-		m_font = NULL;
-	}
 }
 
 void GSLobby::onFrameUpdate(double dt,

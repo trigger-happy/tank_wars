@@ -18,6 +18,7 @@
 #define GSLOBBY_H
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
+#include <boost/scoped_ptr.hpp>
 #include "igamescene.h"
 #include "ui/button.h"
 
@@ -34,7 +35,7 @@ public:
 	virtual void onSceneDeactivate();
 	
 private:
-	CL_Font_System* m_font;
+	boost::scoped_ptr<CL_Font_System> m_font;
 	int m_xpos;
 	int m_ypos;
 	Button m_playbtn;

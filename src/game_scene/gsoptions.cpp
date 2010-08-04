@@ -21,15 +21,11 @@ GSOptions::GSOptions(CL_GraphicContext& gc, CL_ResourceManager& resources){
 	CL_FontDescription desc;
 	desc.set_typeface_name("tahoma");
 	desc.set_height(32);
-	m_font = new CL_Font_System(gc, desc);
+	m_font.reset(new CL_Font_System(gc, desc));
 	//TODO: add more code here for initializing the scene
 }
 
 GSOptions::~GSOptions(){
-	if(m_font){
-		delete m_font;
-		m_font = NULL;
-	}
 }
 
 void GSOptions::onFrameUpdate(double dt,
