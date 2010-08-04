@@ -16,12 +16,13 @@
     License along with this library; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-
-
 #include "game_scene/gsgame.h"
+#include "game_core/physics.h"
 
-GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources){
-	
+using namespace Physics;
+
+GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
+: m_physrunner(new PhysRunner()){
 }
 
 GSGame::~GSGame(){
@@ -36,12 +37,16 @@ void GSGame::onSceneActivate(){
 }
 
 void GSGame::onFrameRender(CL_GraphicContext* gc){
-
+	//TODO: code here for rendering the entire scene
 }
 
 void GSGame::onFrameUpdate(double dt,
 						   CL_InputDevice* keyboard,
 						   CL_InputDevice* mouse){
-
+	//TODO: code here for AI update
+	
+	//TODO: code here for handling the keyboard controls
+	
+	//TODO: code here for updating the game state
 }
 

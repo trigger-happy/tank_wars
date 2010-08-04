@@ -22,8 +22,12 @@
 #define GSGAME_H
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
+#include <boost/scoped_ptr.hpp>
 #include "game_scene/igamescene.h"
 
+namespace Physics{
+	class PhysRunner;
+}
 
 class GSGame : public iGameScene{
 public:
@@ -37,7 +41,7 @@ public:
 							   CL_InputDevice* keyboard,
 							   CL_InputDevice* mouse);
 private:
-	//TODO: game specific stuff here
+	boost::scoped_ptr<Physics::PhysRunner> m_physrunner;
 };
 
 #endif // GSGAME_H

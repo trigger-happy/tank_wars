@@ -43,7 +43,8 @@ void GSLobby::onFrameUpdate(double dt,
 			// do nothing
 			break;
 		case 1:
-			//TODO: start the game
+			// start the game
+			GameDisplay::push_scene(m_gsgame.get());
 			break;
 		case 2:
 			// do nothing
