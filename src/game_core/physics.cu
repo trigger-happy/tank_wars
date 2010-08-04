@@ -221,6 +221,7 @@ __host__ __device__ u32 PhysRunner::get_slot(){
 		assert(m_first_free_slot < MAX_ARRAY_SIZE);
 	#endif
 	
+	//NOTE: be warned that we might be returning MAX_ARRAY_SIZE or greater
 	return m_first_free_slot++;
 }
 
@@ -230,19 +231,11 @@ __host__ __device__ void PhysRunner::free_slot(u32 id){
 
 
 __host__ __device__ physBody::physBody(){
-	#if __CUDA_ARCH__
-		// device code
-		for(int i = 0; i < MAX_ARRAY_SIZE; ++i){
-			rotation[i] = 0;
-			max_vel[i] = 0;
-			can_collide[i] = false;
-		}
-	#elif !defined(__CUDA_ARCH__)
-		// host code
-		std::fill(rotation, rotation + MAX_ARRAY_SIZE, 0);
-		std::fill(max_vel, max_vel + MAX_ARRAY_SIZE, 0);
-		std::fill(can_collide, can_collide + MAX_ARRAY_SIZE, false);
-	#endif
+	for(int i = 0; i < MAX_ARRAY_SIZE; ++i){
+		rotation[i] = 0;
+		max_vel[i] = 0;
+		can_collide[i] = false;
+	}
 }
 
 __host__ __device__ PhysObject::PhysObject(PhysRunner* p) : m_runner(p){
@@ -286,55 +279,25 @@ __host__ __device__ bool PhysObject::is_collidable(){
 }
 
 __host__ __device__ void PhysObject::set_cur_pos(const vec2& pos){
-	#if __CUDA_ARCH__
-		//TODO: code here for device path
-	#elif !defined(__CUDA_ARCH__)
-		// host path
-		m_runner->m_bodies.cur_pos.x[m_objid] = pos.x;
-		m_runner->m_bodies.cur_pos.y[m_objid] = pos.y;
-		m_runner->m_bodies.old_pos.x[m_objid] = pos.x;
-		m_runner->m_bodies.old_pos.y[m_objid] = pos.y;
-// 		m_runner->update_dev_mem();
-	#endif
+	m_runner->m_bodies.cur_pos.x[m_objid] = pos.x;
+	m_runner->m_bodies.cur_pos.y[m_objid] = pos.y;
+	m_runner->m_bodies.old_pos.x[m_objid] = pos.x;
+	m_runner->m_bodies.old_pos.y[m_objid] = pos.y;
 }
 
 __host__ __device__ void PhysObject::set_acceleration(const vec2& accel){
-	#if __CUDA_ARCH__
-		//TODO: code here for device path
-	#elif !defined(__CUDA_ARCH__)
-		// host path
-		m_runner->m_bodies.acceleration.x[m_objid] = accel.x;
-		m_runner->m_bodies.acceleration.y[m_objid] = accel.y;
-// 		m_runner->update_dev_mem();
-	#endif
+	m_runner->m_bodies.acceleration.x[m_objid] = accel.x;
+	m_runner->m_bodies.acceleration.y[m_objid] = accel.y;
 }
 
 __host__ __device__ void PhysObject::set_rotation(f32 r){
-	#if __CUDA_ARCH__
-		//TODO: code here for device path
-	#elif !defined(__CUDA_ARCH__)
-		// host path
-		m_runner->m_bodies.rotation[m_objid] = r;
-// 		m_runner->update_dev_mem();
-	#endif
+	m_runner->m_bodies.rotation[m_objid] = r;
 }
 
 __host__ __device__ void PhysObject::set_max_velocity(f32 mv){
-	#if __CUDA_ARCH__
-		//TODO: code here for device path
-	#elif !defined(__CUDA_ARCH__)
-		// host path
-		m_runner->m_bodies.max_vel[m_objid] = mv;
-// 		m_runner->update_dev_mem();
-	#endif
+	m_runner->m_bodies.max_vel[m_objid] = mv;
 }
 
 __host__ __device__ void PhysObject::should_collide(bool f){
-	#if __CUDA_ARCH__
-		//TODO: code here for device path
-	#elif !defined(__CUDA_ARCH__)
-		// host path
-		m_runner->m_bodies.can_collide[m_objid] = f;
-// 		m_runner->update_dev_mem();
-	#endif
+	m_runner->m_bodies.can_collide[m_objid] = f;
 }
