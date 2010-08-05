@@ -24,6 +24,7 @@
 #include <boost/timer.hpp>
 #include <boost/scoped_ptr.hpp>
 #include "game_display.h"
+#include "types.h"
 
 #include "game_scene/igamescene.h"
 
@@ -83,7 +84,7 @@ int GameDisplay::main(){
 			if(!s_scene_stack.empty()){
 				// use the real delta time if the frame rate is slow
 				// otherwise, we hard lock to default frame rate
-				double dt = FRAME_TIME;
+				f32 dt = FRAME_TIME;
 				if(s_deltatime > FRAME_TIME){
 					dt = s_deltatime;
 				}
@@ -102,10 +103,11 @@ int GameDisplay::main(){
 			CL_KeepAlive::process();
 			
 			// get the elapsed frame time
-			s_deltatime = s_frame_timer.elapsed()*1000.0;
+			s_deltatime = s_frame_timer.elapsed()*1000;
 			
 			// sleep until we reach the next frame time iteration
-			//CL_System::sleep(FRAME_TIME - s_deltatime);
+			//NOTE: this seems to be buggy in windows
+			CL_System::sleep(FRAME_TIME - s_deltatime);
 		}
 	}catch(CL_Exception& e){
 		CL_ConsoleWindow console("error console", 80, 160);

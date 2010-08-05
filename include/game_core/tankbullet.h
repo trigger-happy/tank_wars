@@ -61,6 +61,13 @@ public:
 	*/
 	CUDA_EXPORT void deactivate(bullet_id bid);
 	
+	/*!
+	Get the current position of the bullet
+	\param bid The bullet to query
+	\return A vector containing the bullet's position
+	*/
+	CUDA_EXPORT Physics::vec2 get_bullet_pos(bullet_id bid);
+	
 	//TODO: add more stuff here
 private:
 	Physics::PhysRunner* m_runner;

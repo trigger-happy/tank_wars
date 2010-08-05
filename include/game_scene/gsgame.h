@@ -22,6 +22,7 @@
 #include <ClanLib/display.h>
 #include <boost/scoped_ptr.hpp>
 #include "game_scene/igamescene.h"
+#include "game_core/tankbullet.h"
 #include "types.h"
 
 namespace Physics{
@@ -42,8 +43,8 @@ public:
 private:
 	boost::scoped_ptr<Physics::PhysRunner> m_physrunner;
 	boost::scoped_ptr<CL_Sprite> m_background;
-	std::vector<u32> m_tanks;
-	std::vector<u32> m_bullets;
+	boost::scoped_ptr<CL_Sprite> m_testbullet;
+	TankBullet m_bullets;
 };
 
 #endif // GSGAME_H

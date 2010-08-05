@@ -46,7 +46,12 @@
 	
 	<section name="game_assets">
 		<sprite name="background">
-			<image file="/game_assets/graphics/background.png" />
+			<image file="game_assets/graphics/background.png" />
+			<translation origin="center" />
+		</sprite>
+		
+		<sprite name="bullet">
+			<image file="game_assets/graphics/bullet.png" />
 			<translation origin="center" />
 		</sprite>
 	</section>

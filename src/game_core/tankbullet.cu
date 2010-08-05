@@ -19,10 +19,9 @@
 
 #define OFFSCREEN_X 	-800
 #define OFFSCREEN_Y 	800
-#define MAX_VELOCITY	10.0f
 
 #define MAX_BULLET_RANGE	 		30.0f
-#define MAX_BULLET_VELOCITY 		15.0f
+#define MAX_BULLET_VELOCITY 		20.0f
 #define INITIAL_BULLET_ACCELERATION 1000.0f
 
 using namespace Physics;
@@ -32,6 +31,7 @@ void TankBullet::initialize(PhysRunner* p){
 	//TODO: allocate all the bullet objects we need
 	for(int i = 0; i < NUM_BULLETS; ++i){
 		m_ids[i] = m_runner->create_object();
+		deactivate(i);
 	}
 }
 
@@ -90,10 +90,14 @@ void TankBullet::deactivate(bullet_id bid){
 	params.y = OFFSCREEN_Y;
 	m_runner->set_cur_pos(bid, params);
 	
-	m_runner->set_max_velocity(bid, MAX_VELOCITY);
+	m_runner->set_max_velocity(bid, MAX_BULLET_VELOCITY);
 	
 	params.x = 0;
 	params.y = 0;
 	m_runner->set_acceleration(bid, params);
 	m_state[bid] = STATE_INACTIVE;
+}
+
+vec2 TankBullet::get_bullet_pos(bullet_id bid){
+	return m_runner->get_cur_pos(m_ids[bid]);
 }
