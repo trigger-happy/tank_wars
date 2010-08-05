@@ -47,6 +47,10 @@ struct vec2_array{
 #define SHAPE_CIRCLE	1
 #define SHAPE_QUAD		2
 
+typedef u32 pBody;
+typedef u32 shape_type;
+
+
 struct physBody{
 	physBody();
 	
@@ -70,34 +74,6 @@ struct physBody{
 	vec2_array	dimension;
 };
 
-// forward declaration
-class PhysRunner;
-
-namespace PhysObject{
-	
-	u32 create_object(PhysRunner* pr);
-	void destroy_object(PhysRunner* pr, u32 oid);
-	
-	vec2 get_cur_pos(PhysRunner* pr, u32 oid);
-	vec2 get_acceleration(PhysRunner* pr, u32 oid);
-	f32 get_rotation(PhysRunner* pr, u32 oid);
-	f32 get_max_velocity(PhysRunner* pr, u32 oid);
-	bool is_collidable(PhysRunner* pr, u32 oid);
-	u32 get_shape_type(PhysRunner* pr, u32 oid);
-	u32 get_user_data(PhysRunner* pr, u32 oid);
-	vec2 get_dimensions(PhysRunner* pr, u32 oid);
-	
-	void set_cur_pos(PhysRunner* pr, u32 oid, const vec2& pos);
-	void set_acceleration(PhysRunner* pr, u32 oid, const vec2& accel);
-	void set_rotation(PhysRunner* pr, u32 oid, f32 r);
-	void set_max_velocity(PhysRunner* pr, u32 oid, f32 mv);
-	void set_shape_type(PhysRunner* pr, u32 oid, u32 st);
-	void set_user_data(PhysRunner* pr, u32 oid, u32 ud);
-	void set_dimensions(PhysRunner* pr, u32 oid, const vec2& dim);
-	
-	void should_collide(PhysRunner* pr, u32 oid, bool f);
-	
-};
 
 class PhysRunner{
 public:
@@ -105,14 +81,36 @@ public:
 	~PhysRunner();
 	void timestep(f32 dt);
 
+	
+	pBody create_object();
+	void destroy_object(pBody bd);
+	
+	vec2 get_cur_pos(pBody bd);
+	vec2 get_acceleration(pBody bd);
+	f32 get_rotation(pBody bd);
+	f32 get_max_velocity(pBody bd);
+	bool is_collidable(pBody bd);
+	shape_type get_shape_type(pBody bd);
+	u32 get_user_data(pBody bd);
+	vec2 get_dimensions(pBody bd);
+	
+	void set_cur_pos(pBody bd, const vec2& pos);
+	void set_acceleration(pBody bd, const vec2& accel);
+	void set_rotation(pBody bd, f32 r);
+	void set_max_velocity(pBody bd, f32 mv);
+	void set_shape_type(pBody bd, shape_type st);
+	void set_user_data(pBody bd, u32 ud);
+	void set_dimensions(pBody bd, const vec2& dim);
+	
+	void should_collide(pBody bd, bool f);
+	
+private:
 	u32 get_slot();
 	void free_slot(u32 id);
 	void find_next_free_slot();
 	
-	// list of bodies. Not private due to CUDA limitations
-	physBody					m_bodies;
-	
 private:
+	physBody					m_bodies;
 	//physBody*					m_pdevbodies;
 	//physShape*				m_pdevshapes;
 	//bool						m_update_dev_mem;

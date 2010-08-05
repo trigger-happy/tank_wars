@@ -191,105 +191,100 @@ __host__ __device__ physBody::physBody(){
 	}
 }
 
-__host__ __device__ u32 PhysObject::create_object(PhysRunner* pr){
-	return pr->get_slot();
+__host__ __device__ pBody PhysRunner::create_object(){
+	return get_slot();
 }
 
-__host__ __device__ void PhysObject::destroy_object(PhysRunner* pr, u32 oid){
-	pr->free_slot(oid);
+__host__ __device__ void PhysRunner::destroy_object(pBody oid){
+	free_slot(oid);
 }
 
-__host__ __device__ vec2 PhysObject::get_cur_pos(PhysRunner* pr, u32 oid){
+__host__ __device__ vec2 PhysRunner::get_cur_pos(pBody oid){
 	vec2 temp;
-	temp.x = pr->m_bodies.cur_pos.x[oid];
-	temp.y = pr->m_bodies.cur_pos.y[oid];
+	temp.x = m_bodies.cur_pos.x[oid];
+	temp.y = m_bodies.cur_pos.y[oid];
 	return temp;
 }
 
-__host__ __device__ vec2 PhysObject::get_acceleration(PhysRunner* pr, u32 oid){
+__host__ __device__ vec2 PhysRunner::get_acceleration(pBody oid){
 	vec2 temp;
-	temp.x = pr->m_bodies.acceleration.x[oid];
-	temp.y = pr->m_bodies.acceleration.y[oid];
+	temp.x = m_bodies.acceleration.x[oid];
+	temp.y = m_bodies.acceleration.y[oid];
 	return temp;
 }
 
-__host__ __device__ f32 PhysObject::get_rotation(PhysRunner* pr, u32 oid){
+__host__ __device__ f32 PhysRunner::get_rotation(pBody oid){
 	f32 rot = 0;
-	rot = pr->m_bodies.rotation[oid];
+	rot = m_bodies.rotation[oid];
 	return rot;
 }
 
-__host__ __device__ f32 PhysObject::get_max_velocity(PhysRunner* pr, u32 oid){
+__host__ __device__ f32 PhysRunner::get_max_velocity(pBody oid){
 	f32 mv = 0;
-	mv = pr->m_bodies.rotation[oid];
+	mv = m_bodies.rotation[oid];
 	return mv;
 }
 
-__host__ __device__ bool PhysObject::is_collidable(PhysRunner* pr, u32 oid){
+__host__ __device__ bool PhysRunner::is_collidable(pBody oid){
 	bool f = false;
-	f = pr->m_bodies.can_collide[oid];
+	f = m_bodies.can_collide[oid];
 	return f;
 }
 
-__host__ __device__ u32 PhysObject::get_shape_type(PhysRunner* pr, u32 oid){
+__host__ __device__ u32 PhysRunner::get_shape_type(pBody oid){
 	u32 st = 0;
-	st = pr->m_bodies.shape_type[oid];
+	st = m_bodies.shape_type[oid];
 	return st;
 }
 
-__host__ __device__ u32 PhysObject::get_user_data(PhysRunner* pr, u32 oid){
+__host__ __device__ u32 PhysRunner::get_user_data(pBody oid){
 	u32 ud = 0;
-	ud = pr->m_bodies.user_data[oid];
+	ud = m_bodies.user_data[oid];
 	return ud;
 }
 
-__host__ __device__ vec2 PhysObject::get_dimensions(PhysRunner* pr, u32 oid){
+__host__ __device__ vec2 PhysRunner::get_dimensions(pBody oid){
 	vec2 dim;
-	dim = pr->m_bodies.dimension.get_vec2(oid);
+	dim = m_bodies.dimension.get_vec2(oid);
 	return dim;
 }
 
-__host__ __device__ void PhysObject::set_cur_pos(PhysRunner* pr, u32 oid,
+__host__ __device__ void PhysRunner::set_cur_pos(pBody oid,
 												 const Physics::vec2& pos){
-	pr->m_bodies.cur_pos.x[oid] = pos.x;
-	pr->m_bodies.cur_pos.y[oid] = pos.y;
-	pr->m_bodies.old_pos.x[oid] = pos.x;
-	pr->m_bodies.old_pos.y[oid] = pos.y;
+	m_bodies.cur_pos.x[oid] = pos.x;
+	m_bodies.cur_pos.y[oid] = pos.y;
+	m_bodies.old_pos.x[oid] = pos.x;
+	m_bodies.old_pos.y[oid] = pos.y;
 }
 
-__host__ __device__ void PhysObject::set_acceleration(PhysRunner* pr, u32 oid,
+__host__ __device__ void PhysRunner::set_acceleration(pBody oid,
 													  const Physics::vec2& accel){
-	pr->m_bodies.acceleration.x[oid] = accel.x;
-	pr->m_bodies.acceleration.y[oid] = accel.y;
+	m_bodies.acceleration.x[oid] = accel.x;
+	m_bodies.acceleration.y[oid] = accel.y;
 }
 
-__host__ __device__ void PhysObject::set_rotation(PhysRunner* pr,
-												  u32 oid, f32 r){
-	pr->m_bodies.rotation[oid] = r;
+__host__ __device__ void PhysRunner::set_rotation(pBody oid, f32 r){
+	m_bodies.rotation[oid] = r;
 }
 
-__host__ __device__ void PhysObject::set_max_velocity(PhysRunner* pr,
-													  u32 oid, f32 mv){
-	pr->m_bodies.max_vel[oid] = mv;
+__host__ __device__ void PhysRunner::set_max_velocity(pBody oid, f32 mv){
+	m_bodies.max_vel[oid] = mv;
 }
 
-__host__ __device__ void PhysObject::should_collide(PhysRunner* pr,
-													u32 oid, bool f){
-	pr->m_bodies.can_collide[oid] = f;
+__host__ __device__ void PhysRunner::should_collide(pBody oid, bool f){
+	m_bodies.can_collide[oid] = f;
 }
 
-__host__ __device__ void PhysObject::set_shape_type(PhysRunner* pr,
-													u32 oid, u32 st){
-	pr->m_bodies.shape_type[oid] = st;
+__host__ __device__ void PhysRunner::set_shape_type(pBody oid, u32 st){
+	m_bodies.shape_type[oid] = st;
 }
 
-__host__ __device__ void PhysObject::set_user_data(PhysRunner* pr,
-												   u32 oid, u32 ud){
-	pr->m_bodies.user_data[oid] = ud;
+__host__ __device__ void PhysRunner::set_user_data(pBody oid, u32 ud){
+	m_bodies.user_data[oid] = ud;
 }
 
-__host__ __device__ void PhysObject::set_dimensions(PhysRunner* pr, u32 oid,
+__host__ __device__ void PhysRunner::set_dimensions(pBody oid,
 													const Physics::vec2& dim){
-	pr->m_bodies.dimension.x[oid] = dim.x;
-	pr->m_bodies.dimension.y[oid] = dim.y;
+	m_bodies.dimension.x[oid] = dim.x;
+	m_bodies.dimension.y[oid] = dim.y;
 }
