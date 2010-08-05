@@ -43,4 +43,11 @@
 			<translation origin="center" />
 		</sprite>
 	</section>
+	
+	<section name="game_assets">
+		<sprite name="background">
+			<image file="/game_assets/graphics/background.png" />
+			<translation origin="center" />
+		</sprite>
+	</section>
 </resources>

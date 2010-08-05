@@ -23,6 +23,9 @@ using namespace Physics;
 
 GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
 : m_physrunner(new PhysRunner()){
+	m_background.reset(new CL_Sprite(gc,
+									 "game_assets/background",
+									 &resources));
 }
 
 GSGame::~GSGame(){
@@ -38,6 +41,7 @@ void GSGame::onSceneActivate(){
 
 void GSGame::onFrameRender(CL_GraphicContext* gc){
 	//TODO: code here for rendering the entire scene
+	m_background->draw(*gc, gc->get_width()/2, gc->get_height()/2);
 }
 
 void GSGame::onFrameUpdate(double dt,
@@ -50,5 +54,8 @@ void GSGame::onFrameUpdate(double dt,
 	// update the game state
 	//TODO: add support for running on the gpu when possible.
 	m_physrunner->timestep(dt);
+	
+	// update the sprites
+	m_background->update();
 }
 

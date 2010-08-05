@@ -42,6 +42,7 @@ public:
 							   CL_InputDevice* mouse);
 private:
 	boost::scoped_ptr<Physics::PhysRunner> m_physrunner;
+	boost::scoped_ptr<CL_Sprite> m_background;
 };
 
 #endif // GSGAME_H
