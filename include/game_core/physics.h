@@ -19,9 +19,9 @@
 #include <cuda.h>
 #include <bitset>
 #include "types.h"
+#include "exports.h"
 
 #define MAX_ARRAY_SIZE 256
-#define MAX_VERTICES 4
 
 namespace Physics{
 	
@@ -36,8 +36,8 @@ struct vec2{
 };
 
 struct vec2_array{
-	vec2_array();
-	vec2 get_vec2(u32 id);
+	CUDA_EXPORT vec2_array();
+	CUDA_EXPORT vec2 get_vec2(u32 id);
 	
 	f32 x[MAX_ARRAY_SIZE];
 	f32 y[MAX_ARRAY_SIZE];
@@ -52,7 +52,7 @@ typedef u32 shape_type;
 
 
 struct physBody{
-	physBody();
+	CUDA_EXPORT physBody();
 	
 	vec2_array	old_pos;
 	vec2_array	cur_pos;
@@ -77,37 +77,37 @@ struct physBody{
 
 class PhysRunner{
 public:
-	PhysRunner();
-	~PhysRunner();
-	void timestep(f32 dt);
+	CUDA_HOST PhysRunner();
+	CUDA_HOST ~PhysRunner();
+	CUDA_EXPORT void timestep(f32 dt);
 
 	
-	pBody create_object();
-	void destroy_object(pBody bd);
+	CUDA_EXPORT pBody create_object();
+	CUDA_EXPORT void destroy_object(pBody bd);
 	
-	vec2 get_cur_pos(pBody bd);
-	vec2 get_acceleration(pBody bd);
-	f32 get_rotation(pBody bd);
-	f32 get_max_velocity(pBody bd);
-	bool is_collidable(pBody bd);
-	shape_type get_shape_type(pBody bd);
-	u32 get_user_data(pBody bd);
-	vec2 get_dimensions(pBody bd);
+	CUDA_EXPORT vec2 get_cur_pos(pBody bd);
+	CUDA_EXPORT vec2 get_acceleration(pBody bd);
+	CUDA_EXPORT f32 get_rotation(pBody bd);
+	CUDA_EXPORT f32 get_max_velocity(pBody bd);
+	CUDA_EXPORT bool is_collidable(pBody bd);
+	CUDA_EXPORT shape_type get_shape_type(pBody bd);
+	CUDA_EXPORT u32 get_user_data(pBody bd);
+	CUDA_EXPORT vec2 get_dimensions(pBody bd);
 	
-	void set_cur_pos(pBody bd, const vec2& pos);
-	void set_acceleration(pBody bd, const vec2& accel);
-	void set_rotation(pBody bd, f32 r);
-	void set_max_velocity(pBody bd, f32 mv);
-	void set_shape_type(pBody bd, shape_type st);
-	void set_user_data(pBody bd, u32 ud);
-	void set_dimensions(pBody bd, const vec2& dim);
+	CUDA_EXPORT void set_cur_pos(pBody bd, const vec2& pos);
+	CUDA_EXPORT void set_acceleration(pBody bd, const vec2& accel);
+	CUDA_EXPORT void set_rotation(pBody bd, f32 r);
+	CUDA_EXPORT void set_max_velocity(pBody bd, f32 mv);
+	CUDA_EXPORT void set_shape_type(pBody bd, shape_type st);
+	CUDA_EXPORT void set_user_data(pBody bd, u32 ud);
+	CUDA_EXPORT void set_dimensions(pBody bd, const vec2& dim);
 	
-	void should_collide(pBody bd, bool f);
+	CUDA_EXPORT void should_collide(pBody bd, bool f);
 	
 private:
-	u32 get_slot();
-	void free_slot(u32 id);
-	void find_next_free_slot();
+	CUDA_EXPORT u32 get_slot();
+	CUDA_EXPORT void free_slot(u32 id);
+	CUDA_EXPORT void find_next_free_slot();
 	
 private:
 	physBody					m_bodies;

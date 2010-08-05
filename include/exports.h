@@ -13,23 +13,23 @@
 	the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 	Boston, MA 02110-1301, USA.
 */
-#ifndef UTIL_H
-#define UTIL_H
-#define PI 3.1415926535897
-#include "exports.h"
+#ifndef EXPORTS_H
+#define EXPORTS_H
 
-namespace util{
-	
-template<typename T>
-CUDA_EXPORT T degs_to_rads(T degs){
-	return (degs * (PI/180));
-}
+#if __CUDA_ARCH__
 
-template<typename T>
-CUDA_EXPORT T rads_to_degs(T rads){
-	return (rads * (180/PI));
-}
-	
-};
+#define CUDA_EXPORT __host__ __device__
+#define CUDA_HOST __host__
+#define CUDA_DEVICE __device__
+#define CUDA_GLOBAL __global__
 
-#endif // UTIL_H
+#elif !defined(__CUDA_ARCH__)
+
+#define CUDA_EXPORT
+#define CUDA_HOST
+#define CUDA_DEVICE
+#define CUDA_GLOBAL
+
+#endif
+
+#endif //EXPORTS_H

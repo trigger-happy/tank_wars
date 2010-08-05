@@ -24,7 +24,7 @@
 using namespace Physics;
 
 
-__host__ __device__ vec2_array::vec2_array(){
+vec2_array::vec2_array(){
 	#if __CUDA_ARCH__
 		// device code
 		for(int i = 0; i < MAX_ARRAY_SIZE; ++i){
@@ -38,7 +38,7 @@ __host__ __device__ vec2_array::vec2_array(){
 	#endif
 }
 
-__host__ __device__ vec2 vec2_array::get_vec2(u32 id){
+vec2 vec2_array::get_vec2(u32 id){
 	vec2 temp;
 	temp.x = x[id];
 	temp.y = y[id];
@@ -46,14 +46,14 @@ __host__ __device__ vec2 vec2_array::get_vec2(u32 id){
 }
 
 
-__host__ PhysRunner::PhysRunner() 
+PhysRunner::PhysRunner() 
 : m_free_slots(0), m_first_free_slot(0)/*, m_update_dev_mem(false)*/{
 }
 
-__host__ PhysRunner::~PhysRunner(){
+PhysRunner::~PhysRunner(){
 }
 
-__host__ __device__ void update_verlet(f32 dt,
+CUDA_EXPORT void update_verlet(f32 dt,
 							  physBody* bodies){
 	#if __CUDA_ARCH__
 		// device code
@@ -142,14 +142,14 @@ __host__ __device__ void update_verlet(f32 dt,
 	#endif
 }
 
-__host__ __device__ void PhysRunner::timestep(f32 dt){
+void PhysRunner::timestep(f32 dt){
 	// convert from millisecond to seconds
 	dt /= 1000.0f;
 	
 	update_verlet(dt, &m_bodies);
 }
 
-__host__ __device__ void PhysRunner::find_next_free_slot(){
+void PhysRunner::find_next_free_slot(){
 	// keep incrementing 
 	for(u32 i = 0; i < MAX_ARRAY_SIZE; ++i){
 		if(!m_free_slots[i]){
@@ -160,7 +160,7 @@ __host__ __device__ void PhysRunner::find_next_free_slot(){
 	m_first_free_slot = MAX_ARRAY_SIZE;
 }
 
-__host__ __device__ u32 PhysRunner::get_slot(){
+u32 PhysRunner::get_slot(){
 	if(!m_free_slots[m_first_free_slot]){
 		m_free_slots[m_first_free_slot] = true;
 		return m_first_free_slot++;
@@ -177,12 +177,12 @@ __host__ __device__ u32 PhysRunner::get_slot(){
 	return m_first_free_slot++;
 }
 
-__host__ __device__ void PhysRunner::free_slot(u32 id){
+void PhysRunner::free_slot(u32 id){
 	m_free_slots[id] = false;
 }
 
 
-__host__ __device__ physBody::physBody(){
+physBody::physBody(){
 	for(int i = 0; i < MAX_ARRAY_SIZE; ++i){
 		rotation[i] = 0;
 		max_vel[i] = 0;
@@ -191,65 +191,65 @@ __host__ __device__ physBody::physBody(){
 	}
 }
 
-__host__ __device__ pBody PhysRunner::create_object(){
+pBody PhysRunner::create_object(){
 	return get_slot();
 }
 
-__host__ __device__ void PhysRunner::destroy_object(pBody oid){
+void PhysRunner::destroy_object(pBody oid){
 	free_slot(oid);
 }
 
-__host__ __device__ vec2 PhysRunner::get_cur_pos(pBody oid){
+vec2 PhysRunner::get_cur_pos(pBody oid){
 	vec2 temp;
 	temp.x = m_bodies.cur_pos.x[oid];
 	temp.y = m_bodies.cur_pos.y[oid];
 	return temp;
 }
 
-__host__ __device__ vec2 PhysRunner::get_acceleration(pBody oid){
+vec2 PhysRunner::get_acceleration(pBody oid){
 	vec2 temp;
 	temp.x = m_bodies.acceleration.x[oid];
 	temp.y = m_bodies.acceleration.y[oid];
 	return temp;
 }
 
-__host__ __device__ f32 PhysRunner::get_rotation(pBody oid){
+f32 PhysRunner::get_rotation(pBody oid){
 	f32 rot = 0;
 	rot = m_bodies.rotation[oid];
 	return rot;
 }
 
-__host__ __device__ f32 PhysRunner::get_max_velocity(pBody oid){
+f32 PhysRunner::get_max_velocity(pBody oid){
 	f32 mv = 0;
 	mv = m_bodies.rotation[oid];
 	return mv;
 }
 
-__host__ __device__ bool PhysRunner::is_collidable(pBody oid){
+bool PhysRunner::is_collidable(pBody oid){
 	bool f = false;
 	f = m_bodies.can_collide[oid];
 	return f;
 }
 
-__host__ __device__ u32 PhysRunner::get_shape_type(pBody oid){
+u32 PhysRunner::get_shape_type(pBody oid){
 	u32 st = 0;
 	st = m_bodies.shape_type[oid];
 	return st;
 }
 
-__host__ __device__ u32 PhysRunner::get_user_data(pBody oid){
+u32 PhysRunner::get_user_data(pBody oid){
 	u32 ud = 0;
 	ud = m_bodies.user_data[oid];
 	return ud;
 }
 
-__host__ __device__ vec2 PhysRunner::get_dimensions(pBody oid){
+vec2 PhysRunner::get_dimensions(pBody oid){
 	vec2 dim;
 	dim = m_bodies.dimension.get_vec2(oid);
 	return dim;
 }
 
-__host__ __device__ void PhysRunner::set_cur_pos(pBody oid,
+void PhysRunner::set_cur_pos(pBody oid,
 												 const Physics::vec2& pos){
 	m_bodies.cur_pos.x[oid] = pos.x;
 	m_bodies.cur_pos.y[oid] = pos.y;
@@ -257,33 +257,33 @@ __host__ __device__ void PhysRunner::set_cur_pos(pBody oid,
 	m_bodies.old_pos.y[oid] = pos.y;
 }
 
-__host__ __device__ void PhysRunner::set_acceleration(pBody oid,
+void PhysRunner::set_acceleration(pBody oid,
 													  const Physics::vec2& accel){
 	m_bodies.acceleration.x[oid] = accel.x;
 	m_bodies.acceleration.y[oid] = accel.y;
 }
 
-__host__ __device__ void PhysRunner::set_rotation(pBody oid, f32 r){
+void PhysRunner::set_rotation(pBody oid, f32 r){
 	m_bodies.rotation[oid] = r;
 }
 
-__host__ __device__ void PhysRunner::set_max_velocity(pBody oid, f32 mv){
+void PhysRunner::set_max_velocity(pBody oid, f32 mv){
 	m_bodies.max_vel[oid] = mv;
 }
 
-__host__ __device__ void PhysRunner::should_collide(pBody oid, bool f){
+void PhysRunner::should_collide(pBody oid, bool f){
 	m_bodies.can_collide[oid] = f;
 }
 
-__host__ __device__ void PhysRunner::set_shape_type(pBody oid, u32 st){
+void PhysRunner::set_shape_type(pBody oid, u32 st){
 	m_bodies.shape_type[oid] = st;
 }
 
-__host__ __device__ void PhysRunner::set_user_data(pBody oid, u32 ud){
+void PhysRunner::set_user_data(pBody oid, u32 ud){
 	m_bodies.user_data[oid] = ud;
 }
 
-__host__ __device__ void PhysRunner::set_dimensions(pBody oid,
+void PhysRunner::set_dimensions(pBody oid,
 													const Physics::vec2& dim){
 	m_bodies.dimension.x[oid] = dim.x;
 	m_bodies.dimension.y[oid] = dim.y;
