@@ -78,8 +78,6 @@ public:
 	PhysObject(PhysRunner* p);
 	~PhysObject();
 	
-	virtual void on_physics_update() = 0;
-	
 	vec2 get_cur_pos();
 	vec2 get_acceleration();
 	f32 get_rotation();

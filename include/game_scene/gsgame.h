@@ -16,8 +16,6 @@
     License along with this library; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
-
-
 #ifndef GSGAME_H
 #define GSGAME_H
 #include <ClanLib/core.h>
@@ -27,6 +25,7 @@
 
 namespace Physics{
 	class PhysRunner;
+	class PhysObject;
 }
 
 class GSGame : public iGameScene{
@@ -43,6 +42,7 @@ public:
 private:
 	boost::scoped_ptr<Physics::PhysRunner> m_physrunner;
 	boost::scoped_ptr<CL_Sprite> m_background;
+	
 };
 
 #endif // GSGAME_H
