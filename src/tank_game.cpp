@@ -35,9 +35,7 @@
 double					GameDisplay::s_deltatime = 0.0;
 boost::timer			GameDisplay::s_frame_timer;
 std::stack<iGameScene*>	GameDisplay::s_scene_stack;
-
-// bad design, but no choice for the time being. Keep things simple.
-bool					s_running = true;
+bool					GameDisplay::s_running = true;
 
 void GameDisplay::push_scene(iGameScene* scene){
 	if(!s_scene_stack.empty()){

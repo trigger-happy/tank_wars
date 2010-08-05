@@ -97,7 +97,7 @@ void GSMenu::onFrameUpdate(double dt,
 			break;
 		case 1:
 			// quit the game
-			s_running = false;
+			GameDisplay::s_running = false;
 			break;
 		case 2:
 			// do nothing

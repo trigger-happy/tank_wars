@@ -27,6 +27,9 @@ public:
 	static void push_scene(iGameScene* scene);
 	static void pop_scene();
 	
+	
+	static bool s_running;
+	
 private:
 	static boost::timer s_frame_timer;
 	static double s_deltatime;
