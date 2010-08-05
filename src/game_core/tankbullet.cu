@@ -28,9 +28,20 @@ using namespace Physics;
 
 void TankBullet::initialize(PhysRunner* p){
 	m_runner = p;
+	vec2 params;
 	//TODO: allocate all the bullet objects we need
 	for(int i = 0; i < NUM_BULLETS; ++i){
 		m_ids[i] = m_runner->create_object();
+		// set the bullet data
+		m_runner->set_rotation(i, 0);
+		m_runner->set_shape_type(i, SHAPE_CIRCLE);
+		params.x = 2; // y is ignored when shape is circle
+		m_runner->set_dimensions(i, params);
+		
+		//TODO: change the 1 to ENTITY_BULLET
+		m_runner->set_user_data(i, 1);
+		
+		// make it initially inactive
 		deactivate(i);
 	}
 }
@@ -95,6 +106,7 @@ void TankBullet::deactivate(bullet_id bid){
 	params.x = 0;
 	params.y = 0;
 	m_runner->set_acceleration(bid, params);
+	
 	m_state[bid] = STATE_INACTIVE;
 }
 
