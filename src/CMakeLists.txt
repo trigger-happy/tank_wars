@@ -6,9 +6,7 @@ if(CUDA_FOUND)
 	list(APPEND TWGAME_SOURCES
 				twgame_gpu.cu
 				evolvers/evolver_gpu.cu
-				game_core/physics.cu
-				game_core/tankbullet.cu
-				game_core/basictank.cu)
+				game_core/physics.cu)
 				
 	cuda_add_library(twgame ${TWGAME_SOURCES})
 	
