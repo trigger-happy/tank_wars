@@ -43,6 +43,10 @@ struct vec2_array{
 	f32 y[MAX_ARRAY_SIZE];
 };
 
+#define SHAPE_INVALID	0
+#define SHAPE_CIRCLE	1
+#define SHAPE_QUAD		2
+
 struct physBody{
 	physBody();
 	
@@ -53,13 +57,17 @@ struct physBody{
 	f32			max_vel[MAX_ARRAY_SIZE];
 	
 	bool		can_collide[MAX_ARRAY_SIZE];
-};
-
-
-struct physShape{
-	// if radius is 0, it's a quad, if it's greater, it's a circle
-	f32 radius[MAX_ARRAY_SIZE];
-	f32 vertices[MAX_ARRAY_SIZE][MAX_VERTICES];
+	
+	// for defining the shape of the object
+	u32			shape_type[MAX_ARRAY_SIZE];
+	
+	// for custom code (to mark the object as a tank, bullet, etc)
+	u32			user_data[MAX_ARRAY_SIZE];
+	
+	// x is width and y is height for quad
+	// x is the radius and y is ignored for circle
+	// totally irrelevant if SHAPE_INVALID
+	vec2_array	dimension;
 };
 
 // forward declaration
@@ -77,11 +85,17 @@ public:
 	f32 get_rotation();
 	f32 get_max_velocity();
 	bool is_collidable();
+	u32 get_shape_type();
+	u32 get_user_data();
+	vec2 get_dimensions();
 	
 	void set_cur_pos(const vec2& pos);
 	void set_acceleration(const vec2& accel);
 	void set_rotation(f32 r);
 	void set_max_velocity(f32 mv);
+	void set_shape_type(u32 st);
+	void set_user_data(u32 ud);
+	void set_dimensions(const vec2& dim);
 	
 	void should_collide(bool f);
 	
@@ -121,7 +135,6 @@ private:
 	
 private:
 	physBody					m_bodies;
-	physShape					m_shapes;
 	//physBody*					m_pdevbodies;
 	//physShape*				m_pdevshapes;
 	//bool						m_update_dev_mem;

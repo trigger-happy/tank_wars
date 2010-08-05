@@ -54,8 +54,7 @@ __host__ PhysRunner::~PhysRunner(){
 }
 
 __host__ __device__ void update_verlet(f32 dt,
-							  physBody* bodies,
-							  physShape* shapes){
+							  physBody* bodies){
 	#if __CUDA_ARCH__
 		// device code
 		u32 idx = threadIdx.x;
@@ -147,7 +146,7 @@ __host__ __device__ void PhysRunner::timestep(f32 dt){
 	// convert from millisecond to seconds
 	dt /= 1000.0f;
 	
-	update_verlet(dt, &m_bodies, &m_shapes);
+	update_verlet(dt, &m_bodies);
 }
 
 __host__ __device__ void PhysRunner::find_next_free_slot(){
@@ -188,6 +187,7 @@ __host__ __device__ physBody::physBody(){
 		rotation[i] = 0;
 		max_vel[i] = 0;
 		can_collide[i] = false;
+		shape_type[i] = 0;
 	}
 }
 
@@ -231,6 +231,24 @@ __host__ __device__ bool PhysObject::is_collidable(){
 	return f;
 }
 
+__host__ __device__ u32 PhysObject::get_shape_type(){
+	u32 st = 0;
+	st = m_runner->m_bodies.shape_type[m_objid];
+	return st;
+}
+
+__host__ __device__ u32 PhysObject::get_user_data(){
+	u32 ud = 0;
+	ud = m_runner->m_bodies.user_data[m_objid];
+	return ud;
+}
+
+__host__ __device__ vec2 PhysObject::get_dimensions(){
+	vec2 dim;
+	dim = m_runner->m_bodies.dimension.get_vec2(m_objid);
+	return dim;
+}
+
 __host__ __device__ void PhysObject::set_cur_pos(const vec2& pos){
 	m_runner->m_bodies.cur_pos.x[m_objid] = pos.x;
 	m_runner->m_bodies.cur_pos.y[m_objid] = pos.y;
@@ -253,4 +271,17 @@ __host__ __device__ void PhysObject::set_max_velocity(f32 mv){
 
 __host__ __device__ void PhysObject::should_collide(bool f){
 	m_runner->m_bodies.can_collide[m_objid] = f;
+}
+
+__host__ __device__ void PhysObject::set_shape_type(u32 st){
+	m_runner->m_bodies.shape_type[m_objid] = st;
+}
+
+__host__ __device__ void PhysObject::set_user_data(u32 ud){
+	m_runner->m_bodies.user_data[m_objid] = ud;
+}
+
+__host__ __device__ void PhysObject::set_dimensions(const vec2& dim){
+	m_runner->m_bodies.dimension.x[m_objid] = dim.x;
+	m_runner->m_bodies.dimension.y[m_objid] = dim.y;
 }
