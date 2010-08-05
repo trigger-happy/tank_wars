@@ -32,11 +32,9 @@ GSGame::~GSGame(){
 }
 
 void GSGame::onSceneDeactivate(){
-
 }
 
 void GSGame::onSceneActivate(){
-
 }
 
 void GSGame::onFrameRender(CL_GraphicContext* gc){

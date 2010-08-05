@@ -73,33 +73,30 @@ struct physBody{
 // forward declaration
 class PhysRunner;
 
-class PhysObject{
-public:
-	PhysObject(PhysRunner* p);
-	~PhysObject();
+namespace PhysObject{
 	
-	vec2 get_cur_pos();
-	vec2 get_acceleration();
-	f32 get_rotation();
-	f32 get_max_velocity();
-	bool is_collidable();
-	u32 get_shape_type();
-	u32 get_user_data();
-	vec2 get_dimensions();
+	u32 create_object(PhysRunner* pr);
+	void destroy_object(PhysRunner* pr, u32 oid);
 	
-	void set_cur_pos(const vec2& pos);
-	void set_acceleration(const vec2& accel);
-	void set_rotation(f32 r);
-	void set_max_velocity(f32 mv);
-	void set_shape_type(u32 st);
-	void set_user_data(u32 ud);
-	void set_dimensions(const vec2& dim);
+	vec2 get_cur_pos(PhysRunner* pr, u32 oid);
+	vec2 get_acceleration(PhysRunner* pr, u32 oid);
+	f32 get_rotation(PhysRunner* pr, u32 oid);
+	f32 get_max_velocity(PhysRunner* pr, u32 oid);
+	bool is_collidable(PhysRunner* pr, u32 oid);
+	u32 get_shape_type(PhysRunner* pr, u32 oid);
+	u32 get_user_data(PhysRunner* pr, u32 oid);
+	vec2 get_dimensions(PhysRunner* pr, u32 oid);
 	
-	void should_collide(bool f);
+	void set_cur_pos(PhysRunner* pr, u32 oid, const vec2& pos);
+	void set_acceleration(PhysRunner* pr, u32 oid, const vec2& accel);
+	void set_rotation(PhysRunner* pr, u32 oid, f32 r);
+	void set_max_velocity(PhysRunner* pr, u32 oid, f32 mv);
+	void set_shape_type(PhysRunner* pr, u32 oid, u32 st);
+	void set_user_data(PhysRunner* pr, u32 oid, u32 ud);
+	void set_dimensions(PhysRunner* pr, u32 oid, const vec2& dim);
 	
-private:
-	PhysRunner*	m_runner;
-	u32			m_objid;
+	void should_collide(PhysRunner* pr, u32 oid, bool f);
+	
 };
 
 class PhysRunner{
@@ -107,15 +104,15 @@ public:
 	PhysRunner();
 	~PhysRunner();
 	void timestep(f32 dt);
-	
-private:
-	friend class PhysObject;
+
 	u32 get_slot();
 	void free_slot(u32 id);
 	void find_next_free_slot();
 	
-private:
+	// list of bodies. Not private due to CUDA limitations
 	physBody					m_bodies;
+	
+private:
 	//physBody*					m_pdevbodies;
 	//physShape*				m_pdevshapes;
 	//bool						m_update_dev_mem;
