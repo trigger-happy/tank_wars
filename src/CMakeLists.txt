@@ -6,13 +6,16 @@ if(CUDA_FOUND)
 	list(APPEND TWGAME_SOURCES
 				twgame_gpu.cu
 				evolvers/evolver_gpu.cu
-				game_core/physics.cu)
+				game_core/physics.cu
+				game_core/tankbullet.cu
+				game_core/basictank.cu)
 				
 	cuda_add_library(twgame ${TWGAME_SOURCES})
 	
 	cuda_add_executable(quick_check qcheck.cu)
 else(CUDA_FOUND)
 	message("CUDA not found, apps that use CUDA will not be built")
+	message("This means nearly everything...")
 	add_library(twgame ${TWGAME_SOURCES})
 endif(CUDA_FOUND)
 
