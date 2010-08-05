@@ -108,30 +108,13 @@ class PhysRunner{
 public:
 	PhysRunner();
 	~PhysRunner();
-// 	void initialize();
 	void timestep(f32 dt);
-	
-	/*
-	inline void update_dev_mem(){
-		m_update_dev_mem = true;
-	}
-	*/
-	
-private:
-	/*
-	void copy_from_device();
-	void copy_to_device();
-	*/
 	
 private:
 	friend class PhysObject;
 	u32 get_slot();
 	void free_slot(u32 id);
 	void find_next_free_slot();
-	
-// 	u32 get_slot_dev();
-// 	void free_slot_dev(u32 id);
-// 	void find_next_free_slot_dev();
 	
 private:
 	physBody					m_bodies;
