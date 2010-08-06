@@ -30,7 +30,7 @@ void TankBullet::initialize(PhysRunner* p){
 	m_runner = p;
 	vec2 params;
 	//TODO: allocate all the bullet objects we need
-	for(int i = 0; i < NUM_BULLETS; ++i){
+	for(int i = 0; i < MAX_BULLETS; ++i){
 		m_ids[i] = m_runner->create_object();
 		// set the bullet data
 		m_runner->set_rotation(i, 0);
@@ -47,7 +47,7 @@ void TankBullet::initialize(PhysRunner* p){
 }
 
 void TankBullet::destroy(){
-	for(int i = 0; i < NUM_BULLETS; ++i){
+	for(int i = 0; i < MAX_BULLETS; ++i){
 		m_runner->destroy_object(m_ids[i]);
 	}
 }
@@ -56,9 +56,9 @@ void TankBullet::update(f32 dt){
 	int idx = 0;
 	#if __CUDA_ARCH__
 		idx = threadIdx.x;
-		if(idx < NUM_BULLETS){
+		if(idx < MAX_BULLETS){
 	#elif !defined(__CUDA_ARCH__)
-		for(idx = 0; idx < NUM_BULLETS; ++idx){
+		for(idx = 0; idx < MAX_BULLETS; ++idx){
 	#endif
 	
 			if(m_state[idx] == STATE_TRAVELLING){

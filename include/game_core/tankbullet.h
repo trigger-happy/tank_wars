@@ -22,7 +22,7 @@
 #define STATE_TRAVELLING	1
 #define STATE_IMPACT		2
 
-#define NUM_BULLETS			MAX_ARRAY_SIZE/2
+#define MAX_BULLETS			MAX_ARRAY_SIZE/2
 
 typedef u32 bullet_id;
 
@@ -72,8 +72,8 @@ public:
 private:
 	Physics::PhysRunner* m_runner;
 	Physics::vec2_array m_initial_firing_pos;
-	u32 m_ids[NUM_BULLETS];
-	u32 m_state[NUM_BULLETS];
+	u32 m_ids[MAX_BULLETS];
+	u32 m_state[MAX_BULLETS];
 };
 
 #endif //TANKBULLET_H
