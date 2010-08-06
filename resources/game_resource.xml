@@ -54,5 +54,15 @@
 			<image file="game_assets/graphics/bullet.png" />
 			<translation origin="center" />
 		</sprite>
+		
+		<sprite name="tank_blu">
+			<image file="game_assets/graphics/tank_blu/tank_blu_0.png" />
+			<translation origin="center" />
+		</sprite>
+		
+		<sprite name="tank_red">
+			<image file="game_assets/graphics/tank_red/tank_red_0.png" />
+			<translation origin="center" />
+		</sprite>
 	</section>
 </resources>

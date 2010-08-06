@@ -24,6 +24,7 @@ void BasicTank::initialize(PhysRunner* p,
 						   TankBullet* tb){
 	m_runner = p;
 	m_tb = tb;
+	m_next_tank = 0;
 	vec2 params;
 	for(int i = 0; i < MAX_TANKS; ++i){
 		m_ids[i] = m_runner->create_object();
@@ -133,7 +134,33 @@ void BasicTank::fire(tank_id tid){
 	m_tb->fire_bullet(m_bullet[tid][nb],
 					  m_runner->get_rotation(m_ids[tid]),
 					  m_runner->get_cur_pos(m_ids[tid]));
-	if(next_bullet[tid] >= m_tb->get_max_bullets()){
+	if(next_bullet[tid] >= BULLETS_PER_TANK){
 		next_bullet[tid] = 0;
 	}
+}
+
+tank_id BasicTank::spawn_tank(const vec2& pos, f32 rot){
+	tank_id tid = m_next_tank++;
+	m_runner->set_cur_pos(m_ids[tid], pos);
+	m_runner->set_rotation(m_ids[tid], rot);
+	return tid;
+}
+
+void BasicTank::kill_tank(tank_id tid){
+	vec2 params;
+	params.x = OFFSCREEN_X;
+	params.y = OFFSCREEN_Y;
+	m_runner->set_cur_pos(m_ids[tid], params);
+	
+	params.x = 0;
+	params.y = 0;
+	m_runner->set_acceleration(m_ids[tid], params);
+}
+
+vec2 BasicTank::get_tank_pos(tank_id tid){
+	return m_runner->get_cur_pos(m_ids[tid]);
+}
+
+f32 BasicTank::get_tank_rot(tank_id tid){
+	return m_runner->get_rotation(m_ids[tid]);
 }

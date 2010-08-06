@@ -18,6 +18,8 @@
 */
 #include "game_scene/gsgame.h"
 #include "game_core/physics.h"
+#include "game_core/tankbullet.h"
+#include "game_core/basictank.h"
 
 #define SCALE_FACTOR 12
 
@@ -40,11 +42,21 @@ GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
 	m_testbullet.reset(new CL_Sprite(gc,
 									 "game_assets/bullet",
 									 &resources));
+	m_testtank.reset(new CL_Sprite(gc,
+								   "game_assets/tank_blu",
+								   &resources));
+	
 	m_bullets.initialize(m_physrunner.get());
-	m_rotdegrees = 0;
+	
+	m_tanks.initialize(m_physrunner.get(), &m_bullets);
+	
+	// test code
+	vec2 params;
+	m_playertank = m_tanks.spawn_tank(params, 0);
 }
 
 GSGame::~GSGame(){
+	m_tanks.destroy();
 	m_bullets.destroy();
 }
 
@@ -60,10 +72,17 @@ void GSGame::onFrameRender(CL_GraphicContext* gc){
 	apply_transform(gc, pos);
 	m_background->draw(*gc, pos.x, pos.y);
 	
-	//TODO: draw the test bullet
+	// draw the bullets
 	pos = m_bullets.get_bullet_pos(0);
 	apply_transform(gc, pos);
 	m_testbullet->draw(*gc, pos.x, pos.y);
+	
+	// draw the tanks
+	pos = m_tanks.get_tank_pos(m_playertank);
+	apply_transform(gc, pos);
+	f32 rot = m_tanks.get_tank_rot(m_playertank);
+	m_testtank->set_angle(CL_Angle(-rot, cl_degrees));
+	m_testtank->draw(*gc, pos.x, pos.y);
 }
 
 void GSGame::onFrameUpdate(double dt,
@@ -71,33 +90,37 @@ void GSGame::onFrameUpdate(double dt,
 						   CL_InputDevice* mouse){
 	//TODO: code here for AI update
 	
-	//TODO: code here for handling the keyboard controls
+	// keyboard control processing
 	// test code for the time being
 	if(keyboard->get_keycode(CL_KEY_SPACE)){
-		vec2 pos;
-		pos.x = 0;
-		pos.y = 0;
-		m_bullets.fire_bullet(0, m_rotdegrees, pos);
+		m_tanks.fire(m_playertank);
+	}
+	
+	if(keyboard->get_keycode(CL_KEY_RETURN)){
+		m_tanks.stop(m_playertank);
 	}
 	
 	if(keyboard->get_keycode(CL_KEY_UP)){
-		++m_rotdegrees;
-		if(m_rotdegrees >= 360){
-			m_rotdegrees = 0;
-		}
+		m_tanks.move_forward(m_playertank);
 	}else if(keyboard->get_keycode(CL_KEY_DOWN)){
-		--m_rotdegrees;
-		if(m_rotdegrees <= -360){
-			m_rotdegrees = 0;
-		}
+		m_tanks.move_backward(m_playertank);
+	}
+	
+	if(keyboard->get_keycode(CL_KEY_LEFT)){
+		m_tanks.turn_left(m_playertank);
+	}else if(keyboard->get_keycode(CL_KEY_RIGHT)){
+		m_tanks.turn_right(m_playertank);
 	}
 	
 	// update the game state
 	//TODO: add support for running on the gpu when possible.
 	m_physrunner->timestep(dt);
 	m_bullets.update(dt);
+	m_tanks.update(dt);
 	
 	// update the sprites
 	m_background->update();
+	m_testbullet->update();
+	m_testtank->update();
 }
 

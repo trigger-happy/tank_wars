@@ -23,6 +23,7 @@
 #include <boost/scoped_ptr.hpp>
 #include "game_scene/igamescene.h"
 #include "game_core/tankbullet.h"
+#include "game_core/basictank.h"
 #include "types.h"
 
 namespace Physics{
@@ -44,8 +45,10 @@ private:
 	boost::scoped_ptr<Physics::PhysRunner> m_physrunner;
 	boost::scoped_ptr<CL_Sprite> m_background;
 	boost::scoped_ptr<CL_Sprite> m_testbullet;
-	f32 m_rotdegrees;
+	boost::scoped_ptr<CL_Sprite> m_testtank;
 	TankBullet m_bullets;
+	BasicTank m_tanks;
+	tank_id m_playertank;
 };
 
 #endif // GSGAME_H

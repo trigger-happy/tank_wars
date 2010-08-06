@@ -28,7 +28,7 @@
 #define TANK_ROT_RATE	2.0f
 #define TANK_ACCEL_RATE	100.0f
 
-#define TANK_WIDTH		2
+#define TANK_WIDTH		4
 #define TANK_LENGTH		6
 
 #define STATE_INACTIVE			0
@@ -83,6 +83,22 @@ public:
 	*/
 	CUDA_EXPORT void fire(tank_id tid);
 	
+	/*!
+	*/
+	CUDA_EXPORT tank_id spawn_tank(const Physics::vec2& pos, f32 rot);
+	
+	/*!
+	*/
+	CUDA_EXPORT void kill_tank(tank_id tid);
+	
+	/*!
+	*/
+    Physics::vec2 get_tank_pos(tank_id tid);
+	
+	/*!
+	*/
+	f32 get_tank_rot(tank_id tid);
+	
 private:
 	Physics::PhysRunner* m_runner;
 	TankBullet* m_tb;
@@ -90,6 +106,7 @@ private:
 	u32	m_ids[MAX_TANKS];
 	bullet_id m_bullet[MAX_TANKS][BULLETS_PER_TANK];
 	bullet_id next_bullet[MAX_TANKS];
+	tank_id m_next_tank;
 };
 
 #endif //BASICTANK_H
