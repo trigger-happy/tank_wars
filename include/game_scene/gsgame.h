@@ -63,7 +63,7 @@ private:
 	Physics::PhysRunner* m_cuda_runner;
 	TankBullet* m_cuda_bullets;
 	BasicTank* m_cuda_tanks;
-	u8* m_cuda_player_input;
+// 	u8* m_cuda_player_input;
 };
 
 #endif // GSGAME_H

@@ -74,8 +74,8 @@ GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
 				   sizeof(TankBullet));
 		cudaMalloc(reinterpret_cast<void**>(&m_cuda_tanks),
 				   sizeof(BasicTank));
-		cudaMalloc(reinterpret_cast<void**>(&m_cuda_player_input),
-				   sizeof(m_player_input));
+// 		cudaMalloc(reinterpret_cast<void**>(&m_cuda_player_input),
+// 				   sizeof(m_player_input));
 		
 		// reset the pointers
 		m_bullets.reset_phys_pointer(m_cuda_runner);
@@ -90,8 +90,8 @@ GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
 				   
 		cudaMemcpy(m_cuda_tanks, &m_tanks,
 				   sizeof(m_tanks), cudaMemcpyHostToDevice);
-		cudaMemcpy(m_cuda_player_input, &m_player_input,
-				   sizeof(m_player_input), cudaMemcpyHostToDevice);
+// 		cudaMemcpy(m_cuda_player_input, &m_player_input,
+// 				   sizeof(m_player_input), cudaMemcpyHostToDevice);
 	}
 }
 
@@ -138,7 +138,7 @@ __global__ void gsgame_step(f32 dt,
 							PhysRunner* runner,
 							TankBullet* bullets,
 							BasicTank* tanks,
-							u8* player_input){
+							u8 player_input){
 	int idx = threadIdx.x;
 	
 	//TODO: perform AI operations here
@@ -146,23 +146,23 @@ __global__ void gsgame_step(f32 dt,
 	if(idx == 0){
 		// thread 0 will perform the input processing
 		// all other threads will do squat (wasteful but can't be helped)
-		if(*player_input & PLAYER_FIRE){
+		if(player_input & PLAYER_FIRE){
 			tanks->fire(player_tank);
 		}
 		
-		if(*player_input & PLAYER_STOP){
+		if(player_input & PLAYER_STOP){
 			tanks->stop(player_tank);
 		}
 		
-		if(*player_input & PLAYER_FORWARD){
+		if(player_input & PLAYER_FORWARD){
 			tanks->move_forward(player_tank);
-		}else if(*player_input & PLAYER_BACKWARD){
+		}else if(player_input & PLAYER_BACKWARD){
 			tanks->move_backward(player_tank);
 		}
 		
-		if(*player_input & PLAYER_LEFT){
+		if(player_input & PLAYER_LEFT){
 			tanks->turn_left(player_tank);
-		}else if(*player_input & PLAYER_RIGHT){
+		}else if(player_input & PLAYER_RIGHT){
 			tanks->turn_right(player_tank);
 		}
 	}
@@ -208,8 +208,8 @@ void GSGame::onFrameUpdate(double dt,
 	// update the game state
 	if(GameDisplay::s_usecuda){
 		// copy over the player input
-		cudaMemcpy(m_cuda_player_input, &m_player_input,
-				   sizeof(m_player_input), cudaMemcpyHostToDevice);
+// 		cudaMemcpy(m_cuda_player_input, &m_player_input,
+// 				   sizeof(m_player_input), cudaMemcpyHostToDevice);
 
 		// call the update
 		gsgame_step<<<CUDA_BLOCKS, CUDA_THREADS>>>(dt,
@@ -217,7 +217,7 @@ void GSGame::onFrameUpdate(double dt,
 												   m_cuda_runner,
 												   m_cuda_bullets,
 												   m_cuda_tanks,
-												   m_cuda_player_input);
+												   m_player_input);
 						  
 		// copy back the results for rendering
 		cudaMemcpy(&m_bullets, m_cuda_bullets, sizeof(m_bullets),
