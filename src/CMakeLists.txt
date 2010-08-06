@@ -8,7 +8,8 @@ if(CUDA_FOUND)
 				evolvers/evolver_gpu.cu
 				game_core/physics.cu
 				game_core/tankbullet.cu
-				game_core/basictank.cu)
+				game_core/basictank.cu
+				game_scene/gsgame.cu)
 				
 	cuda_add_library(twgame ${TWGAME_SOURCES})
 	
@@ -30,6 +31,5 @@ add_executable(tank_game
 				game_scene/gsmenu.cpp
 				game_scene/gslobby.cpp
 				game_scene/gsoptions.cpp
-				game_scene/gsgame.cpp
 				tank_game.cpp)
 target_link_libraries(tank_game twgame)

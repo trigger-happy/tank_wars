@@ -47,6 +47,10 @@ void TankBullet::initialize(PhysRunner* p){
 	}
 }
 
+void TankBullet::reset_phys_pointer(PhysRunner* p){
+	m_runner = p;
+}
+
 void TankBullet::destroy(){
 	for(int i = 0; i < MAX_BULLETS; ++i){
 		m_runner->destroy_object(m_ids[i]);

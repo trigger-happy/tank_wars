@@ -21,10 +21,18 @@
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
 #include <boost/scoped_ptr.hpp>
+
 #include "game_scene/igamescene.h"
 #include "game_core/tankbullet.h"
 #include "game_core/basictank.h"
 #include "types.h"
+
+#define PLAYER_FORWARD	1
+#define PLAYER_BACKWARD	2
+#define PLAYER_LEFT		4
+#define PLAYER_RIGHT	8
+#define PLAYER_FIRE		16
+#define PLAYER_STOP		32
 
 namespace Physics{
 	class PhysRunner;
@@ -49,6 +57,13 @@ private:
 	TankBullet m_bullets;
 	BasicTank m_tanks;
 	tank_id m_playertank;
+	u8 m_player_input;
+	
+	//cuda stuff
+	Physics::PhysRunner* m_cuda_runner;
+	TankBullet* m_cuda_bullets;
+	BasicTank* m_cuda_tanks;
+	u8* m_cuda_player_input;
 };
 
 #endif // GSGAME_H

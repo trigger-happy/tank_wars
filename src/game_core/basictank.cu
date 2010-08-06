@@ -55,6 +55,10 @@ void BasicTank::initialize(PhysRunner* p,
 	}
 }
 
+void BasicTank::reset_phys_pointer(PhysRunner* p){
+	m_runner = p;
+}
+
 void BasicTank::destroy(){
 	for(int i = 0; i < MAX_TANKS; ++i){
 		m_runner->destroy_object(m_ids[i]);

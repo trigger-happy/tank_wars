@@ -37,6 +37,7 @@ double					GameDisplay::s_deltatime = 0.0;
 boost::timer			GameDisplay::s_frame_timer;
 std::stack<iGameScene*>	GameDisplay::s_scene_stack;
 bool					GameDisplay::s_running = true;
+bool					GameDisplay::s_usecuda = false;
 
 void GameDisplay::push_scene(iGameScene* scene){
 	if(!s_scene_stack.empty()){
@@ -118,5 +119,11 @@ int GameDisplay::main(){
 }
 
 int main(int argc, char* argv[]){
+	//TODO: replace this with boost::program_options
+	if(argc > 1){
+		if(strcmp(argv[1], "--use-cuda") == 0){
+			GameDisplay::s_usecuda = true;
+		}
+	}
 	GameDisplay::main();
 }

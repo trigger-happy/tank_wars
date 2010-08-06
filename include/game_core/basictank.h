@@ -50,6 +50,10 @@ public:
 	*/
 	CUDA_HOST void initialize(Physics::PhysRunner* p,
 							  TankBullet* tb);
+							  
+	/*!
+	*/
+	CUDA_HOST void reset_phys_pointer(Physics::PhysRunner* p);
 	
 	/*!
 	*/

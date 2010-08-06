@@ -36,6 +36,10 @@ public:
 	CUDA_HOST void initialize(Physics::PhysRunner* p);
 	
 	/*!
+	*/
+	CUDA_HOST void reset_phys_pointer(Physics::PhysRunner* p);
+	
+	/*!
 	Destroy all tank bullets
 	*/
 	CUDA_HOST void destroy();

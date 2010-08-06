@@ -29,6 +29,7 @@ public:
 	
 	
 	static bool s_running;
+	static bool s_usecuda;
 	
 private:
 	static boost::timer s_frame_timer;
