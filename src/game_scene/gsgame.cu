@@ -27,6 +27,13 @@
 #define CUDA_BLOCKS 1
 #define CUDA_THREADS MAX_ARRAY_SIZE
 
+//NOTE: external calls are not supported, cheap hack but it works
+#if __CUDA_ARCH__
+#include "../game_core/physics.cu"
+#include "../game_core/tankbullet.cu"
+#include "../game_core/basictank.cu"
+#endif
+
 using namespace Physics;
 
 // helper function
@@ -103,6 +110,11 @@ void GSGame::onSceneActivate(){
 }
 
 void GSGame::onFrameRender(CL_GraphicContext* gc){
+	if(GameDisplay::s_usecuda){
+		// re-assign the pointer to the CPU version
+		m_tanks.reset_phys_pointer(m_physrunner.get());
+		m_bullets.reset_phys_pointer(m_physrunner.get());
+	}
 	// draw the background
 	vec2 pos;
 	apply_transform(gc, pos);
@@ -122,13 +134,41 @@ void GSGame::onFrameRender(CL_GraphicContext* gc){
 }
 
 __global__ void gsgame_step(f32 dt,
+							tank_id player_tank,
 							PhysRunner* runner,
 							TankBullet* bullets,
 							BasicTank* tanks,
 							u8* player_input){
-// 	runner->timestep(dt);
-// 	bullets->update(dt);
-// 	tanks->update(dt);
+	int idx = threadIdx.x;
+	
+	//TODO: perform AI operations here
+	
+	if(idx == 0){
+		// thread 0 will perform the input processing
+		// all other threads will do squat (wasteful but can't be helped)
+		if(*player_input & PLAYER_FIRE){
+			tanks->fire(player_tank);
+		}
+		
+		if(*player_input & PLAYER_STOP){
+			tanks->stop(player_tank);
+		}
+		
+		if(*player_input & PLAYER_FORWARD){
+			tanks->move_forward(player_tank);
+		}else if(*player_input & PLAYER_BACKWARD){
+			tanks->move_backward(player_tank);
+		}
+		
+		if(*player_input & PLAYER_LEFT){
+			tanks->turn_left(player_tank);
+		}else if(*player_input & PLAYER_RIGHT){
+			tanks->turn_right(player_tank);
+		}
+	}
+ 	runner->timestep(dt);
+ 	bullets->update(dt);
+ 	tanks->update(dt);
 }
 
 void GSGame::onFrameUpdate(double dt,
@@ -173,6 +213,7 @@ void GSGame::onFrameUpdate(double dt,
 
 		// call the update
 		gsgame_step<<<CUDA_BLOCKS, CUDA_THREADS>>>(dt,
+												   m_playertank,
 												   m_cuda_runner,
 												   m_cuda_bullets,
 												   m_cuda_tanks,
@@ -185,10 +226,6 @@ void GSGame::onFrameUpdate(double dt,
 				   cudaMemcpyDeviceToHost);
 		cudaMemcpy(m_physrunner.get(), m_cuda_runner, sizeof(m_physrunner),
 				   cudaMemcpyDeviceToHost);
-		
-		// re-assign the pointer to the CPU version
-		m_tanks.reset_phys_pointer(m_physrunner.get());
-		m_bullets.reset_phys_pointer(m_physrunner.get());
 	}else{
 		// process the player input
 		if(m_player_input & PLAYER_FIRE){
