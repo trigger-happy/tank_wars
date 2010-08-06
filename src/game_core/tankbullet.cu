@@ -27,6 +27,7 @@
 using namespace Physics;
 
 void TankBullet::initialize(PhysRunner* p){
+	m_cur_free_bullet = 0;
 	m_runner = p;
 	vec2 params;
 	//TODO: allocate all the bullet objects we need
@@ -112,4 +113,12 @@ void TankBullet::deactivate(bullet_id bid){
 
 vec2 TankBullet::get_bullet_pos(bullet_id bid){
 	return m_runner->get_cur_pos(m_ids[bid]);
+}
+
+bullet_id TankBullet::get_bullet(){
+	return m_cur_free_bullet++;
+}
+
+bullet_id TankBullet::get_max_bullets() const{
+	return MAX_BULLETS;
 }

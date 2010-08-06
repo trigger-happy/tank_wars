@@ -68,12 +68,22 @@ public:
 	*/
 	CUDA_EXPORT Physics::vec2 get_bullet_pos(bullet_id bid);
 	
-	//TODO: add more stuff here
+	/*!
+	Get a bullet from the list
+	\note DOES NOT CHECK IF IT'S GREATER THAN MAX_BULLETS
+	*/
+	CUDA_HOST bullet_id get_bullet();
+	
+	/*!
+	Get the maximum number of bullets available
+	*/
+	CUDA_EXPORT bullet_id get_max_bullets() const;
 private:
 	Physics::PhysRunner* m_runner;
 	Physics::vec2_array m_initial_firing_pos;
 	u32 m_ids[MAX_BULLETS];
 	u32 m_state[MAX_BULLETS];
+	bullet_id m_cur_free_bullet;
 };
 
 #endif //TANKBULLET_H
