@@ -231,7 +231,7 @@ bool PhysRunner::is_collidable(pBody oid){
 	return f;
 }
 
-u32 PhysRunner::get_shape_type(pBody oid){
+pShape PhysRunner::get_shape_type(pBody oid){
 	u32 st = 0;
 	st = m_bodies.shape_type[oid];
 	return st;
@@ -250,7 +250,7 @@ vec2 PhysRunner::get_dimensions(pBody oid){
 }
 
 void PhysRunner::set_cur_pos(pBody oid,
-												 const Physics::vec2& pos){
+							 const Physics::vec2& pos){
 	m_bodies.cur_pos.x[oid] = pos.x;
 	m_bodies.cur_pos.y[oid] = pos.y;
 	m_bodies.old_pos.x[oid] = pos.x;
@@ -258,7 +258,7 @@ void PhysRunner::set_cur_pos(pBody oid,
 }
 
 void PhysRunner::set_acceleration(pBody oid,
-													  const Physics::vec2& accel){
+								  const Physics::vec2& accel){
 	m_bodies.acceleration.x[oid] = accel.x;
 	m_bodies.acceleration.y[oid] = accel.y;
 }
@@ -275,7 +275,7 @@ void PhysRunner::should_collide(pBody oid, bool f){
 	m_bodies.can_collide[oid] = f;
 }
 
-void PhysRunner::set_shape_type(pBody oid, u32 st){
+void PhysRunner::set_shape_type(pBody oid, pShape st){
 	m_bodies.shape_type[oid] = st;
 }
 
@@ -284,7 +284,7 @@ void PhysRunner::set_user_data(pBody oid, u32 ud){
 }
 
 void PhysRunner::set_dimensions(pBody oid,
-													const Physics::vec2& dim){
+								const Physics::vec2& dim){
 	m_bodies.dimension.x[oid] = dim.x;
 	m_bodies.dimension.y[oid] = dim.y;
 }

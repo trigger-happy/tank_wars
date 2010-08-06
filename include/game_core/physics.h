@@ -48,7 +48,7 @@ struct vec2_array{
 #define SHAPE_QUAD		2
 
 typedef u32 pBody;
-typedef u32 shape_type;
+typedef u32 pShape;
 
 
 struct physBody{
@@ -63,7 +63,7 @@ struct physBody{
 	bool		can_collide[MAX_ARRAY_SIZE];
 	
 	// for defining the shape of the object
-	u32			shape_type[MAX_ARRAY_SIZE];
+	pShape	 	shape_type[MAX_ARRAY_SIZE];
 	
 	// for custom code (to mark the object as a tank, bullet, etc)
 	u32			user_data[MAX_ARRAY_SIZE];
@@ -90,7 +90,7 @@ public:
 	CUDA_EXPORT f32 get_rotation(pBody bd);
 	CUDA_EXPORT f32 get_max_velocity(pBody bd);
 	CUDA_EXPORT bool is_collidable(pBody bd);
-	CUDA_EXPORT shape_type get_shape_type(pBody bd);
+	CUDA_EXPORT pShape get_shape_type(pBody bd);
 	CUDA_EXPORT u32 get_user_data(pBody bd);
 	CUDA_EXPORT vec2 get_dimensions(pBody bd);
 	
@@ -98,7 +98,7 @@ public:
 	CUDA_EXPORT void set_acceleration(pBody bd, const vec2& accel);
 	CUDA_EXPORT void set_rotation(pBody bd, f32 r);
 	CUDA_EXPORT void set_max_velocity(pBody bd, f32 mv);
-	CUDA_EXPORT void set_shape_type(pBody bd, shape_type st);
+	CUDA_EXPORT void set_shape_type(pBody bd, pShape st);
 	CUDA_EXPORT void set_user_data(pBody bd, u32 ud);
 	CUDA_EXPORT void set_dimensions(pBody bd, const vec2& dim);
 	
