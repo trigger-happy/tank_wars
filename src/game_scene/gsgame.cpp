@@ -26,7 +26,7 @@ using namespace Physics;
 // helper function
 void apply_transform(CL_GraphicContext* gc, vec2& c){
 	c.x *= SCALE_FACTOR;
-	c.y *= SCALE_FACTOR;
+	c.y *= -SCALE_FACTOR;
 	c.x += gc->get_width()/2;
 	c.y += gc->get_height()/2;
 }
@@ -41,6 +41,7 @@ GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
 									 "game_assets/bullet",
 									 &resources));
 	m_bullets.initialize(m_physrunner.get());
+	m_rotdegrees = 0;
 }
 
 GSGame::~GSGame(){
@@ -76,7 +77,19 @@ void GSGame::onFrameUpdate(double dt,
 		vec2 pos;
 		pos.x = 0;
 		pos.y = 0;
-		m_bullets.fire_bullet(0, 0, pos);
+		m_bullets.fire_bullet(0, m_rotdegrees, pos);
+	}
+	
+	if(keyboard->get_keycode(CL_KEY_UP)){
+		++m_rotdegrees;
+		if(m_rotdegrees >= 360){
+			m_rotdegrees = 0;
+		}
+	}else if(keyboard->get_keycode(CL_KEY_DOWN)){
+		--m_rotdegrees;
+		if(m_rotdegrees <= -360){
+			m_rotdegrees = 0;
+		}
 	}
 	
 	// update the game state

@@ -44,6 +44,7 @@ private:
 	boost::scoped_ptr<Physics::PhysRunner> m_physrunner;
 	boost::scoped_ptr<CL_Sprite> m_background;
 	boost::scoped_ptr<CL_Sprite> m_testbullet;
+	f32 m_rotdegrees;
 	TankBullet m_bullets;
 };
 
