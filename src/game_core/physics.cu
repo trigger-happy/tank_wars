@@ -16,6 +16,7 @@
 #include <cmath>
 #include <algorithm>
 #include <cassert>
+#include <memory.h>
 #include "game_core/physics.h"
 #include "util/util.h"
 
@@ -46,8 +47,9 @@ vec2 vec2_array::get_vec2(u32 id){
 }
 
 
-PhysRunner::PhysRunner() 
-: m_free_slots(0), m_first_free_slot(0)/*, m_update_dev_mem(false)*/{
+PhysRunner::PhysRunner()
+: m_first_free_slot(0){
+	memset(m_free_slots, 0, sizeof(u8)*MAX_ARRAY_SIZE);
 }
 
 PhysRunner::~PhysRunner(){

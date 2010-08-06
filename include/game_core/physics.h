@@ -114,7 +114,8 @@ private:
 	//physBody*					m_pdevbodies;
 	//physShape*				m_pdevshapes;
 	//bool						m_update_dev_mem;
-	std::bitset<MAX_ARRAY_SIZE>	m_free_slots;
+	//TODO: change this to a custom bitvector
+	u8							m_free_slots[MAX_ARRAY_SIZE];
 	u32							m_first_free_slot;
 };
 	
