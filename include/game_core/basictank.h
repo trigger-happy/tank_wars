@@ -44,73 +44,79 @@
 typedef u32 tank_id;
 typedef u32 tank_state;
 
-class BasicTank{
-public:
+namespace BasicTank{
+	
+	struct TankCollection{
+		Physics::PhysRunner::RunnerCore* parent_runner;
+		TankBullet::BulletCollection* bullet_collection;
+		tank_state state[MAX_TANKS];
+		u32	phys_id[MAX_TANKS];
+		bullet_id bullet[MAX_TANKS][BULLETS_PER_TANK];
+		bullet_id next_bullet[MAX_TANKS];
+		tank_id next_tank;
+	};
+	
 	/*!
 	*/
-	CUDA_HOST void initialize(Physics::PhysRunner* p,
-							  TankBullet* tb);
+	CUDA_HOST void initialize(TankCollection* tank,
+							  Physics::PhysRunner::RunnerCore* p,
+							  TankBullet::BulletCollection* bt);
 							  
 	/*!
 	*/
-	CUDA_HOST void reset_phys_pointer(Physics::PhysRunner* p);
+	CUDA_HOST void reset_pointers(TankCollection* tank,
+								  Physics::PhysRunner::RunnerCore* p,
+								  TankBullet::BulletCollection* bt);
 	
 	/*!
 	*/
-	CUDA_HOST void destroy();
+	CUDA_HOST void destroy(TankCollection* tank);
 	
 	/*!
 	*/
-	CUDA_EXPORT void update(f32 dt);
+	CUDA_EXPORT void update(TankCollection* tt, f32 dt);
 	
 	/*!
 	*/
-	CUDA_EXPORT void move_forward(tank_id tid);
+	CUDA_EXPORT void move_forward(TankCollection* tt, tank_id tid);
 	
 	/*!
 	*/
-	CUDA_EXPORT void move_backward(tank_id tid);
+	CUDA_EXPORT void move_backward(TankCollection* tt, tank_id tid);
 	
 	/*!
 	*/
-	CUDA_EXPORT void stop(tank_id tid);
+	CUDA_EXPORT void stop(TankCollection* tt, tank_id tid);
 	
 	/*!
 	*/
-	CUDA_EXPORT void turn_left(tank_id tid);
+	CUDA_EXPORT void turn_left(TankCollection* tt, tank_id tid);
 	
 	/*!
 	*/
-	CUDA_EXPORT void turn_right(tank_id tid);
+	CUDA_EXPORT void turn_right(TankCollection* tt, tank_id tid);
 	
 	/*!
 	*/
-	CUDA_EXPORT void fire(tank_id tid);
+	CUDA_EXPORT void fire(TankCollection* tt, tank_id tid);
 	
 	/*!
 	*/
-	CUDA_EXPORT tank_id spawn_tank(const Physics::vec2& pos, f32 rot);
+	CUDA_EXPORT tank_id spawn_tank(TankCollection* tt,
+								   const Physics::vec2& pos,
+								   f32 rot);
 	
 	/*!
 	*/
-	CUDA_EXPORT void kill_tank(tank_id tid);
+	CUDA_EXPORT void kill_tank(TankCollection* tt, tank_id tid);
 	
 	/*!
 	*/
-    Physics::vec2 get_tank_pos(tank_id tid);
+	Physics::vec2 get_tank_pos(TankCollection* tt, tank_id tid);
 	
 	/*!
 	*/
-	f32 get_tank_rot(tank_id tid);
-	
-private:
-	Physics::PhysRunner* m_runner;
-	TankBullet* m_tb;
-	tank_state m_state[MAX_TANKS];
-	u32	m_ids[MAX_TANKS];
-	bullet_id m_bullet[MAX_TANKS][BULLETS_PER_TANK];
-	bullet_id next_bullet[MAX_TANKS];
-	tank_id m_next_tank;
+	f32 get_tank_rot(TankCollection* tt, tank_id tid);
 };
 
 #endif //BASICTANK_H

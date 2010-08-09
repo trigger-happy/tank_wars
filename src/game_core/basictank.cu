@@ -18,54 +18,56 @@
 #include "game_core/physics.h"
 #include "game_core/basictank.h"
 
-using namespace Physics;
-
-void BasicTank::initialize(PhysRunner* p,
-						   TankBullet* tb){
-	m_runner = p;
-	m_tb = tb;
-	m_next_tank = 0;
-	vec2 params;
+void BasicTank::initialize(BasicTank::TankCollection* tank,
+						   Physics::PhysRunner::RunnerCore* p,
+						   TankBullet::BulletCollection* tb){
+	tank->parent_runner = p;
+	tank->bullet_collection = tb;
+	tank->next_tank = 0;
+	Physics::vec2 params;
 	for(int i = 0; i < MAX_TANKS; ++i){
-		m_ids[i] = m_runner->create_object();
-		m_runner->set_acceleration(m_ids[i], params);
-		m_runner->set_max_velocity(m_ids[i], MAX_TANK_VEL);
-		m_runner->set_rotation(m_ids[i], 0);
-		m_runner->set_shape_type(m_ids[i], SHAPE_QUAD);
+		tank->phys_id[i] = Physics::PhysRunner::create_object();
+		Physics::PhysRunner::set_acceleration(p, tank->phys_id[i], params);
+		Physics::PhysRunner::set_max_velocity(p, tank->phys_id[i], MAX_TANK_VEL);
+		Physics::PhysRunner::set_rotation(p, tank->phys_id[i], 0);
+		Physics::PhysRunner::set_shape_type(p, tank->phys_id[i], SHAPE_QUAD);
 		
 		params.x = TANK_LENGTH;
 		params.y = TANK_WIDTH;
-		m_runner->set_dimensions(m_ids[i], params);
+		Physics::PhysRunner::set_dimensions(p, tank->phys_id[i], params);
 		
 		//TODO: change this to ENTITY_TANK
-		m_runner->set_user_data(m_ids[i], 2);
+		Physics::PhysRunner::set_user_data(p, tank->phys_id[i], 2);
 		
 		params.x = OFFSCREEN_X;
 		params.y = OFFSCREEN_Y;
-		m_runner->set_cur_pos(m_ids[i], params);
+		Physics::PhysRunner::set_cur_pos(p, tank->phys_id[i], params);
 		
-		next_bullet[i] = 0;
+		tank->next_bullet[i] = 0;
 		
 		for(int j = 0; j < BULLETS_PER_TANK; ++j){
-			if(j >= m_tb->get_max_bullets()){
+			if(j >= TankBullet::get_max_bullets(tb)){
 				continue; // don't allocate anymore
 			}
-			m_bullet[i][j] = m_tb->get_bullet();
+			tank->bullet[i][j] = TankBullet::get_bullet(tb);
 		}
 	}
 }
 
-void BasicTank::reset_phys_pointer(PhysRunner* p){
-	m_runner = p;
+void BasicTank::reset_pointers(BasicTank::TankCollection* tank,
+							   Physics::PhysRunner::RunnerCore* p,
+							   TankBullet::BulletCollection* bt){
+	tank->parent_runner = p;
+	tank->bullet_collection = bt;
 }
 
-void BasicTank::destroy(){
+void BasicTank::destroy(BasicTank::TankCollection* tank){
 	for(int i = 0; i < MAX_TANKS; ++i){
-		m_runner->destroy_object(m_ids[i]);
+		Physics::PhysRunner::destroy_object(tank->phys_id[i]);
 	}
 }
 
-void BasicTank::update(f32 dt){
+void BasicTank::update(BasicTank::TankCollection* tt, f32 dt){
 	int idx = 0;
 	#if __CUDA_ARCH__
 		idx = threadIdx.x;
@@ -78,93 +80,106 @@ void BasicTank::update(f32 dt){
 		}
 }
 
-void BasicTank::move_forward(tank_id tid){
-	vec2 accel;
-	f32 rot = util::degs_to_rads(m_runner->get_rotation(m_ids[tid]));
+void BasicTank::move_forward(BasicTank::TankCollection* tt, tank_id tid){
+	Physics::vec2 accel;
+	f32 rot = util::degs_to_rads(Physics::PhysRunner::get_rotation(tt->parent_runner,
+																   tt->phys_id[tid]));
 	accel.x = TANK_ACCEL_RATE * cosf(rot);
 	accel.y = TANK_ACCEL_RATE * sinf(rot);
-	m_runner->set_acceleration(m_ids[tid], accel);
-	m_state[tid] = STATE_MOVING_FORWARD;
+	Physics::PhysRunner::set_acceleration(tt->phys_id[tid], accel);
+	tt->state[tid] = STATE_MOVING_FORWARD;
 }
 
-void BasicTank::move_backward(tank_id tid){
-	vec2 accel;
-	f32 rot = util::degs_to_rads(m_runner->get_rotation(m_ids[tid]));
+void BasicTank::move_backward(BasicTank::TankCollection* tt, tank_id tid){
+	Physics::vec2 accel;
+	f32 rot = util::degs_to_rads(Physics::PhysRunner::get_rotation(tt->parent_runner,
+																   tt->phys_id[tid]));
 	accel.x = -(TANK_ACCEL_RATE * cosf(rot));
 	accel.y = -(TANK_ACCEL_RATE * sinf(rot));
-	m_runner->set_acceleration(m_ids[tid], accel);
-	m_state[tid] = STATE_MOVING_BACKWARD;
+	
+	Physics::PhysRunner::set_acceleration(tt->parent_runner,
+										  tt->phys_id[tid], accel);
+	tt->state[tid] = STATE_MOVING_BACKWARD;
 }
 
-void BasicTank::stop(tank_id tid){
-	m_state[tid] = STATE_NEUTRAL;
-	vec2 accel;
+void BasicTank::stop(BasicTank::TankCollection* tt, tank_id tid){
+	tt->state[tid] = STATE_NEUTRAL;
+	Physics::vec2 accel;
 	accel.x = accel.y = 0;
-	m_runner->set_acceleration(m_ids[tid], accel);
-	m_runner->set_cur_pos(m_ids[tid],
-						  m_runner->get_cur_pos(m_ids[tid]));
+	Physics::PhysRunner::set_acceleration(tt->parent_runner,
+										  tt->phys_id[tid], accel);
+	Physics::PhysRunner::set_cur_pos(tt->parent_runner,
+									 tt->phys_id[tid],
+									 Physics::PhysRunner::get_cur_pos(tt->phys_id[tid]));
 }
 
-void BasicTank::turn_left(tank_id tid){
-	f32 rot = m_runner->get_rotation(m_ids[tid]);
+void BasicTank::turn_left(BasicTank::TankCollection* tt, tank_id tid){
+	f32 rot = Physics::PhysRunner::get_rotation(tt->parent_runner,
+												tt->phys_id[tid]);
+	
 	rot += TANK_ROT_RATE;
 	if(rot >= 360){
 		rot -= 360;
 	}
-	m_runner->set_rotation(m_ids[tid], rot);
-	if(m_state[tid] == STATE_MOVING_FORWARD){
-		move_forward(tid);
-	}else if(m_state[tid] == STATE_MOVING_BACKWARD){
-		move_backward(tid);
+	
+	Physics::PhysRunner::set_rotation(tt->parent_runner, tt->phys_id[tid], rot);
+	if(tt->state[tid] == STATE_MOVING_FORWARD){
+		BasicTank::move_forward(tt, tid);
+	}else if(tt->state[tid] == STATE_MOVING_BACKWARD){
+		BasicTank::move_backward(tt, tid);
 	}
 }
 
-void BasicTank::turn_right(tank_id tid){
-	f32 rot = m_runner->get_rotation(m_ids[tid]);
+void BasicTank::turn_right(BasicTank::TankCollection* tt, tank_id tid){
+	f32 rot = Physics::PhysRunner::get_rotation(tt->parent_runner,
+												tt->phys_id[tid]);
 	rot -= TANK_ROT_RATE;
 	if(rot < 0){
 		rot += 360;
 	}
-	m_runner->set_rotation(m_ids[tid], rot);
-	if(m_state[tid] == STATE_MOVING_FORWARD){
-		move_forward(tid);
-	}else if(m_state[tid] == STATE_MOVING_BACKWARD){
-		move_backward(tid);
+	
+	Physics::PhysRunner::set_rotation(tt->parent_runner, tt->phys_id[tid], rot);
+	if(tt->state[tid] == STATE_MOVING_FORWARD){
+		BasicTank::move_forward(tt, tid);
+	}else if(tt->state[tid] == STATE_MOVING_BACKWARD){
+		BasicTank::move_backward(tt, tid);
 	}
 }
 
-void BasicTank::fire(tank_id tid){
-	bullet_id nb = next_bullet[tid]++;
-	m_tb->fire_bullet(m_bullet[tid][nb],
-					  m_runner->get_rotation(m_ids[tid]),
-					  m_runner->get_cur_pos(m_ids[tid]));
-	if(next_bullet[tid] >= BULLETS_PER_TANK){
-		next_bullet[tid] = 0;
+void BasicTank::fire(BasicTank::TankCollection* tt, tank_id tid){
+	Physics::PhysRunner::RunnerCore* rc = tt->parent_runner;
+	bullet_id nb = tt->next_bullet[tid]++;
+	TankBullet::fire_bullet(tt->bullet_collection, tt->bullet[tid][nb],
+							Physics::PhysRunner::get_rotation(rc, tt->phys_id[tid]),
+							Physics::PhysRunner::get_cur_pos(rc, tt->phys_id[tid]));
+	if(tt->next_bullet[tid] >= BULLETS_PER_TANK){
+		tt->next_bullet[tid] = 0;
 	}
 }
 
-tank_id BasicTank::spawn_tank(const vec2& pos, f32 rot){
-	tank_id tid = m_next_tank++;
-	m_runner->set_cur_pos(m_ids[tid], pos);
-	m_runner->set_rotation(m_ids[tid], rot);
+tank_id BasicTank::spawn_tank(BasicTank::TankCollection* tt, const Physics::vec2& pos, f32 rot){
+	tank_id tid = tt->next_tank++;
+	Physics::PhysRunner::set_cur_pos(tt->parent_runner, tt->phys_id[tid], pos);
+	Physics::PhysRunner::set_rotation(tt->parent_runner, tt->phys_id[tid], rot);
 	return tid;
 }
 
-void BasicTank::kill_tank(tank_id tid){
-	vec2 params;
+void BasicTank::kill_tank(BasicTank::TankCollection* tt, tank_id tid){
+	Physics::PhysRunner::RunnerCore* rc = tt->parent_runner;
+	Physics::vec2 params;
 	params.x = OFFSCREEN_X;
 	params.y = OFFSCREEN_Y;
-	m_runner->set_cur_pos(m_ids[tid], params);
+	Physics::PhysRunner::set_cur_pos(rc, tt->phys_id[tid], params);
 	
 	params.x = 0;
 	params.y = 0;
-	m_runner->set_acceleration(m_ids[tid], params);
+	Physics::PhysRunner::set_acceleration(rc, tt->phys_id[tid], params);
 }
 
-vec2 BasicTank::get_tank_pos(tank_id tid){
-	return m_runner->get_cur_pos(m_ids[tid]);
+Physics::vec2 BasicTank::get_tank_pos(BasicTank::TankCollection* tt, tank_id tid){
+	return Physics::PhysRunner::get_cur_pos(tt->parent_runner, tt->phys_id[tid]);
 }
 
-f32 BasicTank::get_tank_rot(tank_id tid){
-	return m_runner->get_rotation(m_ids[tid]);
+f32 BasicTank::get_tank_rot(BasicTank::TankCollection* tt, tank_id tid){
+	return Physics::PhysRunner::get_rotation(tt->parent_runner, tt->phys_id[tid]);
 }

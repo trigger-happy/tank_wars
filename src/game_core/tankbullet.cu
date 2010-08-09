@@ -24,40 +24,41 @@
 #define MAX_BULLET_VELOCITY 		20.0f
 #define INITIAL_BULLET_ACCELERATION 1000.0f
 
-using namespace Physics;
-
-void TankBullet::initialize(PhysRunner* p){
-	m_cur_free_bullet = 0;
-	m_runner = p;
-	vec2 params;
-	//TODO: allocate all the bullet objects we need
+void TankBullet::initialize(TankBullet::BulletCollection* bc,
+							Physics::PhysRunner::RunnerCore* p){
+	bc->cur_free_bullet = 0;
+	bc->parent_runner = p;
+	Physics::vec2 params;
+	// allocate all the bullet objects we need
 	for(int i = 0; i < MAX_BULLETS; ++i){
-		m_ids[i] = m_runner->create_object();
+		bc->phys_id[i] = Physics::PhysRunner::create_object(p);
 		// set the bullet data
-		m_runner->set_rotation(i, 0);
-		m_runner->set_shape_type(i, SHAPE_CIRCLE);
+		Physics::PhysRunner::set_rotation(p, i, 0);
+		Physics::PhysRunner::set_shape_type(p, i, SHAPE_CIRCLE);
 		params.x = 2; // y is ignored when shape is circle
-		m_runner->set_dimensions(i, params);
+		Physics::PhysRunner::set_dimensions(p, i, params);
 		
 		//TODO: change the 1 to ENTITY_BULLET
-		m_runner->set_user_data(i, 1);
+		Physics::PhysRunner::set_user_data(p, i, 1);
 		
 		// make it initially inactive
-		deactivate(i);
+		TankBullet::deactivate(bc, i);
 	}
 }
 
-void TankBullet::reset_phys_pointer(PhysRunner* p){
-	m_runner = p;
+void TankBullet::reset_phys_pointer(TankBullet::BulletCollection* bc,
+									Physics::PhysRunner::RunnerCore* p){
+	bc->parent_runner = p;
 }
 
-void TankBullet::destroy(){
+void TankBullet::destroy(TankBullet::BulletCollection* bc){
 	for(int i = 0; i < MAX_BULLETS; ++i){
-		m_runner->destroy_object(m_ids[i]);
+		Physics::PhysRunner::destroy_object(bc->parent_runner, bc->phys_id[i]);
 	}
 }
 
-void TankBullet::update(f32 dt){
+void TankBullet::update(TankBullet::BulletCollection* bc, f32 dt){
+	Physics::PhysRunner::RunnerCore* rc = bc->parent_runner;
 	int idx = 0;
 	#if __CUDA_ARCH__
 		idx = threadIdx.x;
@@ -66,63 +67,66 @@ void TankBullet::update(f32 dt){
 		for(idx = 0; idx < MAX_BULLETS; ++idx){
 	#endif
 	
-			if(m_state[idx] == STATE_TRAVELLING){
-				vec2 temp;
-				temp = m_runner->get_cur_pos(m_ids[idx]);
-				f32 xdiff = fabsf(m_initial_firing_pos.x[m_ids[idx]]
+			if(bc->state[idx] == STATE_TRAVELLING){
+				Physics::vec2 temp;
+				temp = Physics::PhysRunner::get_cur_pos(rc, bc->phys_id[idx]);
+				f32 xdiff = fabsf(bc->initial_pos.x[bc->phys_id[idx]]
 				- temp.x);
-				f32 ydiff = fabsf(m_initial_firing_pos.y[m_ids[idx]]
+				f32 ydiff = fabsf(bc->initial_pos.y[bc->phys_id[idx]]
 				- temp.y);
 				f32 sq_dist = (xdiff * xdiff) + (ydiff * ydiff);
 				if(sq_dist >= MAX_BULLET_RANGE * MAX_BULLET_RANGE){
-					deactivate(m_ids[idx]);
+					TankBullet::deactivate(bc, bc->phys_id[idx]);
 				}
 			}
 			
 		}
 }
 
-void TankBullet::fire_bullet(bullet_id bid,
+void TankBullet::fire_bullet(TankBullet::BulletCollection* bc,
+							 bullet_id bid,
 							 f32 rot_degrees,
-							 vec2 pos){
-	if(m_state[bid] != STATE_TRAVELLING){
-		m_runner->set_rotation(bid, rot_degrees);
-		m_initial_firing_pos.x[bid] = pos.x;
-		m_initial_firing_pos.y[bid] = pos.y;
-		vec2 params;
+							 Physics::vec2 pos){
+	if(bc->state[bid] != STATE_TRAVELLING){
+		Physics::PhysRunner::set_rotation(bc->parent_runner, bid, rot_degrees);
+		bc->initial_pos.x[bid] = pos.x;
+		bc->initial_pos.y[bid] = pos.y;
+		Physics::vec2 params;
 		f32 rotation_rads = util::degs_to_rads(rot_degrees);
 		params.x = INITIAL_BULLET_ACCELERATION * cosf(rotation_rads);
 		params.y = INITIAL_BULLET_ACCELERATION * sinf(rotation_rads);
-		m_runner->set_acceleration(bid, params);
+		Physics::PhysRunner::set_acceleration(bc->parent_runner, bid, params);
 		
-		m_runner->set_cur_pos(bid, pos);
-		m_state[bid] = STATE_TRAVELLING;
+		Physics::PhysRunner::set_cur_pos(bc, bid, pos);
+		bc->state[bid] = STATE_TRAVELLING;
 	}
 }
 
-void TankBullet::deactivate(bullet_id bid){
-	vec2 params;
+void TankBullet::deactivate(TankBullet::BulletCollection* bc, bullet_id bid){
+	Physics::PhysRunner::RunnerCore* rc = bc->parent_runner;
+	Physics::vec2 params;
 	params.x = OFFSCREEN_X;
 	params.y = OFFSCREEN_Y;
-	m_runner->set_cur_pos(bid, params);
+	Physics::PhysRunner::set_cur_pos(rc, bid, params);
 	
-	m_runner->set_max_velocity(bid, MAX_BULLET_VELOCITY);
+	Physics::PhysRunner::set_max_velocity(rc, bid, MAX_BULLET_VELOCITY);
 	
 	params.x = 0;
 	params.y = 0;
-	m_runner->set_acceleration(bid, params);
+	Physics::PhysRunner::set_acceleration(rc, bid, params);
 	
-	m_state[bid] = STATE_INACTIVE;
+	bc->state[bid] = STATE_INACTIVE;
 }
 
-vec2 TankBullet::get_bullet_pos(bullet_id bid){
-	return m_runner->get_cur_pos(m_ids[bid]);
+Physics::vec2 TankBullet::get_bullet_pos(TankBullet::BulletCollection* bc,
+										 bullet_id bid){
+	return Physics::PhysRunner::get_cur_pos(bc->parent_runner, bc->phys_id[bid]);
 }
 
-bullet_id TankBullet::get_bullet(){
-	return m_cur_free_bullet++;
+bullet_id TankBullet::get_bullet(TankBullet::BulletCollection* bc){
+	return bc->cur_free_bullet++;
 }
 
-bullet_id TankBullet::get_max_bullets() const{
+bullet_id TankBullet::get_max_bullets(TankBullet::BulletCollection* bc) const{
 	return MAX_BULLETS;
 }

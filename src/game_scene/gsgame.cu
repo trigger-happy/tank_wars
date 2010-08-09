@@ -27,13 +27,6 @@
 #define CUDA_BLOCKS 1
 #define CUDA_THREADS MAX_ARRAY_SIZE
 
-//NOTE: external calls are not supported, cheap hack but it works
-#if __CUDA_ARCH__
-#include "../game_core/physics.cu"
-#include "../game_core/tankbullet.cu"
-#include "../game_core/basictank.cu"
-#endif
-
 using namespace Physics;
 
 // helper function
