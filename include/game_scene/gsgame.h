@@ -35,7 +35,17 @@
 #define PLAYER_STOP		32
 
 namespace Physics{
-	class PhysRunner;
+	namespace PhysRunner{
+		struct RunnerCore;
+	}
+}
+
+namespace TankBullet{
+	struct BulletCollection;
+}
+
+namespace BasicTank{
+	struct TankCollection;
 }
 
 class GSGame : public iGameScene{
@@ -50,19 +60,19 @@ public:
 							   CL_InputDevice* keyboard,
 							   CL_InputDevice* mouse);
 private:
-	boost::scoped_ptr<Physics::PhysRunner> m_physrunner;
+	boost::scoped_ptr<Physics::PhysRunner::RunnerCore> m_physrunner;
 	boost::scoped_ptr<CL_Sprite> m_background;
 	boost::scoped_ptr<CL_Sprite> m_testbullet;
 	boost::scoped_ptr<CL_Sprite> m_testtank;
-	TankBullet m_bullets;
-	BasicTank m_tanks;
+	TankBullet::BulletCollection m_bullets;
+	BasicTank::TankCollection m_tanks;
 	tank_id m_playertank;
 	u8 m_player_input;
 	
 	//cuda stuff
-	Physics::PhysRunner* m_cuda_runner;
-	TankBullet* m_cuda_bullets;
-	BasicTank* m_cuda_tanks;
+	Physics::PhysRunner::RunnerCore* m_cuda_runner;
+	TankBullet::BulletCollection* m_cuda_bullets;
+	BasicTank::TankCollection* m_cuda_tanks;
 // 	u8* m_cuda_player_input;
 };
 

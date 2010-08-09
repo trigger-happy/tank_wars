@@ -18,19 +18,18 @@
 */
 #include "game_display.h"
 #include "game_scene/gsgame.h"
-#include "game_core/physics.h"
-#include "game_core/tankbullet.h"
-#include "game_core/basictank.h"
+#include "../game_core/twgame.cu"
+// #include "game_core/physics.h"
+// #include "game_core/tankbullet.h"
+// #include "game_core/basictank.h"
 
 #define SCALE_FACTOR 12
 
 #define CUDA_BLOCKS 1
 #define CUDA_THREADS MAX_ARRAY_SIZE
 
-using namespace Physics;
-
 // helper function
-void apply_transform(CL_GraphicContext* gc, vec2& c){
+void apply_transform(CL_GraphicContext* gc, Physics::vec2& c){
 	c.x *= SCALE_FACTOR;
 	c.y *= -SCALE_FACTOR;
 	c.x += gc->get_width()/2;
@@ -38,7 +37,7 @@ void apply_transform(CL_GraphicContext* gc, vec2& c){
 }
 
 GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
-: m_physrunner(new PhysRunner()){
+: m_physrunner(new Physics::PhysRunner::RunnerCore()){
 	
 	m_background.reset(new CL_Sprite(gc,
 									 "game_assets/background",
@@ -49,34 +48,34 @@ GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
 	m_testtank.reset(new CL_Sprite(gc,
 								   "game_assets/tank_blu",
 								   &resources));
-								   
-	m_bullets.initialize(m_physrunner.get());
-	m_tanks.initialize(m_physrunner.get(), &m_bullets);
+	
+	TankBullet::initialize(&m_bullets, m_physrunner.get());
+	BasicTank::initialize(&m_tanks, m_physrunner.get(), &m_bullets);
 	
 	// test code
-	vec2 params;
-	m_playertank = m_tanks.spawn_tank(params, 0);
+	Physics::vec2 params;
+	m_playertank = BasicTank::spawn_tank(&m_tanks, params, 0);
 	m_player_input = 0;
 	
 	// stuff for cuda
 	if(GameDisplay::s_usecuda){
 		// allocate cuda memory
 		cudaMalloc(reinterpret_cast<void**>(&m_cuda_runner),
-				   sizeof(PhysRunner));
+				   sizeof(Physics::PhysRunner::RunnerCore));
 		cudaMalloc(reinterpret_cast<void**>(&m_cuda_bullets),
-				   sizeof(TankBullet));
+				   sizeof(TankBullet::BulletCollection));
 		cudaMalloc(reinterpret_cast<void**>(&m_cuda_tanks),
-				   sizeof(BasicTank));
+				   sizeof(BasicTank::TankCollection));
 // 		cudaMalloc(reinterpret_cast<void**>(&m_cuda_player_input),
 // 				   sizeof(m_player_input));
 		
 		// reset the pointers
-		m_bullets.reset_phys_pointer(m_cuda_runner);
-		m_tanks.reset_phys_pointer(m_cuda_runner);
+		BasicTank::reset_pointers(&m_tanks, m_cuda_runner, m_cuda_bullets);
+		TankBullet::reset_phys_pointer(&m_bullets, m_cuda_runner);
 		
 		// copy over the stuff to GPU mem
 		cudaMemcpy(m_cuda_runner, m_physrunner.get(),
-				   sizeof(PhysRunner), cudaMemcpyHostToDevice);
+				   sizeof(Physics::PhysRunner::RunnerCore), cudaMemcpyHostToDevice);
 				   
 		cudaMemcpy(m_cuda_bullets, &m_bullets,
 				   sizeof(m_bullets), cudaMemcpyHostToDevice);
@@ -89,8 +88,8 @@ GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
 }
 
 GSGame::~GSGame(){
-	m_tanks.destroy();
-	m_bullets.destroy();
+	BasicTank::destroy(&m_tanks);
+	TankBullet::destroy(&m_bullets);
 	cudaFree(m_cuda_tanks);
 	cudaFree(m_cuda_bullets);
 	cudaFree(m_cuda_runner);
@@ -105,32 +104,34 @@ void GSGame::onSceneActivate(){
 void GSGame::onFrameRender(CL_GraphicContext* gc){
 	if(GameDisplay::s_usecuda){
 		// re-assign the pointer to the CPU version
-		m_tanks.reset_phys_pointer(m_physrunner.get());
-		m_bullets.reset_phys_pointer(m_physrunner.get());
+		BasicTank::reset_pointers(&m_tanks, m_physrunner.get(), &m_bullets);
+		TankBullet::reset_phys_pointer(&m_bullets, m_physrunner.get());
 	}
 	// draw the background
-	vec2 pos;
+	Physics::vec2 pos;
 	apply_transform(gc, pos);
 	m_background->draw(*gc, pos.x, pos.y);
 	
 	// draw the bullets
-	pos = m_bullets.get_bullet_pos(0);
+	pos = TankBullet::get_bullet_pos(&m_bullets, 0);
 	apply_transform(gc, pos);
 	m_testbullet->draw(*gc, pos.x, pos.y);
 	
 	// draw the tanks
-	pos = m_tanks.get_tank_pos(m_playertank);
+	pos = BasicTank::get_tank_pos(&m_tanks, m_playertank);
 	apply_transform(gc, pos);
-	f32 rot = m_tanks.get_tank_rot(m_playertank);
+	f32 rot = BasicTank::get_tank_rot(&m_tanks, m_playertank);
 	m_testtank->set_angle(CL_Angle(-rot, cl_degrees));
 	m_testtank->draw(*gc, pos.x, pos.y);
 }
 
+
+// #if __CUDA_ARCH__
 __global__ void gsgame_step(f32 dt,
 							tank_id player_tank,
-							PhysRunner* runner,
-							TankBullet* bullets,
-							BasicTank* tanks,
+							Physics::PhysRunner::RunnerCore* runner,
+							TankBullet::BulletCollection* bullets,
+							BasicTank::TankCollection* tanks,
 							u8 player_input){
 	int idx = threadIdx.x;
 	
@@ -140,29 +141,30 @@ __global__ void gsgame_step(f32 dt,
 		// thread 0 will perform the input processing
 		// all other threads will do squat (wasteful but can't be helped)
 		if(player_input & PLAYER_FIRE){
-			tanks->fire(player_tank);
+			BasicTank::fire(tanks, player_tank);
 		}
 		
 		if(player_input & PLAYER_STOP){
-			tanks->stop(player_tank);
+			BasicTank::stop(tanks, player_tank);
 		}
 		
 		if(player_input & PLAYER_FORWARD){
-			tanks->move_forward(player_tank);
+			BasicTank::move_backward(tanks, player_tank);
 		}else if(player_input & PLAYER_BACKWARD){
-			tanks->move_backward(player_tank);
+			BasicTank::move_forward(tanks, player_tank);
 		}
 		
 		if(player_input & PLAYER_LEFT){
-			tanks->turn_left(player_tank);
+			BasicTank::turn_left(tanks, player_tank);
 		}else if(player_input & PLAYER_RIGHT){
-			tanks->turn_right(player_tank);
+			BasicTank::turn_right(tanks, player_tank);
 		}
 	}
- 	runner->timestep(dt);
- 	bullets->update(dt);
- 	tanks->update(dt);
+	Physics::PhysRunner::timestep(runner, dt);
+	TankBullet::update(bullets, dt);
+	BasicTank::update(tanks, dt);
 }
+// #endif
 
 void GSGame::onFrameUpdate(double dt,
 						   CL_InputDevice* keyboard,
@@ -222,29 +224,29 @@ void GSGame::onFrameUpdate(double dt,
 	}else{
 		// process the player input
 		if(m_player_input & PLAYER_FIRE){
-			m_tanks.fire(m_playertank);
+			BasicTank::fire(&m_tanks, m_playertank);
 		}
 		
 		if(m_player_input & PLAYER_STOP){
-			m_tanks.stop(m_playertank);
+			BasicTank::stop(&m_tanks, m_playertank);
 		}
 		
 		if(m_player_input & PLAYER_FORWARD){
-			m_tanks.move_forward(m_playertank);
+			BasicTank::move_forward(&m_tanks, m_playertank);
 		}else if(m_player_input & PLAYER_BACKWARD){
-			m_tanks.move_backward(m_playertank);
+			BasicTank::move_backward(&m_tanks, m_playertank);
 		}
 		
 		if(m_player_input & PLAYER_LEFT){
-			m_tanks.turn_left(m_playertank);
+			BasicTank::turn_left(&m_tanks, m_playertank);
 		}else if(m_player_input & PLAYER_RIGHT){
-			m_tanks.turn_right(m_playertank);
+			BasicTank::turn_right(&m_tanks, m_playertank);
 		}
 		
 		// perform all the update
-		m_physrunner->timestep(dt);
-		m_bullets.update(dt);
-		m_tanks.update(dt);
+		Physics::PhysRunner::timestep(m_physrunner.get(), dt);
+		TankBullet::update(&m_bullets, dt);
+		BasicTank::update(&m_tanks, dt);
 	}
 	
 	// update the sprites
