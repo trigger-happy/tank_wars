@@ -95,9 +95,11 @@ void TankBullet::fire_bullet(TankBullet::BulletCollection* bc,
 		f32 rotation_rads = util::degs_to_rads(rot_degrees);
 		params.x = INITIAL_BULLET_ACCELERATION * cosf(rotation_rads);
 		params.y = INITIAL_BULLET_ACCELERATION * sinf(rotation_rads);
-		Physics::PhysRunner::set_acceleration(bc->parent_runner, bid, params);
+		Physics::PhysRunner::set_acceleration(bc->parent_runner,
+											  bc->phys_id[bid], params);
 		
-		Physics::PhysRunner::set_cur_pos(bc, bid, pos);
+		Physics::PhysRunner::set_cur_pos(bc->parent_runner,
+										 bc->phys_id[bid], pos);
 		bc->state[bid] = STATE_TRAVELLING;
 	}
 }
@@ -127,6 +129,6 @@ bullet_id TankBullet::get_bullet(TankBullet::BulletCollection* bc){
 	return bc->cur_free_bullet++;
 }
 
-bullet_id TankBullet::get_max_bullets(TankBullet::BulletCollection* bc) const{
+bullet_id TankBullet::get_max_bullets(TankBullet::BulletCollection* bc){
 	return MAX_BULLETS;
 }

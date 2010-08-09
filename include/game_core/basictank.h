@@ -21,8 +21,6 @@
 #include "game_core/tankbullet.h"
 
 #define MAX_TANK_VEL	7.0f
-#define OFFSCREEN_X		1000
-#define OFFSCREEN_Y		1000
 #define INITIAL_ROT		0
 
 #define TANK_ROT_RATE	2.0f

@@ -21,11 +21,9 @@
 #include "util/util.h"
 
 #define NUM_ITERATIONS 30
+#include "game_core/physics.h"
 
-using namespace Physics;
-
-
-vec2_array::vec2_array(){
+Physics::vec2_array::vec2_array(){
 	#if __CUDA_ARCH__
 		// device code
 		for(int i = 0; i < MAX_ARRAY_SIZE; ++i){
@@ -39,7 +37,7 @@ vec2_array::vec2_array(){
 	#endif
 }
 
-vec2 vec2_array::get_vec2(u32 id){
+Physics::vec2 Physics::vec2_array::get_vec2(u32 id){
 	vec2 temp;
 	temp.x = x[id];
 	temp.y = y[id];
@@ -47,22 +45,22 @@ vec2 vec2_array::get_vec2(u32 id){
 }
 
 
-PhysRunner::PhysRunner()
-: m_first_free_slot(0){
-	memset(m_free_slots, 0, sizeof(u8)*MAX_ARRAY_SIZE);
+void Physics::PhysRunner::initialize(Physics::PhysRunner::RunnerCore* rc){
+	memset(rc->free_slots, 0, sizeof(u8)*MAX_ARRAY_SIZE);
 }
 
-PhysRunner::~PhysRunner(){
+void Physics::PhysRunner::cleanup(Physics::PhysRunner::RunnerCore* rc){
+	//TODO: cleanup stuff here
 }
 
 CUDA_EXPORT void update_verlet(f32 dt,
-							  physBody* bodies){
+							   Physics::physBody* bodies){
 	#if __CUDA_ARCH__
 		// device code
 		u32 idx = threadIdx.x;
 		
-		vec2 temp = bodies->cur_pos.get_vec2(idx);
-		vec2 newpos;
+		Physics::vec2 temp = bodies->cur_pos.get_vec2(idx);
+		Physics::vec2 newpos;
 		
 		newpos.x = bodies->cur_pos.x[idx] - bodies->old_pos.x[idx] 
 		+ bodies->acceleration.x[idx] * dt * dt;
@@ -71,7 +69,7 @@ CUDA_EXPORT void update_verlet(f32 dt,
 		+ bodies->acceleration.y[idx] * dt * dt;
 		
 		// don't let the object exceed maximum velocity
-		vec2 maxvel;
+		Physics::vec2 maxvel;
 		maxvel.x = fabsf(dt * bodies->max_vel[idx]
 		* cosf(bodies->rotation[idx]
 		* (static_cast<float>(PI)/180)));
@@ -102,8 +100,8 @@ CUDA_EXPORT void update_verlet(f32 dt,
 	#elif !defined(__CUDA_ARCH__)
 		// host code, this is completely serialized
 		for(u32 idx = 0; idx < MAX_ARRAY_SIZE; ++idx){
-			vec2 temp = bodies->cur_pos.get_vec2(idx);
-			vec2 newpos;
+			Physics::vec2 temp = bodies->cur_pos.get_vec2(idx);
+			Physics::vec2 newpos;
 			
 			newpos.x = bodies->cur_pos.x[idx] - bodies->old_pos.x[idx] 
 			+ bodies->acceleration.x[idx] * dt * dt;
@@ -112,7 +110,7 @@ CUDA_EXPORT void update_verlet(f32 dt,
 			+ bodies->acceleration.y[idx] * dt * dt;
 			
 			// don't let the object exceed maximum velocity
-			vec2 maxvel;
+			Physics::vec2 maxvel;
 			maxvel.x = fabsf(dt * bodies->max_vel[idx]
 			* cosf(bodies->rotation[idx]
 			* (static_cast<float>(PI)/180)));
@@ -144,149 +142,172 @@ CUDA_EXPORT void update_verlet(f32 dt,
 	#endif
 }
 
-void PhysRunner::timestep(PhysRunner::RunnerCore* rc, f32 dt){
+void Physics::PhysRunner::timestep(Physics::PhysRunner::RunnerCore* rc, f32 dt){
 	// convert from millisecond to seconds
 	dt /= 1000.0f;
 	
-	update_verlet(dt, &m_bodies);
+	update_verlet(dt, &(rc->bodies));
 }
 
-void PhysRunner::find_next_free_slot(PhysRunner::RunnerCore* rc){
+void Physics::PhysRunner::find_next_free_slot(Physics::PhysRunner::RunnerCore* rc){
 	// keep incrementing 
 	for(u32 i = 0; i < MAX_ARRAY_SIZE; ++i){
-		if(!m_free_slots[i]){
-			m_first_free_slot = i;
+		if(!rc->free_slots[i]){
+			rc->first_free_slot = i;
 			return;
 		}
 	}
-	m_first_free_slot = MAX_ARRAY_SIZE;
+	rc->first_free_slot= MAX_ARRAY_SIZE;
 }
 
-u32 PhysRunner::get_slot(PhysRunner::RunnerCore* rc){
-	if(!m_free_slots[m_first_free_slot]){
-		m_free_slots[m_first_free_slot] = true;
-		return m_first_free_slot++;
+u32 Physics::PhysRunner::get_slot(Physics::PhysRunner::RunnerCore* rc){
+	if(!rc->free_slots[rc->first_free_slot]){
+		rc->free_slots[rc->first_free_slot] = true;
+		return rc->first_free_slot++;
 	}
 	
-	find_next_free_slot();
+	Physics::PhysRunner::find_next_free_slot(rc);
 	
 	#if !defined(__CUDA_ARCH__)
 		// host code
-		assert(m_first_free_slot < MAX_ARRAY_SIZE);
+		assert(rc->first_free_slot < MAX_ARRAY_SIZE);
 	#endif
 	
-	//NOTE: be warned that we might be returning MAX_ARRAY_SIZE or greater
-	return m_first_free_slot++;
+	//WARNING: we might be returning MAX_ARRAY_SIZE or greater
+	return rc->first_free_slot++;
 }
 
-void PhysRunner::free_slot(PhysRunner::RunnerCore* rc, u32 id){
-	m_free_slots[id] = false;
+void Physics::PhysRunner::free_slot(Physics::PhysRunner::RunnerCore* rc, u32 id){
+	rc->free_slots[id] = false;
 }
 
 
-physBody::physBody(){
-	for(int i = 0; i < MAX_ARRAY_SIZE; ++i){
-		rotation[i] = 0;
-		max_vel[i] = 0;
-		can_collide[i] = false;
-		shape_type[i] = 0;
+void Physics::init_physbody(Physics::physBody* pb){
+	int idx = 0;
+	#if __CUDA_ARCH__
+	idx = threadIdx.x;
+	if(idx < MAX_ARRAY_SIZE){
+	#elif !defined(__CUDA_ARCH__)
+	for(idx = 0; idx < MAX_ARRAY_SIZE; ++idx){
+	#endif
+		pb->rotation[idx] = 0;
+		pb->max_vel[idx] = 0;
+		pb->can_collide[idx] = false;
+		pb->shape_type[idx] = 0;
 	}
 }
 
-pBody PhysRunner::create_object(PhysRunner::RunnerCore* rc){
-	return get_slot();
+Physics::pBody Physics::PhysRunner::create_object(Physics::PhysRunner::RunnerCore* rc){
+	return Physics::PhysRunner::get_slot(rc);
 }
 
-void PhysRunner::destroy_object(PhysRunner::RunnerCore* rc, pBody bd){
-	free_slot(oid);
+void Physics::PhysRunner::destroy_object(Physics::PhysRunner::RunnerCore* rc,
+										 Physics::pBody oid){
+	Physics::PhysRunner::free_slot(rc, oid);
 }
 
-vec2 PhysRunner::get_cur_pos(PhysRunner::RunnerCore* rc, pBody bd){
+Physics::vec2 Physics::PhysRunner::get_cur_pos(Physics::PhysRunner::RunnerCore* rc,
+											   Physics::pBody oid){
 	vec2 temp;
-	temp.x = m_bodies.cur_pos.x[oid];
-	temp.y = m_bodies.cur_pos.y[oid];
+	temp.x = rc->bodies.cur_pos.x[oid];
+	temp.y = rc->bodies.cur_pos.y[oid];
 	return temp;
 }
 
-vec2 PhysRunner::get_acceleration(PhysRunner::RunnerCore* rc, pBody bd){
+Physics::vec2 Physics::PhysRunner::get_acceleration(Physics::PhysRunner::RunnerCore* rc,
+													Physics::pBody oid){
 	vec2 temp;
-	temp.x = m_bodies.acceleration.x[oid];
-	temp.y = m_bodies.acceleration.y[oid];
+	temp.x = rc->bodies.acceleration.x[oid];
+	temp.y = rc->bodies.acceleration.y[oid];
 	return temp;
 }
 
-f32 PhysRunner::get_rotation(PhysRunner::RunnerCore* rc, pBody bd){
+f32 Physics::PhysRunner::get_rotation(Physics::PhysRunner::RunnerCore* rc,
+									  Physics::pBody oid){
 	f32 rot = 0;
-	rot = m_bodies.rotation[oid];
+	rot = rc->bodies.rotation[oid];
 	return rot;
 }
 
-f32 PhysRunner::get_max_velocity(PhysRunner::RunnerCore* rc, pBody bd){
+f32 Physics::PhysRunner::get_max_velocity(Physics::PhysRunner::RunnerCore* rc,
+										  Physics::pBody oid){
 	f32 mv = 0;
-	mv = m_bodies.rotation[oid];
+	mv = rc->bodies.rotation[oid];
 	return mv;
 }
 
-bool PhysRunner::is_collidable(PhysRunner::RunnerCore* rc, pBody bd){
+bool Physics::PhysRunner::is_collidable(Physics::PhysRunner::RunnerCore* rc,
+										Physics::pBody oid){
 	bool f = false;
-	f = m_bodies.can_collide[oid];
+	f = rc->bodies.can_collide[oid];
 	return f;
 }
 
-pShape PhysRunner::get_shape_type(PhysRunner::RunnerCore* rc, pBody bd){
+Physics::pShape Physics::PhysRunner::get_shape_type(Physics::PhysRunner::RunnerCore* rc,
+													Physics::pBody oid){
 	u32 st = 0;
-	st = m_bodies.shape_type[oid];
+	st = rc->bodies.shape_type[oid];
 	return st;
 }
 
-u32 PhysRunner::get_user_data(PhysRunner::RunnerCore* rc, pBody bd){
+u32 Physics::PhysRunner::get_user_data(Physics::PhysRunner::RunnerCore* rc,
+									   Physics::pBody oid){
 	u32 ud = 0;
-	ud = m_bodies.user_data[oid];
+	ud = rc->bodies.user_data[oid];
 	return ud;
 }
 
-vec2 PhysRunner::get_dimensions(PhysRunner::RunnerCore* rc, pBody bd){
+Physics::vec2 Physics::PhysRunner::get_dimensions(Physics::PhysRunner::RunnerCore* rc,
+												  Physics::pBody oid){
 	vec2 dim;
-	dim = m_bodies.dimension.get_vec2(oid);
+	dim = rc->bodies.dimension.get_vec2(oid);
 	return dim;
 }
 
-void PhysRunner::set_cur_pos(pBody oid,
-							 const Physics::vec2& pos){
-	m_bodies.cur_pos.x[oid] = pos.x;
-	m_bodies.cur_pos.y[oid] = pos.y;
-	m_bodies.old_pos.x[oid] = pos.x;
-	m_bodies.old_pos.y[oid] = pos.y;
+void Physics::PhysRunner::set_cur_pos(Physics::PhysRunner::RunnerCore* rc,
+									  Physics::pBody oid,
+									  const Physics::vec2& pos){
+	rc->bodies.cur_pos.x[oid] = pos.x;
+	rc->bodies.cur_pos.y[oid] = pos.y;
+	rc->bodies.old_pos.x[oid] = pos.x;
+	rc->bodies.old_pos.y[oid] = pos.y;
 }
 
-void PhysRunner::set_acceleration(pBody oid,
-								  const Physics::vec2& accel){
-	m_bodies.acceleration.x[oid] = accel.x;
-	m_bodies.acceleration.y[oid] = accel.y;
+void Physics::PhysRunner::set_acceleration(Physics::PhysRunner::RunnerCore* rc,
+										   Physics::pBody oid,
+										   const Physics::vec2& accel){
+	rc->bodies.acceleration.x[oid] = accel.x;
+	rc->bodies.acceleration.y[oid] = accel.y;
 }
 
-void PhysRunner::set_rotation(PhysRunner::RunnerCore* rc, pBody bd, f32 r){
-	m_bodies.rotation[oid] = r;
+void Physics::PhysRunner::set_rotation(Physics::PhysRunner::RunnerCore* rc,
+									   Physics::pBody oid, f32 r){
+	rc->bodies.rotation[oid] = r;
 }
 
-void PhysRunner::set_max_velocity(PhysRunner::RunnerCore* rc, pBody bd, f32 mv){
-	m_bodies.max_vel[oid] = mv;
+void Physics::PhysRunner::set_max_velocity(Physics::PhysRunner::RunnerCore* rc,
+										   Physics::pBody oid, f32 mv){
+	rc->bodies.max_vel[oid] = mv;
 }
 
-void PhysRunner::should_collide(PhysRunner::RunnerCore* rc, pBody bd, bool f){
-	m_bodies.can_collide[oid] = f;
+void Physics::PhysRunner::should_collide(Physics::PhysRunner::RunnerCore* rc,
+										 Physics::pBody oid, bool f){
+	rc->bodies.can_collide[oid] = f;
 }
 
-void PhysRunner::set_shape_type(PhysRunner::RunnerCore* rc, pBody bd, pShape st){
-	m_bodies.shape_type[oid] = st;
+void Physics::PhysRunner::set_shape_type(Physics::PhysRunner::RunnerCore* rc,
+										 Physics::pBody oid, pShape st){
+	rc->bodies.shape_type[oid] = st;
 }
 
-void PhysRunner::set_user_data(PhysRunner::RunnerCore* rc, pBody bd, u32 ud){
-	m_bodies.user_data[oid] = ud;
+void Physics::PhysRunner::set_user_data(Physics::PhysRunner::RunnerCore* rc,
+										Physics::pBody oid, u32 ud){
+	rc->bodies.user_data[oid] = ud;
 }
 
-void PhysRunner::set_dimensions(pBody oid,
-								const Physics::vec2& dim){
-	m_bodies.dimension.x[oid] = dim.x;
-	m_bodies.dimension.y[oid] = dim.y;
+void Physics::PhysRunner::set_dimensions(Physics::PhysRunner::RunnerCore* rc,
+										 Physics::pBody oid,
+										 const Physics::vec2& dim){
+	rc->bodies.dimension.x[oid] = dim.x;
+	rc->bodies.dimension.y[oid] = dim.y;
 }

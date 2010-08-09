@@ -26,7 +26,7 @@ void BasicTank::initialize(BasicTank::TankCollection* tank,
 	tank->next_tank = 0;
 	Physics::vec2 params;
 	for(int i = 0; i < MAX_TANKS; ++i){
-		tank->phys_id[i] = Physics::PhysRunner::create_object();
+		tank->phys_id[i] = Physics::PhysRunner::create_object(p);
 		Physics::PhysRunner::set_acceleration(p, tank->phys_id[i], params);
 		Physics::PhysRunner::set_max_velocity(p, tank->phys_id[i], MAX_TANK_VEL);
 		Physics::PhysRunner::set_rotation(p, tank->phys_id[i], 0);
@@ -63,7 +63,8 @@ void BasicTank::reset_pointers(BasicTank::TankCollection* tank,
 
 void BasicTank::destroy(BasicTank::TankCollection* tank){
 	for(int i = 0; i < MAX_TANKS; ++i){
-		Physics::PhysRunner::destroy_object(tank->phys_id[i]);
+		Physics::PhysRunner::destroy_object(tank->parent_runner,
+											tank->phys_id[i]);
 	}
 }
 
@@ -86,7 +87,8 @@ void BasicTank::move_forward(BasicTank::TankCollection* tt, tank_id tid){
 																   tt->phys_id[tid]));
 	accel.x = TANK_ACCEL_RATE * cosf(rot);
 	accel.y = TANK_ACCEL_RATE * sinf(rot);
-	Physics::PhysRunner::set_acceleration(tt->phys_id[tid], accel);
+	Physics::PhysRunner::set_acceleration(tt->parent_runner,
+										  tt->phys_id[tid], accel);
 	tt->state[tid] = STATE_MOVING_FORWARD;
 }
 
@@ -110,7 +112,8 @@ void BasicTank::stop(BasicTank::TankCollection* tt, tank_id tid){
 										  tt->phys_id[tid], accel);
 	Physics::PhysRunner::set_cur_pos(tt->parent_runner,
 									 tt->phys_id[tid],
-									 Physics::PhysRunner::get_cur_pos(tt->phys_id[tid]));
+									 Physics::PhysRunner::get_cur_pos(tt->parent_runner,
+																	  tt->phys_id[tid]));
 }
 
 void BasicTank::turn_left(BasicTank::TankCollection* tt, tank_id tid){

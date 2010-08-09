@@ -93,7 +93,7 @@ namespace TankBullet{
 	/*!
 	Get the maximum number of bullets available
 	*/
-	CUDA_EXPORT bullet_id get_max_bullets(BulletCollection* bc) const;
+	CUDA_EXPORT bullet_id get_max_bullets(BulletCollection* bc);
 };
 
 #endif //TANKBULLET_H
