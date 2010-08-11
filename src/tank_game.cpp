@@ -108,7 +108,9 @@ int GameDisplay::main(){
 			
 			// sleep until we reach the next frame time iteration
 			//NOTE: this seems to be buggy in windows
+#if !defined(WIN32)
 			CL_System::sleep(FRAME_TIME - s_deltatime);
+#endif
 		}
 	}catch(CL_Exception& e){
 		CL_ConsoleWindow console("error console", 80, 160);
