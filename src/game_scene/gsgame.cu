@@ -149,9 +149,9 @@ __global__ void gsgame_step(f32 dt,
 		}
 		
 		if(player_input & PLAYER_FORWARD){
-			BasicTank::move_backward(tanks, player_tank);
-		}else if(player_input & PLAYER_BACKWARD){
 			BasicTank::move_forward(tanks, player_tank);
+		}else if(player_input & PLAYER_BACKWARD){
+			BasicTank::move_backward(tanks, player_tank);
 		}
 		
 		if(player_input & PLAYER_LEFT){
@@ -219,7 +219,8 @@ void GSGame::onFrameUpdate(double dt,
 				   cudaMemcpyDeviceToHost);
 		cudaMemcpy(&m_tanks, m_cuda_tanks, sizeof(m_tanks),
 				   cudaMemcpyDeviceToHost);
-		cudaMemcpy(m_physrunner.get(), m_cuda_runner, sizeof(m_physrunner),
+		cudaMemcpy(m_physrunner.get(), m_cuda_runner,
+				   sizeof(Physics::PhysRunner::RunnerCore),
 				   cudaMemcpyDeviceToHost);
 	}else{
 		// process the player input
