@@ -169,6 +169,9 @@ tank_id BasicTank::spawn_tank(BasicTank::TankCollection* tt, const Physics::vec2
 	tank_id tid = tt->next_tank++;
 	Physics::PhysRunner::set_cur_pos(tt->parent_runner, tt->phys_id[tid], pos);
 	Physics::PhysRunner::set_rotation(tt->parent_runner, tt->phys_id[tid], rot);
+	Physics::vec2 accel;
+	accel.x = accel.y = 0;
+	Physics::PhysRunner::set_acceleration(tt->parent_runner, tt->phys_id[tid], accel);
 	tt->state[tid] = STATE_NEUTRAL;
 	return tid;
 }

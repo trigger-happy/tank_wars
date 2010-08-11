@@ -67,7 +67,6 @@ GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
 	m_playertank = BasicTank::spawn_tank(&m_tanks, params, 0);
 	params.x = 25;
 	m_player2tank = BasicTank::spawn_tank(&m_tanks, params, 180);
-	BasicTank::stop(&m_tanks, m_player2tank);
 	m_player_input = 0;
 	m_player2_input = 0;
 	
