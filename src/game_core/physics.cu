@@ -55,90 +55,57 @@ void Physics::PhysRunner::cleanup(Physics::PhysRunner::RunnerCore* rc){
 
 CUDA_EXPORT void update_verlet(f32 dt,
 							   Physics::physBody* bodies){
+	int idx = 0;
 	#if __CUDA_ARCH__
 		// device code
-		u32 idx = threadIdx.x;
-		
-		Physics::vec2 temp = bodies->cur_pos.get_vec2(idx);
-		Physics::vec2 newpos;
-		
-		newpos.x = bodies->cur_pos.x[idx] - bodies->old_pos.x[idx] 
-		+ bodies->acceleration.x[idx] * dt * dt;
-		
-		newpos.y = bodies->cur_pos.y[idx] - bodies->old_pos.y[idx] 
-		+ bodies->acceleration.y[idx] * dt * dt;
-		
-		// don't let the object exceed maximum velocity
-		Physics::vec2 maxvel;
-		maxvel.x = fabsf(dt * bodies->max_vel[idx]
-		* cosf(bodies->rotation[idx]
-		* (static_cast<float>(PI)/180)));
-		
-		maxvel.y = fabsf(dt * bodies->max_vel[idx]
-		* sinf(bodies->rotation[idx]
-		* (static_cast<float>(PI)/180)));
-		
-		if(fabsf(newpos.x) > fabsf(maxvel.x)){
-			if(bodies->acceleration.x[idx] < 0){
-				newpos.x = -maxvel.x;
-			}else{
-				newpos.x = maxvel.x;
-			}
-		}
-		if(fabsf(newpos.y) > fabsf(maxvel.y)){
-			if(bodies->acceleration.y[idx] < 0){
-				newpos.y = -maxvel.y;
-			}else{
-				newpos.y = maxvel.y;
-			}
-		}
-		
-		bodies->cur_pos.x[idx] += newpos.x;
-		bodies->cur_pos.y[idx] += newpos.y;
-		bodies->old_pos.x[idx] = temp.x;
-		bodies->old_pos.y[idx] = temp.y;
+	idx = threadIdx.x;
+	
 	#elif !defined(__CUDA_ARCH__)
 		// host code, this is completely serialized
-		for(u32 idx = 0; idx < MAX_ARRAY_SIZE; ++idx){
-			Physics::vec2 temp = bodies->cur_pos.get_vec2(idx);
-			Physics::vec2 newpos;
-			
-			newpos.x = bodies->cur_pos.x[idx] - bodies->old_pos.x[idx] 
-			+ bodies->acceleration.x[idx] * dt * dt;
-			
-			newpos.y = bodies->cur_pos.y[idx] - bodies->old_pos.y[idx] 
-			+ bodies->acceleration.y[idx] * dt * dt;
-			
-			// don't let the object exceed maximum velocity
-			Physics::vec2 maxvel;
-			maxvel.x = fabsf(dt * bodies->max_vel[idx]
-			* cosf(bodies->rotation[idx]
-			* (static_cast<float>(PI)/180)));
-			
-			maxvel.y = fabsf(dt * bodies->max_vel[idx]
-			* sinf(bodies->rotation[idx]
-			* (static_cast<float>(PI)/180)));
-			
-			if(fabsf(newpos.x) > fabsf(maxvel.x)){
-				if(bodies->acceleration.x[idx] < 0){
-					newpos.x = -maxvel.x;
-				}else{
-					newpos.x = maxvel.x;
-				}
-			}
-			if(fabsf(newpos.y) > fabsf(maxvel.y)){
-				if(bodies->acceleration.y[idx] < 0){
-					newpos.y = -maxvel.y;
-				}else{
-					newpos.y = maxvel.y;
-				}
-			}
-			
-			bodies->cur_pos.x[idx] += newpos.x;
-			bodies->cur_pos.y[idx] += newpos.y;
-			bodies->old_pos.x[idx] = temp.x;
-			bodies->old_pos.y[idx] = temp.y;
+	for(idx = 0; idx < MAX_ARRAY_SIZE; ++idx){
+	#endif
+	
+	Physics::vec2 temp = bodies->cur_pos.get_vec2(idx);
+	Physics::vec2 newpos;
+	
+	newpos.x = bodies->cur_pos.x[idx] - bodies->old_pos.x[idx] 
+	+ bodies->acceleration.x[idx] * dt * dt;
+	
+	newpos.y = bodies->cur_pos.y[idx] - bodies->old_pos.y[idx] 
+	+ bodies->acceleration.y[idx] * dt * dt;
+	
+	// don't let the object exceed maximum velocity
+	Physics::vec2 maxvel;
+	maxvel.x = fabsf(dt * bodies->max_vel[idx]
+	* cosf(bodies->rotation[idx]
+	* (static_cast<float>(PI)/180)));
+	
+	maxvel.y = fabsf(dt * bodies->max_vel[idx]
+	* sinf(bodies->rotation[idx]
+	* (static_cast<float>(PI)/180)));
+	
+	if(fabsf(newpos.x) > fabsf(maxvel.x)){
+		if(bodies->acceleration.x[idx] < 0){
+			newpos.x = -maxvel.x;
+		}else{
+			newpos.x = maxvel.x;
 		}
+	}
+	if(fabsf(newpos.y) > fabsf(maxvel.y)){
+		if(bodies->acceleration.y[idx] < 0){
+			newpos.y = -maxvel.y;
+		}else{
+			newpos.y = maxvel.y;
+		}
+	}
+	
+	bodies->cur_pos.x[idx] += newpos.x;
+	bodies->cur_pos.y[idx] += newpos.y;
+	bodies->old_pos.x[idx] = temp.x;
+	bodies->old_pos.y[idx] = temp.y;
+	
+	#if !defined(__CUDA_ARCH__)
+	}
 	#endif
 }
 

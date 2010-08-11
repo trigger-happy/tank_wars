@@ -146,9 +146,7 @@ __global__ void gsgame_step(f32 dt,
 		
 		if(player_input & PLAYER_STOP){
 			BasicTank::stop(tanks, player_tank);
-		}
-		
-		if(player_input & PLAYER_FORWARD){
+		}else if(player_input & PLAYER_FORWARD){
 			BasicTank::move_forward(tanks, player_tank);
 		}else if(player_input & PLAYER_BACKWARD){
 			BasicTank::move_backward(tanks, player_tank);
@@ -182,9 +180,7 @@ void GSGame::onFrameUpdate(double dt,
 	if(keyboard->get_keycode(CL_KEY_RETURN)){
 		//m_tanks.stop(m_playertank);
 		m_player_input |= PLAYER_STOP;
-	}
-	
-	if(keyboard->get_keycode(CL_KEY_UP)){
+	}else if(keyboard->get_keycode(CL_KEY_UP)){
 		//m_tanks.move_forward(m_playertank);
 		m_player_input |= PLAYER_FORWARD;
 	}else if(keyboard->get_keycode(CL_KEY_DOWN)){
