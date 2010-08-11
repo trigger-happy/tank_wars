@@ -48,6 +48,7 @@ Physics::vec2 Physics::vec2_array::get_vec2(u32 id){
 void Physics::PhysRunner::initialize(Physics::PhysRunner::RunnerCore* rc){
 	rc->first_free_slot = 0;
 	memset(rc->free_slots, 0, sizeof(u8)*MAX_ARRAY_SIZE);
+	init_physbody(&(rc->bodies));
 }
 
 void Physics::PhysRunner::cleanup(Physics::PhysRunner::RunnerCore* rc){
@@ -163,6 +164,12 @@ void Physics::init_physbody(Physics::physBody* pb){
 		pb->max_vel[idx] = 0;
 		pb->can_collide[idx] = false;
 		pb->shape_type[idx] = 0;
+		pb->acceleration.x[idx] = 0;
+		pb->acceleration.y[idx] = 0;
+		pb->cur_pos.x[idx] = OFFSCREEN_X;
+		pb->cur_pos.y[idx] = OFFSCREEN_Y;
+		pb->old_pos.x[idx] = OFFSCREEN_X;
+		pb->old_pos.y[idx] = OFFSCREEN_Y;
 	}
 }
 

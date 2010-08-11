@@ -17,9 +17,6 @@
 #include "game_core/physics.h"
 #include "util/util.h"
 
-#define OFFSCREEN_X 	-800
-#define OFFSCREEN_Y 	800
-
 #define MAX_BULLET_RANGE	 		30.0f
 #define MAX_BULLET_VELOCITY 		20.0f
 #define INITIAL_BULLET_ACCELERATION 1000.0f

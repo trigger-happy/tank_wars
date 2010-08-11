@@ -20,7 +20,9 @@
 #include "types.h"
 #include "exports.h"
 
-#define MAX_ARRAY_SIZE 256
+#define MAX_ARRAY_SIZE	256
+#define OFFSCREEN_X		1000
+#define OFFSCREEN_Y		1000
 
 namespace Physics{
 	
