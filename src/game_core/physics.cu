@@ -46,6 +46,7 @@ Physics::vec2 Physics::vec2_array::get_vec2(u32 id){
 
 
 void Physics::PhysRunner::initialize(Physics::PhysRunner::RunnerCore* rc){
+	rc->first_free_slot = 0;
 	memset(rc->free_slots, 0, sizeof(u8)*MAX_ARRAY_SIZE);
 }
 

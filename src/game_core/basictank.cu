@@ -44,6 +44,7 @@ void BasicTank::initialize(BasicTank::TankCollection* tank,
 		Physics::PhysRunner::set_cur_pos(p, tank->phys_id[i], params);
 		
 		tank->next_bullet[i] = 0;
+		tank->state[i] = STATE_INACTIVE;
 		
 		for(int j = 0; j < BULLETS_PER_TANK; ++j){
 			if(j >= TankBullet::get_max_bullets(tb)){
@@ -168,6 +169,7 @@ tank_id BasicTank::spawn_tank(BasicTank::TankCollection* tt, const Physics::vec2
 	tank_id tid = tt->next_tank++;
 	Physics::PhysRunner::set_cur_pos(tt->parent_runner, tt->phys_id[tid], pos);
 	Physics::PhysRunner::set_rotation(tt->parent_runner, tt->phys_id[tid], rot);
+	tt->state[tid] = STATE_NEUTRAL;
 	return tid;
 }
 

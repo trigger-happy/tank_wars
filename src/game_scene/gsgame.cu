@@ -54,14 +54,22 @@ GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
 	m_testtank.reset(new CL_Sprite(gc,
 								   "game_assets/tank_blu",
 								   &resources));
+	m_testtank2.reset(new CL_Sprite(gc,
+									"game_assets/tank_red",
+									&resources));
 	
 	TankBullet::initialize(&m_bullets, m_physrunner.get());
 	BasicTank::initialize(&m_tanks, m_physrunner.get(), &m_bullets);
 	
 	// test code
 	Physics::vec2 params;
+	params.x = -25;
 	m_playertank = BasicTank::spawn_tank(&m_tanks, params, 0);
+	params.x = 25;
+	m_player2tank = BasicTank::spawn_tank(&m_tanks, params, 180);
+	BasicTank::stop(&m_tanks, m_player2tank);
 	m_player_input = 0;
+	m_player2_input = 0;
 	
 	// stuff for cuda
 	if(GameDisplay::s_usecuda){
@@ -130,9 +138,15 @@ void GSGame::onFrameRender(CL_GraphicContext* gc){
 	m_testtank->set_angle(CL_Angle(-rot, cl_degrees));
 	m_testtank->draw(*gc, pos.x, pos.y);
 	
+	pos = BasicTank::get_tank_pos(&m_tanks, m_player2tank);
+	apply_transform(gc, pos);
+	rot = BasicTank::get_tank_rot(&m_tanks, m_player2tank);
+	m_testtank2->set_angle(CL_Angle(-rot, cl_degrees));
+	m_testtank2->draw(*gc, pos.x, pos.y);
+	
 	// Debug info
 // 	CL_StringFormat fmt("S: %1 X: %2 Y: %3 Rot: %4 AX: %5 AY: %6 XV: %7 XY: %8");
-// 	switch(m_tanks.state[m_playertank]){
+// 	switch(m_tanks.state[m_player2tank]){
 // 		case STATE_INACTIVE:
 // 			fmt.set_arg(1, "Inactive");
 // 			break;
@@ -152,13 +166,14 @@ void GSGame::onFrameRender(CL_GraphicContext* gc){
 // 			fmt.set_arg(1, "Reloading");
 // 			break;
 // 	}
+// 	pos = BasicTank::get_tank_pos(&m_tanks, m_player2tank);
 // 	fmt.set_arg(2, pos.x);
 // 	fmt.set_arg(3, pos.y);
-// 	fmt.set_arg(4, BasicTank::get_tank_rot(&m_tanks, m_playertank));
-// 	Physics::vec2 accel = BasicTank::get_tank_accel(&m_tanks, m_playertank);
+// 	fmt.set_arg(4, BasicTank::get_tank_rot(&m_tanks, m_player2tank));
+// 	Physics::vec2 accel = BasicTank::get_tank_accel(&m_tanks, m_player2tank);
 // 	fmt.set_arg(5, accel.x);
 // 	fmt.set_arg(6, accel.y);
-// 	Physics::pBody pb = m_tanks.phys_id[m_playertank];
+// 	Physics::pBody pb = m_tanks.phys_id[m_player2tank];
 // 	accel.y = m_physrunner->bodies.cur_pos.y[pb] - m_physrunner->bodies.old_pos.y[pb];
 // 	accel.x = m_physrunner->bodies.cur_pos.x[pb] - m_physrunner->bodies.old_pos.x[pb];
 // 	fmt.set_arg(7, accel.x);

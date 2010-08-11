@@ -64,6 +64,7 @@ private:
 	boost::scoped_ptr<CL_Sprite> m_background;
 	boost::scoped_ptr<CL_Sprite> m_testbullet;
 	boost::scoped_ptr<CL_Sprite> m_testtank;
+	boost::scoped_ptr<CL_Sprite> m_testtank2;
 	boost::scoped_ptr<CL_Font_System> m_debugfont;
 	CL_String m_dbgmsg;
 	
@@ -71,7 +72,9 @@ private:
 	TankBullet::BulletCollection m_bullets;
 	BasicTank::TankCollection m_tanks;
 	tank_id m_playertank;
+	tank_id m_player2tank;
 	u32 m_player_input;
+	u32 m_player2_input;
 	
 	//cuda stuff
 	Physics::PhysRunner::RunnerCore* m_cuda_runner;
