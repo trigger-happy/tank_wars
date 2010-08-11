@@ -115,6 +115,10 @@ namespace BasicTank{
 	/*!
 	*/
 	f32 get_tank_rot(TankCollection* tt, tank_id tid);
+	
+	/*!
+	*/
+	Physics::vec2 get_tank_accel(TankCollection* tt, tank_id tid);
 };
 
 #endif //BASICTANK_H

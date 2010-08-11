@@ -19,6 +19,7 @@
 #if __CUDA_ARCH__
 
 #include <cuda.h>
+#include <cuda_runtime.h>
 
 #define CUDA_EXPORT __host__ __device__
 #define CUDA_HOST __host__

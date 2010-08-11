@@ -110,10 +110,14 @@ void BasicTank::stop(BasicTank::TankCollection* tt, tank_id tid){
 	accel.x = accel.y = 0;
 	Physics::PhysRunner::set_acceleration(tt->parent_runner,
 										  tt->phys_id[tid], accel);
+										  
+	// re-use the vec2 object
+	accel = Physics::PhysRunner::get_cur_pos(tt->parent_runner,
+											 tt->phys_id[tid]);
+	
 	Physics::PhysRunner::set_cur_pos(tt->parent_runner,
 									 tt->phys_id[tid],
-									 Physics::PhysRunner::get_cur_pos(tt->parent_runner,
-																	  tt->phys_id[tid]));
+									 accel);
 }
 
 void BasicTank::turn_left(BasicTank::TankCollection* tt, tank_id tid){
@@ -185,4 +189,9 @@ Physics::vec2 BasicTank::get_tank_pos(BasicTank::TankCollection* tt, tank_id tid
 
 f32 BasicTank::get_tank_rot(BasicTank::TankCollection* tt, tank_id tid){
 	return Physics::PhysRunner::get_rotation(tt->parent_runner, tt->phys_id[tid]);
+}
+
+Physics::vec2 BasicTank::get_tank_accel(BasicTank::TankCollection* tt,
+										tank_id tid){
+	return Physics::PhysRunner::get_acceleration(tt->parent_runner, tt->phys_id[tid]);
 }

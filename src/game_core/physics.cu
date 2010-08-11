@@ -59,12 +59,13 @@ CUDA_EXPORT void update_verlet(f32 dt,
 	#if __CUDA_ARCH__
 		// device code
 	idx = threadIdx.x;
+
+	__syncthreads();
 	
 	#elif !defined(__CUDA_ARCH__)
 		// host code, this is completely serialized
 	for(idx = 0; idx < MAX_ARRAY_SIZE; ++idx){
 	#endif
-	
 	Physics::vec2 temp = bodies->cur_pos.get_vec2(idx);
 	Physics::vec2 newpos;
 	
