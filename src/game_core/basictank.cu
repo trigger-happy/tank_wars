@@ -36,7 +36,7 @@ void BasicTank::initialize(BasicTank::TankCollection* tank,
 // 		params.x = TANK_LENGTH;
 // 		params.y = TANK_WIDTH;
 // 		Physics::PhysRunner::set_dimensions(p, tank->phys_id[i], params);
-		params.x = 3;
+		params.x = 2;
 		Physics::PhysRunner::set_dimensions(p, tank->phys_id[i], params);
 		
 		//TODO: change this to ENTITY_TANK

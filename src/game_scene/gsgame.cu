@@ -222,6 +222,9 @@ __global__ void gsgame_step(f32 dt,
 	if(idx < MAX_BULLETS){
 		Collision::bullet_tank_check(bullets, tanks, idx);
 	}
+	if(idx < MAX_TANKS){
+		Collision::tank_tank_check(tanks, idx);
+	}
 }
 // #endif
 
@@ -309,6 +312,10 @@ void GSGame::onFrameUpdate(double dt,
 		// perform collision detection for the bullets
 		for(int i = 0; i < MAX_BULLETS; ++i){
 			Collision::bullet_tank_check(&m_bullets, &m_tanks, i);
+		}
+		// perform collision detection for tanks
+		for(int i = 0; i < MAX_TANKS; ++i){
+			Collision::tank_tank_check(&m_tanks, i);
 		}
 	}
 	

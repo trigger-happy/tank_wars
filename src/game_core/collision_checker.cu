@@ -22,6 +22,9 @@ bool Collision::bullet_tank_check(TankBullet::BulletCollection* bc,
 	if(bc->parent_runner != tc->parent_runner){
 		return false;
 	}
+	if(bc->state[bid] == STATE_INACTIVE){
+		return false;
+	}
 	Physics::PhysRunner::RunnerCore* rc = bc->parent_runner;
 	
 	Physics::pBody bullet_pid = bc->phys_id[bid];
@@ -49,6 +52,48 @@ bool Collision::bullet_tank_check(TankBullet::BulletCollection* bc,
 				BasicTank::kill_tank(tc, tid);
 				return true;
 			}
+		}
+	}
+	return false;
+}
+
+bool Collision::tank_tank_check(BasicTank::TankCollection* tc,
+								tank_id tid){
+	if(tc->state[tid] == STATE_INACTIVE){
+		return false;
+	}
+	Physics::PhysRunner::RunnerCore* rc = tc->parent_runner;
+	Physics::pBody tank_pid = tc->phys_id[tid];
+	
+	//TODO: change this to quad measure in the future
+	f32 t1_radius = rc->bodies.dimension.x[tank_pid];
+	
+	for(unsigned int tid2 = 0; tid2 < MAX_TANKS; ++tid2){
+		if(tc->state[tid2] == STATE_INACTIVE){
+			// not a living tank
+			continue;
+		}
+		if(tc->faction[tid] == tc->faction[tid2]){
+			// friendly tank
+			continue;
+		}
+		
+		// perform the actual check
+		Physics::pBody tank2_pid = tc->phys_id[tid2];
+		f32 t2_radius = rc->bodies.dimension.x[tank2_pid];
+		//TODO: change this to quad based check in the future
+		f32 tank_radius = rc->bodies.dimension.x[tank_pid];
+		Physics::vec2 tank1pos, tank2pos;
+		tank1pos = Physics::PhysRunner::get_cur_pos(rc, tank_pid);
+		tank2pos = Physics::PhysRunner::get_cur_pos(rc, tank2_pid);
+		f32 xdiff = fabsf(tank1pos.x - tank2pos.x);
+		f32 ydiff = fabsf(tank1pos.y - tank2pos.y);
+		f32 sq_dist = (xdiff * xdiff) + (ydiff * ydiff);
+		if(sq_dist <= (t2_radius + tank_radius) * (t2_radius + tank_radius)){
+			// A collision!
+			BasicTank::kill_tank(tc, tid);
+			BasicTank::kill_tank(tc, tid2);
+			return true;
 		}
 	}
 	return false;

@@ -24,6 +24,9 @@ namespace Collision{
 	CUDA_EXPORT bool bullet_tank_check(TankBullet::BulletCollection* bc,
 									   BasicTank::TankCollection* tc,
 									   bullet_id bid);
+									   
+	CUDA_EXPORT bool tank_tank_check(BasicTank::TankCollection* tc,
+									 tank_id tid);
 }
 
 #endif //COLLISION_CHECKER_H
