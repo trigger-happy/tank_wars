@@ -22,6 +22,8 @@
 #define STATE_TRAVELLING	1
 #define STATE_IMPACT		2
 
+#define BULLET_RADIUS		0.2f
+
 #define MAX_BULLETS			MAX_ARRAY_SIZE/2
 
 typedef u32 bullet_id;
@@ -34,6 +36,7 @@ namespace TankBullet{
 		Physics::vec2_array initial_pos;
 		u32 phys_id[MAX_BULLETS];
 		u32 state[MAX_BULLETS];
+		u32 faction[MAX_BULLETS];
 		bullet_id cur_free_bullet;
 	};
 	
@@ -88,7 +91,7 @@ namespace TankBullet{
 	Get a bullet from the list
 	\note DOES NOT CHECK IF IT'S GREATER THAN MAX_BULLETS
 	*/
-	CUDA_HOST bullet_id get_bullet(BulletCollection* bc);
+	CUDA_HOST bullet_id get_bullet(TankBullet::BulletCollection* bc);
 	
 	/*!
 	Get the maximum number of bullets available

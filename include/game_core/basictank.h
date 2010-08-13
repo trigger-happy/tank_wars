@@ -49,6 +49,7 @@ namespace BasicTank{
 		TankBullet::BulletCollection* bullet_collection;
 		tank_state state[MAX_TANKS];
 		u32	phys_id[MAX_TANKS];
+		u32 faction[MAX_TANKS];
 		bullet_id bullet[MAX_TANKS][BULLETS_PER_TANK];
 		bullet_id next_bullet[MAX_TANKS];
 		tank_id next_tank;
@@ -102,7 +103,8 @@ namespace BasicTank{
 	*/
 	CUDA_EXPORT tank_id spawn_tank(TankCollection* tt,
 								   const Physics::vec2& pos,
-								   f32 rot);
+								   f32 rot,
+								   u32 faction = 0);
 	
 	/*!
 	*/

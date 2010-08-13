@@ -64,9 +64,9 @@ GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
 	// test code
 	Physics::vec2 params;
 	params.x = -25;
-	m_playertank = BasicTank::spawn_tank(&m_tanks, params, 0);
+	m_playertank = BasicTank::spawn_tank(&m_tanks, params, 0, 0);
 	params.x = 25;
-	m_player2tank = BasicTank::spawn_tank(&m_tanks, params, 180);
+	m_player2tank = BasicTank::spawn_tank(&m_tanks, params, 180, 1);
 	m_player_input = 0;
 	m_player2_input = 0;
 	
@@ -217,6 +217,11 @@ __global__ void gsgame_step(f32 dt,
 	Physics::PhysRunner::timestep(runner, dt);
 	TankBullet::update(bullets, dt);
 	BasicTank::update(tanks, dt);
+	
+	// collision check
+	if(idx < MAX_BULLETS){
+		Collision::bullet_tank_check(bullets, tanks, idx);
+	}
 }
 // #endif
 
@@ -300,6 +305,11 @@ void GSGame::onFrameUpdate(double dt,
 		Physics::PhysRunner::timestep(m_physrunner.get(), dt);
 		TankBullet::update(&m_bullets, dt);
 		BasicTank::update(&m_tanks, dt);
+		
+		// perform collision detection for the bullets
+		for(int i = 0; i < MAX_BULLETS; ++i){
+			Collision::bullet_tank_check(&m_bullets, &m_tanks, i);
+		}
 	}
 	
 	// update the sprites

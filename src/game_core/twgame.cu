@@ -2,3 +2,4 @@
 #include "physics.cu"
 #include "tankbullet.cu"
 #include "basictank.cu"
+#include "collision_checker.cu"

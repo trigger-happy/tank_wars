@@ -32,7 +32,7 @@ void TankBullet::initialize(TankBullet::BulletCollection* bc,
 		// set the bullet data
 		Physics::PhysRunner::set_rotation(p, i, 0);
 		Physics::PhysRunner::set_shape_type(p, i, SHAPE_CIRCLE);
-		params.x = 2; // y is ignored when shape is circle
+		params.x = BULLET_RADIUS; // y is ignored when shape is circle
 		Physics::PhysRunner::set_dimensions(p, i, params);
 		
 		//TODO: change the 1 to ENTITY_BULLET

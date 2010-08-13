@@ -30,10 +30,13 @@ void BasicTank::initialize(BasicTank::TankCollection* tank,
 		Physics::PhysRunner::set_acceleration(p, tank->phys_id[i], params);
 		Physics::PhysRunner::set_max_velocity(p, tank->phys_id[i], MAX_TANK_VEL);
 		Physics::PhysRunner::set_rotation(p, tank->phys_id[i], 0);
-		Physics::PhysRunner::set_shape_type(p, tank->phys_id[i], SHAPE_QUAD);
+		//TODO: change this to shape_quad in the future
+		Physics::PhysRunner::set_shape_type(p, tank->phys_id[i], SHAPE_CIRCLE);
 		
-		params.x = TANK_LENGTH;
-		params.y = TANK_WIDTH;
+// 		params.x = TANK_LENGTH;
+// 		params.y = TANK_WIDTH;
+// 		Physics::PhysRunner::set_dimensions(p, tank->phys_id[i], params);
+		params.x = 3;
 		Physics::PhysRunner::set_dimensions(p, tank->phys_id[i], params);
 		
 		//TODO: change this to ENTITY_TANK
@@ -165,7 +168,9 @@ void BasicTank::fire(BasicTank::TankCollection* tt, tank_id tid){
 	}
 }
 
-tank_id BasicTank::spawn_tank(BasicTank::TankCollection* tt, const Physics::vec2& pos, f32 rot){
+tank_id BasicTank::spawn_tank(BasicTank::TankCollection* tt,
+							  const Physics::vec2& pos,
+							  f32 rot, u32 faction){
 	tank_id tid = tt->next_tank++;
 	Physics::PhysRunner::set_cur_pos(tt->parent_runner, tt->phys_id[tid], pos);
 	Physics::PhysRunner::set_rotation(tt->parent_runner, tt->phys_id[tid], rot);
@@ -173,10 +178,16 @@ tank_id BasicTank::spawn_tank(BasicTank::TankCollection* tt, const Physics::vec2
 	accel.x = accel.y = 0;
 	Physics::PhysRunner::set_acceleration(tt->parent_runner, tt->phys_id[tid], accel);
 	tt->state[tid] = STATE_NEUTRAL;
+	tt->faction[tid] = faction;
+	
+	for(int i = 0; i < BULLETS_PER_TANK; ++i){
+		tt->bullet_collection->faction[tt->bullet[tid][i]] = faction;
+	}
 	return tid;
 }
 
 void BasicTank::kill_tank(BasicTank::TankCollection* tt, tank_id tid){
+	tt->state[tid] = STATE_INACTIVE;
 	Physics::PhysRunner::RunnerCore* rc = tt->parent_runner;
 	Physics::vec2 params;
 	params.x = OFFSCREEN_X;
