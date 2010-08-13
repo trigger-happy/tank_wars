@@ -58,6 +58,7 @@ GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
 									"game_assets/tank_red",
 									&resources));
 	
+	Physics::PhysRunner::initialize(m_physrunner.get());
 	TankBullet::initialize(&m_bullets, m_physrunner.get());
 	BasicTank::initialize(&m_tanks, m_physrunner.get(), &m_bullets);
 	
