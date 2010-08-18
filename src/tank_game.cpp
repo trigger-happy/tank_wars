@@ -110,6 +110,8 @@ int GameDisplay::main(){
 			//NOTE: this seems to be buggy in windows
 #if !defined(WIN32)
 			CL_System::sleep(FRAME_TIME - s_deltatime);
+#else
+			Sleep(FRAME_TIME - s_deltatime);
 #endif
 		}
 	}catch(CL_Exception& e){
