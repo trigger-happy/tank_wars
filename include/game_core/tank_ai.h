@@ -50,6 +50,31 @@ namespace AI{
 	*/
 	CUDA_EXPORT tank_id get_nearest_ally(BasicTank::TankCollection* tc,
 										 tank_id tid);
+										 
+	/*!
+	Get the distance of a target tank to the current tank
+	\param tc The TankCollection which the tank belongs to
+	\param my_id The reference tank
+	\param target_id The id of the target tank whose distance to check
+	\return The distance between the 2 tanks
+	*/
+	CUDA_EXPORT uint32_t get_tank_dist(BasicTank::TankCollection* tc,
+									   tank_id my_id,
+									   tank_id target_id);
+	
+	/*!
+	Get the distance of a bullet to the current tank
+	\param tc The TankCollection which the tank belongs to
+	\param bc The BulletCollection which the bullet belongs to
+	\param tid The id of the reference tank
+	\param The id of the bullet to query
+	\return The distance between the bullet and the tank
+	*/
+	CUDA_EXPORT uint32_t get_bullet_dist(BasicTank::TankCollection* tc,
+										 TankBullet::BulletCollection* bc,
+										 tank_id tid,
+										 bullet_id bid);
+										 
 }
 
 #endif //TANK_AI_H
