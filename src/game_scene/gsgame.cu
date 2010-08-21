@@ -145,41 +145,11 @@ void GSGame::onFrameRender(CL_GraphicContext* gc){
 	m_testtank2->draw(*gc, pos.x, pos.y);
 	
 	// Debug info
-// 	CL_StringFormat fmt("S: %1 X: %2 Y: %3 Rot: %4 AX: %5 AY: %6 XV: %7 XY: %8");
-// 	switch(m_tanks.state[m_player2tank]){
-// 		case STATE_INACTIVE:
-// 			fmt.set_arg(1, "Inactive");
-// 			break;
-// 		case STATE_NEUTRAL:
-// 			fmt.set_arg(1, "Neutral");
-// 			break;
-// 		case STATE_MOVING_FORWARD:
-// 			fmt.set_arg(1, "Forward");
-// 			break;
-// 		case STATE_MOVING_BACKWARD:
-// 			fmt.set_arg(1, "Backward");
-// 			break;
-// 		case STATE_FIRING:
-// 			fmt.set_arg(1, "Firing");
-// 			break;
-// 		case STATE_RELOADING:
-// 			fmt.set_arg(1, "Reloading");
-// 			break;
-// 	}
-// 	pos = BasicTank::get_tank_pos(&m_tanks, m_player2tank);
-// 	fmt.set_arg(2, pos.x);
-// 	fmt.set_arg(3, pos.y);
-// 	fmt.set_arg(4, BasicTank::get_tank_rot(&m_tanks, m_player2tank));
-// 	Physics::vec2 accel = BasicTank::get_tank_accel(&m_tanks, m_player2tank);
-// 	fmt.set_arg(5, accel.x);
-// 	fmt.set_arg(6, accel.y);
-// 	Physics::pBody pb = m_tanks.phys_id[m_player2tank];
-// 	accel.y = m_physrunner->bodies.cur_pos.y[pb] - m_physrunner->bodies.old_pos.y[pb];
-// 	accel.x = m_physrunner->bodies.cur_pos.x[pb] - m_physrunner->bodies.old_pos.x[pb];
-// 	fmt.set_arg(7, accel.x);
-// 	fmt.set_arg(8, accel.y);
-// 	m_dbgmsg = fmt.get_result();
-// 	m_debugfont->draw_text(*gc, 1, 12, m_dbgmsg, CL_Colorf::red);
+	CL_StringFormat fmt("Dist: %1");
+	tank_id tid = AI::get_nearest_enemy(&m_tanks, m_playertank);
+	fmt.set_arg(1, AI::get_tank_dist(&m_tanks, m_playertank, tid));
+	m_dbgmsg = fmt.get_result();
+	m_debugfont->draw_text(*gc, 1, 12, m_dbgmsg, CL_Colorf::red);
 }
 
 

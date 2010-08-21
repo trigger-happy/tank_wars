@@ -22,7 +22,7 @@ bullet_id AI::get_nearest_bullet(BasicTank::TankCollection* tc,
 								 tank_id tid){
 	Physics::PhysRunner::RunnerCore* rc = tc->parent_runner;
 	u32 tank_faction = tc->faction[tid];
-	unsigned int sqdist = boost::integer_traits<unsigned int>::const_max;
+	f32 sqdist = boost::integer_traits<unsigned short>::const_max;
 	unsigned int bid = INVALID_ID;
 	for(int i = 0; i < MAX_BULLETS; ++i){
 		// check if the current bullet is an enemy bullet
@@ -32,11 +32,11 @@ bullet_id AI::get_nearest_bullet(BasicTank::TankCollection* tc,
 		}
 		
 		// get the distance
-		int xdist = rc->bodies.cur_pos.x[tc->phys_id[tid]]
-		- rc->bodies.cur_pos.x[bc->phys_id[i]];
+		f32 xdist = rc->bodies.cur_pos.x[tc->phys_id[tid]]
+					- rc->bodies.cur_pos.x[bc->phys_id[i]];
 		xdist *= xdist;
-		int ydist = rc->bodies.cur_pos.y[tc->phys_id[tid]]
-		- rc->bodies.cur_pos.y[bc->phys_id[i]];
+		f32 ydist = rc->bodies.cur_pos.y[tc->phys_id[tid]]
+					- rc->bodies.cur_pos.y[bc->phys_id[i]];
 		ydist *= ydist;
 		
 		// if the distance is smaller, save it
@@ -52,7 +52,7 @@ tank_id AI::get_nearest_enemy(BasicTank::TankCollection* tc,
 							  tank_id tid){
 	Physics::PhysRunner::RunnerCore* rc = tc->parent_runner;
 	u32 tank_faction = tc->faction[tid];
-	unsigned int sqdist = boost::integer_traits<unsigned int>::const_max;
+	f32 sqdist = boost::integer_traits<unsigned short>::const_max;
 	unsigned int eid = INVALID_ID;
 	for(int i = 0; i < MAX_TANKS; ++i){
 		// check if the tank is an enemy tank
@@ -61,11 +61,11 @@ tank_id AI::get_nearest_enemy(BasicTank::TankCollection* tc,
 			continue;
 		}
 		// get the distance
-		int xdist = rc->bodies.cur_pos.x[tc->phys_id[tid]]
-		- rc->bodies.cur_pos.x[tc->phys_id[i]];
+		f32 xdist = rc->bodies.cur_pos.x[tc->phys_id[tid]]
+					- rc->bodies.cur_pos.x[tc->phys_id[i]];
 		xdist *= xdist;
-		int ydist = rc->bodies.cur_pos.y[tc->phys_id[tid]]
-		- rc->bodies.cur_pos.y[tc->phys_id[i]];
+		f32 ydist = rc->bodies.cur_pos.y[tc->phys_id[tid]]
+					- rc->bodies.cur_pos.y[tc->phys_id[i]];
 		ydist *= ydist;
 		// if the distance is smaller, save it
 		if(xdist + ydist < sqdist){
@@ -80,7 +80,7 @@ tank_id AI::get_nearest_ally(BasicTank::TankCollection* tc,
 							 tank_id tid){
 	Physics::PhysRunner::RunnerCore* rc = tc->parent_runner;
 	u32 tank_faction = tc->faction[tid];
-	unsigned int sqdist = boost::integer_traits<unsigned int>::const_max;
+	f32 sqdist = boost::integer_traits<unsigned short>::const_max;
 	unsigned int aid = INVALID_ID;
 	for(int i = 0; i < MAX_TANKS; ++i){
 		// check if the tank is an allied tank
@@ -89,11 +89,11 @@ tank_id AI::get_nearest_ally(BasicTank::TankCollection* tc,
 			continue;
 		}
 		// get the distance
-		int xdist = rc->bodies.cur_pos.x[tc->phys_id[tid]]
-		- rc->bodies.cur_pos.x[tc->phys_id[i]];
+		f32 xdist = rc->bodies.cur_pos.x[tc->phys_id[tid]]
+					- rc->bodies.cur_pos.x[tc->phys_id[i]];
 		xdist *= xdist;
-		int ydist = rc->bodies.cur_pos.y[tc->phys_id[tid]]
-		- rc->bodies.cur_pos.y[tc->phys_id[i]];
+		f32 ydist = rc->bodies.cur_pos.y[tc->phys_id[tid]]
+					- rc->bodies.cur_pos.y[tc->phys_id[i]];
 		ydist *= ydist;
 		// if the distance is smaller, save it
 		if(xdist + ydist < sqdist){
@@ -106,13 +106,25 @@ tank_id AI::get_nearest_ally(BasicTank::TankCollection* tc,
 
 
 
-CUDA_EXPORT uint32_t AI::get_tank_dist(BasicTank::TankCollection* tc,
-									   tank_id my_id,
-									   tank_id target_id){
+f32 AI::get_tank_dist(BasicTank::TankCollection* tc,
+					  tank_id my_id,
+					  tank_id target_id){
+	Physics::PhysRunner::RunnerCore* rc = tc->parent_runner;
+	f32 xdist = rc->bodies.cur_pos.x[tc->phys_id[my_id]]
+				- rc->bodies.cur_pos.x[tc->phys_id[target_id]];
+	f32 ydist = rc->bodies.cur_pos.y[tc->phys_id[my_id]]
+				- rc->bodies.cur_pos.y[tc->phys_id[target_id]];
+	return sqrt((xdist*xdist) + (ydist*ydist));
 }
 								   
-CUDA_EXPORT uint32_t AI::get_bullet_dist(BasicTank::TankCollection* tc,
-										 TankBullet::BulletCollection* bc,
-										 tank_id tid,
-										 bullet_id bid){
+f32 AI::get_bullet_dist(BasicTank::TankCollection* tc,
+						TankBullet::BulletCollection* bc,
+						tank_id tid,
+						bullet_id bid){
+	Physics::PhysRunner::RunnerCore* rc = tc->parent_runner;
+	f32 xdist = rc->bodies.cur_pos.x[tc->phys_id[tid]]
+				- rc->bodies.cur_pos.x[bc->phys_id[bid]];
+	f32 ydist = rc->bodies.cur_pos.y[tc->phys_id[tid]]
+				- rc->bodies.cur_pos.y[bc->phys_id[bid]];
+	return sqrt((xdist * xdist) + (ydist*ydist));
 }
