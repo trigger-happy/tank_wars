@@ -171,22 +171,24 @@ __global__ void gsgame_step(f32 dt,
 	if(idx == 0){
 		// thread 0 will perform the input processing
 		// all other threads will do squat (wasteful but can't be helped)
-		if(player_input & PLAYER_FIRE){
-			BasicTank::fire(tanks, player_tank);
-		}
-		
-		if(player_input & PLAYER_STOP){
-			BasicTank::stop(tanks, player_tank);
-		}else if(player_input & PLAYER_FORWARD){
-			BasicTank::move_forward(tanks, player_tank);
-		}else if(player_input & PLAYER_BACKWARD){
-			BasicTank::move_backward(tanks, player_tank);
-		}
-		
-		if(player_input & PLAYER_LEFT){
-			BasicTank::turn_left(tanks, player_tank);
-		}else if(player_input & PLAYER_RIGHT){
-			BasicTank::turn_right(tanks, player_tank);
+		if(tanks->state[player_tank] != TANK_STATE_INACTIVE){
+			if(player_input & PLAYER_FIRE){
+				BasicTank::fire(tanks, player_tank);
+			}
+			
+			if(player_input & PLAYER_STOP){
+				BasicTank::stop(tanks, player_tank);
+			}else if(player_input & PLAYER_FORWARD){
+				BasicTank::move_forward(tanks, player_tank);
+			}else if(player_input & PLAYER_BACKWARD){
+				BasicTank::move_backward(tanks, player_tank);
+			}
+			
+			if(player_input & PLAYER_LEFT){
+				BasicTank::turn_left(tanks, player_tank);
+			}else if(player_input & PLAYER_RIGHT){
+				BasicTank::turn_right(tanks, player_tank);
+			}
 		}
 	}
 	Physics::PhysRunner::timestep(runner, dt);
@@ -259,38 +261,40 @@ void GSGame::onFrameUpdate(double dt,
 				   cudaMemcpyDeviceToHost);
 	}else{
 		// process the player input
-		if(m_player_input & PLAYER_FIRE){
-			BasicTank::fire(&m_tanks, m_playertank);
-		}
-		
-		if(m_player_input & PLAYER_STOP){
-			BasicTank::stop(&m_tanks, m_playertank);
-		}
-		
-		if(m_player_input & PLAYER_FORWARD){
-			BasicTank::move_forward(&m_tanks, m_playertank);
-		}else if(m_player_input & PLAYER_BACKWARD){
-			BasicTank::move_backward(&m_tanks, m_playertank);
-		}
-		
-		if(m_player_input & PLAYER_LEFT){
-			BasicTank::turn_left(&m_tanks, m_playertank);
-		}else if(m_player_input & PLAYER_RIGHT){
-			BasicTank::turn_right(&m_tanks, m_playertank);
-		}
-		
-		// perform all the update
-		Physics::PhysRunner::timestep(m_physrunner.get(), dt);
-		TankBullet::update(&m_bullets, dt);
-		BasicTank::update(&m_tanks, dt);
-		
-		// perform collision detection for the bullets
-		for(int i = 0; i < MAX_BULLETS; ++i){
-			Collision::bullet_tank_check(&m_bullets, &m_tanks, i);
-		}
-		// perform collision detection for tanks
-		for(int i = 0; i < MAX_TANKS; ++i){
-			Collision::tank_tank_check(&m_tanks, i);
+		if(m_tanks.state[m_playertank] != TANK_STATE_INACTIVE){
+			if(m_player_input & PLAYER_FIRE){
+				BasicTank::fire(&m_tanks, m_playertank);
+			}
+			
+			if(m_player_input & PLAYER_STOP){
+				BasicTank::stop(&m_tanks, m_playertank);
+			}
+			
+			if(m_player_input & PLAYER_FORWARD){
+				BasicTank::move_forward(&m_tanks, m_playertank);
+			}else if(m_player_input & PLAYER_BACKWARD){
+				BasicTank::move_backward(&m_tanks, m_playertank);
+			}
+			
+			if(m_player_input & PLAYER_LEFT){
+				BasicTank::turn_left(&m_tanks, m_playertank);
+			}else if(m_player_input & PLAYER_RIGHT){
+				BasicTank::turn_right(&m_tanks, m_playertank);
+			}
+			
+			// perform all the update
+			Physics::PhysRunner::timestep(m_physrunner.get(), dt);
+			TankBullet::update(&m_bullets, dt);
+			BasicTank::update(&m_tanks, dt);
+			
+			// perform collision detection for the bullets
+			for(int i = 0; i < MAX_BULLETS; ++i){
+				Collision::bullet_tank_check(&m_bullets, &m_tanks, i);
+			}
+			// perform collision detection for tanks
+			for(int i = 0; i < MAX_TANKS; ++i){
+				Collision::tank_tank_check(&m_tanks, i);
+			}
 		}
 	}
 	
