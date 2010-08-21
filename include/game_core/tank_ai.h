@@ -22,11 +22,34 @@ Boston, MA 02110-1301, USA.
 
 namespace AI{
 	// sensor functions
-	CUDA_EXPORT Physics::pBody get_nearest_bullet(BasicTank::TankCollection* tc,
-												  tank_id tid);
+	/*!
+	Get the nearest bullet to the tank tid
+	\param tc The TankCollection which the tank belongs to
+	\param bc The BulletCollection where the bullets reside
+	\param tid The tank id
+	\return The bullet id of the closest bullet to the tank
+	*/
+	CUDA_EXPORT bullet_id get_nearest_bullet(BasicTank::TankCollection* tc,
+											 TankBullet::BulletCollection* bc,
+											 tank_id tid);
 												  
-	CUDA_EXPORT Physics::pBody get_nearest_enemy(BasicTank::TankCollection* tc,
-												 tank_id tid);
+	/*!
+	Get the nearest enemy tank
+	\param tc The TankCollection which the tank belongs to
+	\param tid The tank id
+	\return The tank id of the closest enemy tank
+	*/
+	CUDA_EXPORT tank_id get_nearest_enemy(BasicTank::TankCollection* tc,
+										  tank_id tid);
+	
+	/*!
+	Get the nearest allied tank_id
+	\param tc The TankCollection which the tank belongs to
+	\param tid The tank id
+	\return The tank id of the nearest allied tank
+	*/
+	CUDA_EXPORT tank_id get_nearest_ally(BasicTank::TankCollection* tc,
+										 tank_id tid);
 }
 
 #endif //TANK_AI_H
