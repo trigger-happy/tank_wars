@@ -47,7 +47,7 @@ void BasicTank::initialize(BasicTank::TankCollection* tank,
 		Physics::PhysRunner::set_cur_pos(p, tank->phys_id[i], params);
 		
 		tank->next_bullet[i] = 0;
-		tank->state[i] = STATE_INACTIVE;
+		tank->state[i] = TANK_STATE_INACTIVE;
 		
 		for(int j = 0; j < BULLETS_PER_TANK; ++j){
 			if(j >= TankBullet::get_max_bullets(tb)){
@@ -93,7 +93,7 @@ void BasicTank::move_forward(BasicTank::TankCollection* tt, tank_id tid){
 	accel.y = TANK_ACCEL_RATE * sinf(rot);
 	Physics::PhysRunner::set_acceleration(tt->parent_runner,
 										  tt->phys_id[tid], accel);
-	tt->state[tid] = STATE_MOVING_FORWARD;
+	tt->state[tid] = TANK_STATE_MOVING_FORWARD;
 }
 
 void BasicTank::move_backward(BasicTank::TankCollection* tt, tank_id tid){
@@ -105,11 +105,11 @@ void BasicTank::move_backward(BasicTank::TankCollection* tt, tank_id tid){
 	
 	Physics::PhysRunner::set_acceleration(tt->parent_runner,
 										  tt->phys_id[tid], accel);
-	tt->state[tid] = STATE_MOVING_BACKWARD;
+	tt->state[tid] = TANK_STATE_MOVING_BACKWARD;
 }
 
 void BasicTank::stop(BasicTank::TankCollection* tt, tank_id tid){
-	tt->state[tid] = STATE_NEUTRAL;
+	tt->state[tid] = TANK_STATE_NEUTRAL;
 	Physics::vec2 accel;
 	accel.x = accel.y = 0;
 	Physics::PhysRunner::set_acceleration(tt->parent_runner,
@@ -134,9 +134,9 @@ void BasicTank::turn_left(BasicTank::TankCollection* tt, tank_id tid){
 	}
 	
 	Physics::PhysRunner::set_rotation(tt->parent_runner, tt->phys_id[tid], rot);
-	if(tt->state[tid] == STATE_MOVING_FORWARD){
+	if(tt->state[tid] == TANK_STATE_MOVING_FORWARD){
 		BasicTank::move_forward(tt, tid);
-	}else if(tt->state[tid] == STATE_MOVING_BACKWARD){
+	}else if(tt->state[tid] == TANK_STATE_MOVING_BACKWARD){
 		BasicTank::move_backward(tt, tid);
 	}
 }
@@ -150,9 +150,9 @@ void BasicTank::turn_right(BasicTank::TankCollection* tt, tank_id tid){
 	}
 	
 	Physics::PhysRunner::set_rotation(tt->parent_runner, tt->phys_id[tid], rot);
-	if(tt->state[tid] == STATE_MOVING_FORWARD){
+	if(tt->state[tid] == TANK_STATE_MOVING_FORWARD){
 		BasicTank::move_forward(tt, tid);
-	}else if(tt->state[tid] == STATE_MOVING_BACKWARD){
+	}else if(tt->state[tid] == TANK_STATE_MOVING_BACKWARD){
 		BasicTank::move_backward(tt, tid);
 	}
 }
@@ -177,7 +177,7 @@ tank_id BasicTank::spawn_tank(BasicTank::TankCollection* tt,
 	Physics::vec2 accel;
 	accel.x = accel.y = 0;
 	Physics::PhysRunner::set_acceleration(tt->parent_runner, tt->phys_id[tid], accel);
-	tt->state[tid] = STATE_NEUTRAL;
+	tt->state[tid] = TANK_STATE_NEUTRAL;
 	tt->faction[tid] = faction;
 	
 	for(int i = 0; i < BULLETS_PER_TANK; ++i){
@@ -187,7 +187,7 @@ tank_id BasicTank::spawn_tank(BasicTank::TankCollection* tt,
 }
 
 void BasicTank::kill_tank(BasicTank::TankCollection* tt, tank_id tid){
-	tt->state[tid] = STATE_INACTIVE;
+	tt->state[tid] = TANK_STATE_INACTIVE;
 	Physics::PhysRunner::RunnerCore* rc = tt->parent_runner;
 	Physics::vec2 params;
 	params.x = OFFSCREEN_X;

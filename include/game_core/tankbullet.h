@@ -18,9 +18,9 @@
 #include "types.h"
 #include "game_core/physics.h"
 
-#define STATE_INACTIVE		0
-#define STATE_TRAVELLING	1
-#define STATE_IMPACT		2
+#define BULLET_STATE_INACTIVE		0
+#define BULLET_STATE_TRAVELLING		1
+#define BULLET_STATE_IMPACT			2
 
 #define BULLET_RADIUS		0.2f
 

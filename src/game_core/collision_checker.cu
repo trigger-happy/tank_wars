@@ -22,7 +22,7 @@ bool Collision::bullet_tank_check(TankBullet::BulletCollection* bc,
 	if(bc->parent_runner != tc->parent_runner){
 		return false;
 	}
-	if(bc->state[bid] == STATE_INACTIVE){
+	if(bc->state[bid] == TANK_STATE_INACTIVE){
 		return false;
 	}
 	Physics::PhysRunner::RunnerCore* rc = bc->parent_runner;
@@ -36,7 +36,7 @@ bool Collision::bullet_tank_check(TankBullet::BulletCollection* bc,
 			continue;
 		}
 		
-		if(tc->state[tid] != STATE_INACTIVE){
+		if(tc->state[tid] != TANK_STATE_INACTIVE){
 			Physics::pBody tank_pid = tc->phys_id[tid];
 			//TODO: change this to quad based check in the future
 			f32 tank_radius = rc->bodies.dimension.x[tank_pid];
@@ -59,17 +59,17 @@ bool Collision::bullet_tank_check(TankBullet::BulletCollection* bc,
 
 bool Collision::tank_tank_check(BasicTank::TankCollection* tc,
 								tank_id tid){
-	if(tc->state[tid] == STATE_INACTIVE){
+	if(tc->state[tid] == TANK_STATE_INACTIVE){
 		return false;
 	}
 	Physics::PhysRunner::RunnerCore* rc = tc->parent_runner;
 	Physics::pBody tank_pid = tc->phys_id[tid];
 	
 	//TODO: change this to quad measure in the future
-	f32 t1_radius = rc->bodies.dimension.x[tank_pid];
+	//f32 t1_radius = rc->bodies.dimension.x[tank_pid];
 	
 	for(unsigned int tid2 = 0; tid2 < MAX_TANKS; ++tid2){
-		if(tc->state[tid2] == STATE_INACTIVE){
+		if(tc->state[tid2] == TANK_STATE_INACTIVE){
 			// not a living tank
 			continue;
 		}

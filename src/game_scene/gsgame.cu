@@ -146,8 +146,12 @@ void GSGame::onFrameRender(CL_GraphicContext* gc){
 	
 	// Debug info
 	CL_StringFormat fmt("Dist: %1");
-	tank_id tid = AI::get_nearest_enemy(&m_tanks, m_playertank);
-	fmt.set_arg(1, AI::get_tank_dist(&m_tanks, m_playertank, tid));
+	bullet_id bid = AI::get_nearest_bullet(&m_tanks, &m_bullets, m_player2tank);
+	if(bid != INVALID_ID){
+		fmt.set_arg(1, AI::get_bullet_dist(&m_tanks, &m_bullets, m_player2tank, bid));
+	}else{
+		fmt.set_arg(1, 0);
+	}
 	m_dbgmsg = fmt.get_result();
 	m_debugfont->draw_text(*gc, 1, 12, m_dbgmsg, CL_Colorf::red);
 }

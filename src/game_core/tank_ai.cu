@@ -31,6 +31,11 @@ bullet_id AI::get_nearest_bullet(BasicTank::TankCollection* tc,
 			continue;
 		}
 		
+		// check if the bullet is active
+		if(bc->state[i] != BULLET_STATE_TRAVELLING){
+			continue;
+		}
+		
 		// get the distance
 		f32 xdist = rc->bodies.cur_pos.x[tc->phys_id[tid]]
 					- rc->bodies.cur_pos.x[bc->phys_id[i]];
@@ -58,6 +63,11 @@ tank_id AI::get_nearest_enemy(BasicTank::TankCollection* tc,
 		// check if the tank is an enemy tank
 		if(tc->faction[i] == tank_faction){
 			// allied tank, ignore
+			continue;
+		}
+		
+		// check if the enemy is active
+		if(tc->state[i] == TANK_STATE_INACTIVE){
 			continue;
 		}
 		// get the distance
