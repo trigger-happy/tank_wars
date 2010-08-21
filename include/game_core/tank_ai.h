@@ -11,7 +11,7 @@
 	You should have received a copy of the GNU Library General Public License
 	along with this library; see the file COPYING.LIB.  If not, write to
 	the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-Boston, MA 02110-1301, USA.
+	Boston, MA 02110-1301, USA.
 */
 #ifndef TANK_AI_H
 #define TANK_AI_H
@@ -23,7 +23,7 @@ Boston, MA 02110-1301, USA.
 namespace AI{
 	// sensor functions
 	/*!
-	Get the nearest bullet to the tank tid
+	Get the nearest bullet to the tank tid (note, this gets enemy bullets)
 	\param tc The TankCollection which the tank belongs to
 	\param bc The BulletCollection where the bullets reside
 	\param tid The tank id

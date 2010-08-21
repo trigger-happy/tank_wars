@@ -3,3 +3,4 @@
 #include "tankbullet.cu"
 #include "basictank.cu"
 #include "collision_checker.cu"
+#include "tank_ai.cu"
