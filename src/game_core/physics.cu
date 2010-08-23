@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <cassert>
 #include <memory.h>
+#include <cstring>
 #include "game_core/physics.h"
 #include "util/util.h"
 
@@ -157,20 +158,20 @@ void Physics::init_physbody(Physics::physBody* pb){
 	#if __CUDA_ARCH__
 	idx = threadIdx.x;
 	if(idx < MAX_ARRAY_SIZE){
-	#elif !defined(__CUDA_ARCH__)
-	for(idx = 0; idx < MAX_ARRAY_SIZE; ++idx){
-	#endif
 		pb->rotation[idx] = 0;
 		pb->max_vel[idx] = 0;
 		pb->can_collide[idx] = false;
 		pb->shape_type[idx] = 0;
 		pb->acceleration.x[idx] = 0;
 		pb->acceleration.y[idx] = 0;
-		pb->cur_pos.x[idx] = OFFSCREEN_X;
-		pb->cur_pos.y[idx] = OFFSCREEN_Y;
-		pb->old_pos.x[idx] = OFFSCREEN_X;
-		pb->old_pos.y[idx] = OFFSCREEN_Y;
+		pb->cur_pos.x[idx] = 0;
+		pb->cur_pos.y[idx] = 0;
+		pb->old_pos.x[idx] = 0;
+		pb->old_pos.y[idx] = 0;
 	}
+	#elif !defined(__CUDA_ARCH__)
+	memset(static_cast<void*>(pb), 0, sizeof(Physics::physBody));
+	#endif
 }
 
 Physics::pBody Physics::PhysRunner::create_object(Physics::PhysRunner::RunnerCore* rc){
