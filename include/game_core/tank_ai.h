@@ -28,9 +28,9 @@ namespace AI{
 	struct AI_Core{
 		BasicTank::TankCollection* tc;
 		TankBullet::BulletCollection* bc;
-		uint32_t next_slot;
+		u32 next_slot;
 		tank_id controlled_tanks[MAX_AI_CONTROLLERS];
-		int32_t genetic_data[MAX_GENE_DATA][MAX_AI_CONTROLLERS];
+		u32 genetic_data[MAX_GENE_DATA][MAX_AI_CONTROLLERS];
 	};
 	
 	// sensor functions

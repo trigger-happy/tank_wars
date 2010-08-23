@@ -14,15 +14,16 @@
 	Boston, MA 02110-1301, USA.
 */
 #include <limits>
-#include <boost/integer_traits.hpp>
 #include <cstring>
 #include "game_core/tank_ai.h"
+
+#define SHORT_MAX 32767
 
 bullet_id AI::get_nearest_bullet(AI::AI_Core* aic,
 								 tank_id tid){
 	Physics::PhysRunner::RunnerCore* rc = aic->tc->parent_runner;
 	u32 tank_faction = aic->tc->faction[tid];
-	f32 sqdist = boost::integer_traits<unsigned short>::const_max;
+	f32 sqdist = SHORT_MAX;
 	unsigned int bid = INVALID_ID;
 	for(int i = 0; i < MAX_BULLETS; ++i){
 		// check if the current bullet is an enemy bullet
@@ -57,7 +58,7 @@ tank_id AI::get_nearest_enemy(AI::AI_Core* aic,
 							  tank_id tid){
 	Physics::PhysRunner::RunnerCore* rc = aic->tc->parent_runner;
 	u32 tank_faction = aic->tc->faction[tid];
-	f32 sqdist = boost::integer_traits<unsigned short>::const_max;
+	f32 sqdist = SHORT_MAX;
 	unsigned int eid = INVALID_ID;
 	for(int i = 0; i < MAX_TANKS; ++i){
 		// check if the tank is an enemy tank
@@ -90,7 +91,7 @@ tank_id AI::get_nearest_ally(AI::AI_Core* aic,
 							 tank_id tid){
 	Physics::PhysRunner::RunnerCore* rc = aic->tc->parent_runner;
 	u32 tank_faction = aic->tc->faction[tid];
-	f32 sqdist = boost::integer_traits<unsigned short>::const_max;
+	f32 sqdist = SHORT_MAX;
 	unsigned int aid = INVALID_ID;
 	for(int i = 0; i < MAX_TANKS; ++i){
 		// check if the tank is an allied tank

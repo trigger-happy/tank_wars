@@ -111,7 +111,7 @@ int GameDisplay::main(){
 #if !defined(WIN32)
 			CL_System::sleep(FRAME_TIME - s_deltatime);
 #else
-			Sleep(FRAME_TIME - s_deltatime);
+			//Sleep(FRAME_TIME - s_deltatime);
 #endif
 		}
 	}catch(CL_Exception& e){
