@@ -61,6 +61,7 @@ GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
 	Physics::PhysRunner::initialize(m_physrunner.get());
 	TankBullet::initialize(&m_bullets, m_physrunner.get());
 	BasicTank::initialize(&m_tanks, m_physrunner.get(), &m_bullets);
+	AI::initialize(&m_ai, &m_tanks, &m_bullets);
 	
 	// test code
 	Physics::vec2 params;
@@ -70,6 +71,7 @@ GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
 	m_player2tank = BasicTank::spawn_tank(&m_tanks, params, 180, 1);
 	m_player_input = 0;
 	m_player2_input = 0;
+	AI::add_tank(&m_ai, m_player2tank);
 	
 	// stuff for cuda
 	if(GameDisplay::s_usecuda){
@@ -80,6 +82,8 @@ GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
 				   sizeof(TankBullet::BulletCollection));
 		cudaMalloc(reinterpret_cast<void**>(&m_cuda_tanks),
 				   sizeof(BasicTank::TankCollection));
+		cudaMalloc(reinterpret_cast<void**>(&m_cuda_ai),
+				   sizeof(AI::AI_Core));
 // 		cudaMalloc(reinterpret_cast<void**>(&m_cuda_player_input),
 // 				   sizeof(m_player_input));
 		
@@ -96,8 +100,11 @@ GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
 				   
 		cudaMemcpy(m_cuda_tanks, &m_tanks,
 				   sizeof(m_tanks), cudaMemcpyHostToDevice);
-// 		cudaMemcpy(m_cuda_player_input, &m_player_input,
-// 				   sizeof(m_player_input), cudaMemcpyHostToDevice);
+				   
+		m_ai.bc = m_cuda_bullets;
+		m_ai.tc = m_cuda_tanks;
+		cudaMemcpy(m_cuda_ai, &m_ai,
+				   sizeof(m_ai), cudaMemcpyHostToDevice);
 	}
 }
 
@@ -107,6 +114,7 @@ GSGame::~GSGame(){
 	cudaFree(m_cuda_tanks);
 	cudaFree(m_cuda_bullets);
 	cudaFree(m_cuda_runner);
+	cudaFree(m_cuda_ai);
 }
 
 void GSGame::onSceneDeactivate(){
@@ -163,10 +171,12 @@ __global__ void gsgame_step(f32 dt,
 							Physics::PhysRunner::RunnerCore* runner,
 							TankBullet::BulletCollection* bullets,
 							BasicTank::TankCollection* tanks,
+							AI::AI_Core* aic,
 							u32 player_input){
 	int idx = threadIdx.x;
 	
-	//TODO: perform AI operations here
+	// AI operations
+	AI::timestep(aic, dt);
 	
 	if(idx == 0){
 		// thread 0 will perform the input processing
@@ -208,8 +218,6 @@ __global__ void gsgame_step(f32 dt,
 void GSGame::onFrameUpdate(double dt,
 						   CL_InputDevice* keyboard,
 						   CL_InputDevice* mouse){
-	//TODO: code here for AI update
-	
 	// keyboard control processing
 	// test code for the time being
 	m_player_input = 0;
@@ -249,6 +257,7 @@ void GSGame::onFrameUpdate(double dt,
 												   m_cuda_runner,
 												   m_cuda_bullets,
 												   m_cuda_tanks,
+												   m_cuda_ai,
 												   m_player_input);
 						  
 		// copy back the results for rendering
@@ -258,6 +267,10 @@ void GSGame::onFrameUpdate(double dt,
 				   cudaMemcpyDeviceToHost);
 		cudaMemcpy(m_physrunner.get(), m_cuda_runner,
 				   sizeof(Physics::PhysRunner::RunnerCore),
+				   cudaMemcpyDeviceToHost);
+		// not really needed but for debugging anyway
+		cudaMemcpy(&m_ai, m_cuda_ai,
+				   sizeof(AI::AI_Core),
 				   cudaMemcpyDeviceToHost);
 	}else{
 		// process the player input
@@ -283,6 +296,7 @@ void GSGame::onFrameUpdate(double dt,
 			}
 			
 			// perform all the update
+			AI::timestep(&m_ai, dt);
 			Physics::PhysRunner::timestep(m_physrunner.get(), dt);
 			TankBullet::update(&m_bullets, dt);
 			BasicTank::update(&m_tanks, dt);

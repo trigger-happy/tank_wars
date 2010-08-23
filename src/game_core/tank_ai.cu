@@ -143,8 +143,10 @@ void AI::initialize(AI::AI_Core* aic,
 					TankBullet::BulletCollection* bc){
 	aic->tc = tc;
 	aic->bc = bc;
-	memset(static_cast<void*>(aic->controlled_tanks),
-		   INVALID_ID, MAX_AI_CONTROLLERS*sizeof(tank_id));
+	aic->next_slot = 0;
+	for(int i = 0; i < MAX_AI_CONTROLLERS; ++i){
+		aic->controlled_tanks[i] = INVALID_ID;
+	}
 	memset(static_cast<void*>(aic->genetic_data),
 		   0, MAX_AI_CONTROLLERS*MAX_GENE_DATA*sizeof(int32_t));
 }
@@ -158,5 +160,15 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 	for(idx = 0; idx < MAX_AI_CONTROLLERS; ++idx){
 	#endif
 		// code here for performing AI update
+		if(aic->controlled_tanks[idx] != INVALID_ID){
+			BasicTank::move_forward(aic->tc, aic->controlled_tanks[idx]);
+		}
+	}
+}
+
+void AI::add_tank(AI::AI_Core* aic, tank_id tid){
+	if(aic->next_slot != MAX_AI_CONTROLLERS){
+		aic->controlled_tanks[aic->next_slot] = tid;
+		++(aic->next_slot);
 	}
 }

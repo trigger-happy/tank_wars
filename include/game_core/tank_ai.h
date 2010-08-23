@@ -28,6 +28,7 @@ namespace AI{
 	struct AI_Core{
 		BasicTank::TankCollection* tc;
 		TankBullet::BulletCollection* bc;
+		uint32_t next_slot;
 		tank_id controlled_tanks[MAX_AI_CONTROLLERS];
 		int32_t genetic_data[MAX_GENE_DATA][MAX_AI_CONTROLLERS];
 	};
@@ -91,10 +92,17 @@ namespace AI{
 	
 	/*!
 	Function called for each frame update
-	\param aic - The AI core
-	\param dt - The frame time in milliseconds
+	\param aic The AI core
+	\param dt The frame time in milliseconds
 	*/
 	CUDA_EXPORT void timestep(AI_Core* aic, f32 dt);
+	
+	/*!
+	Add a new tank for the AI to control
+	\param aic The AI core
+	\param tid The tank id
+	*/
+	CUDA_EXPORT void add_tank(AI_Core* aic, tank_id tid);
 }
 
 #endif //TANK_AI_H

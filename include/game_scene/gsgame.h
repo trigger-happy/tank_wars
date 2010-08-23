@@ -25,6 +25,7 @@
 #include "game_scene/igamescene.h"
 #include "game_core/tankbullet.h"
 #include "game_core/basictank.h"
+#include "game_core/tank_ai.h"
 #include "types.h"
 
 #define PLAYER_FORWARD	1
@@ -71,6 +72,7 @@ private:
 	
 	TankBullet::BulletCollection m_bullets;
 	BasicTank::TankCollection m_tanks;
+	AI::AI_Core m_ai;
 	tank_id m_playertank;
 	tank_id m_player2tank;
 	u32 m_player_input;
@@ -80,6 +82,7 @@ private:
 	Physics::PhysRunner::RunnerCore* m_cuda_runner;
 	TankBullet::BulletCollection* m_cuda_bullets;
 	BasicTank::TankCollection* m_cuda_tanks;
+	AI::AI_Core* m_cuda_ai;
 // 	u8* m_cuda_player_input;
 };
 
