@@ -127,7 +127,7 @@ void Physics::PhysRunner::find_next_free_slot(Physics::PhysRunner::RunnerCore* r
 			return;
 		}
 	}
-	rc->first_free_slot= MAX_ARRAY_SIZE;
+	rc->first_free_slot = INVALID_ID;
 }
 
 u32 Physics::PhysRunner::get_slot(Physics::PhysRunner::RunnerCore* rc){
