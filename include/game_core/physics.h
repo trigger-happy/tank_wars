@@ -27,6 +27,9 @@
 
 namespace Physics{
 	
+/*!
+Simple vector class for floats
+*/
 struct vec2{
 	vec2(){
 		x = 0;
@@ -37,6 +40,10 @@ struct vec2{
 	f32 y;
 };
 
+/*!
+Structure of arrays for a vec2 class
+Purpose of this is to improve memory coallescing on the gpu
+*/
 struct vec2_array{
 	CUDA_EXPORT vec2_array();
 	CUDA_EXPORT vec2 get_vec2(u32 id);
@@ -52,7 +59,11 @@ struct vec2_array{
 typedef u32 pBody;
 typedef u32 pShape;
 
-
+/*!
+Structure of array for the physics body objects. An object's parameters
+can be accessed grabbing the nth element in any of the array of parameters.
+pBody is used as the index for any given object.
+*/
 struct physBody{
 	vec2_array	old_pos;
 	vec2_array	cur_pos;
@@ -79,6 +90,11 @@ struct physBody{
 
 namespace PhysRunner{
 	
+	/*!
+	Context object for the physics runner.
+	Contains the physBody structure of arrays and an array to denote free
+	slots for the physics objects.
+	*/
 	struct RunnerCore{
 		physBody					bodies;
 		//TODO: change this to a custom bitvector
@@ -86,37 +102,190 @@ namespace PhysRunner{
 		u32							first_free_slot;
 	};
 	
+	/*!
+	Initialize the RunnerCore object
+	\param rc The RunnerCore object 
+	*/
 	CUDA_HOST void initialize(RunnerCore* rc);
+	
+	/*!
+	Cleanup the RunnerCore object
+	\param rc The RunnerCore object
+	*/
 	CUDA_HOST void cleanup(RunnerCore* rc);
 	
+	/*!
+	Perform a frame update
+	\param rc The RunnerCore object.
+	\param dt The frame time in seconds.
+	*/
 	CUDA_EXPORT void timestep(RunnerCore* rc, f32 dt);
 
 	
+	/*!
+	Create a physics object by reserving a slot in the PhysBody lists
+	\param rc The RunnerCore object.
+	\return The index in the physics body list.
+	*/
 	CUDA_EXPORT pBody create_object(RunnerCore* rc);
+	
+	/*!
+	Destroy the physics object so that the slot may be used elsewhere
+	\param rc The RunnerCore object.
+	\param oid The index of the object.
+	*/
 	CUDA_EXPORT void destroy_object(RunnerCore* rc, pBody oid);
 	
+	/*!
+	Get the current position of the physics object.
+	\param rc The RunnerCore object
+	\param oid The index of the physicsbody
+	\return A vec2 object containing the current position
+	*/
 	CUDA_EXPORT vec2 get_cur_pos(RunnerCore* rc, pBody oid);
+	
+	/*!
+	Get the acceleration of the object
+	\param rc The RunnerCore object
+	\param oid The index of the physicsbody
+	\return A vec2 containing the acceleration of the object.
+	*/
 	CUDA_EXPORT vec2 get_acceleration(Physics::PhysRunner::RunnerCore* rc, pBody oid);
+	
+	/*!
+	Get the rotation of the physics object
+	\param rc The RunnerCore object.
+	\param oid The index of the physicsbody
+	\return The rotation of the object.
+	*/
 	CUDA_EXPORT f32 get_rotation(Physics::PhysRunner::RunnerCore* rc, pBody oid);
+	
+	/*!
+	Get the maximum velocity of the object.
+	\param rc The RunnerCore object.
+	\param oid The index of the physicsbody.
+	\return The maximum velocity of the object.
+	*/
 	CUDA_EXPORT f32 get_max_velocity(RunnerCore* rc, pBody oid);
+	
+	/*!
+	Returns true if the object may collides, false otherwise
+	\param rc The RunnerCore object.
+	\param oid The index of the physicsbody.
+	\return A boolean
+	*/
 	CUDA_EXPORT bool is_collidable(RunnerCore* rc, pBody oid);
+	
+	/*!
+	Get the shape type of the physics object.
+	\param rc The RunnerCore object.
+	\param oid The index of the physicsbody.
+	\return The shape type of the object.
+	*/
 	CUDA_EXPORT pShape get_shape_type(RunnerCore* rc, pBody oid);
+	
+	/*!
+	Get any attached user data on the physics object.
+	\param rc The RunnerCore object.
+	\param oid The index of the physicsbody.
+	\return The attached user data.
+	*/
 	CUDA_EXPORT u32 get_user_data(RunnerCore* rc, pBody oid);
+	
+	/*!
+	Get the dimensions of the physics object.
+	\param rc The RunnerCore object.
+	\param oid The index of the physicsbody.
+	\return A vec2 object containing the physical dimensions of the object.
+	*/
 	CUDA_EXPORT vec2 get_dimensions(RunnerCore* rc, pBody oid);
 	
+	
+	/*!
+	Set the current position of the physics object.
+	\param rc The RunnerCore object.
+	\param oid The index of the physicsbody.
+	\param pos The new object position.
+	*/
 	CUDA_EXPORT void set_cur_pos(RunnerCore* rc, pBody oid, const vec2& pos);
+	
+	/*!
+	Set the acceleration of the physics object.
+	\param rc The RunnerCore object.
+	\param oid The index of the physicsbody.
+	\param accel The acceleration of the physicsobject.
+	*/
 	CUDA_EXPORT void set_acceleration(RunnerCore* rc,
 									  pBody oid, const vec2& accel);
+									  
+	/*!
+	Set the rotation of the object.
+	\param rc The RunnerCore object.
+	\param oid The index of the physicsbody.
+	\param r The rotation of the object.
+	*/
 	CUDA_EXPORT void set_rotation(RunnerCore* rc, pBody oid, f32 r);
+	
+	/*!
+	Set the maximum velocity of the object.
+	\param rc The RunnerCore object.
+	\param oid The index of the physicsbody.
+	\param mv The maximum velocity.
+	*/
 	CUDA_EXPORT void set_max_velocity(RunnerCore* rc, pBody oid, f32 mv);
+	
+	/*!
+	Set the shape type of the object.
+	\param rc The RunnerCore object.
+	\param oid The index of the physicsbody.
+	\param st The shape type.
+	*/
 	CUDA_EXPORT void set_shape_type(RunnerCore* rc, pBody oid, pShape st);
+	
+	/*!
+	Attach some user data on the object.
+	\param rc The RunnerCore object.
+	\param oid The index of the physicsbody.
+	\param ud The user data.
+	*/
 	CUDA_EXPORT void set_user_data(RunnerCore* rc, pBody oid, u32 ud);
+	
+	/*!
+	Set the dimensions of the object.
+	\param rc The RunnerCore object.
+	\param oid The index of the physicsbody.
+	\param dim The dimensions of the object.
+	*/
 	CUDA_EXPORT void set_dimensions(RunnerCore* rc, pBody oid, const vec2& dim);
 	
+	/*!
+	Set the collidable property of an object.
+	\param rc The RunnerCore object.
+	\param oid The index of the physicsbody.
+	\param f true if it collidable, false otherwise.
+	*/
 	CUDA_EXPORT void should_collide(RunnerCore* rc, pBody oid, bool f);
 	
+	/*!
+	Get a slot from the PhysBody array.
+	\note INTERNAL USE ONLY
+	\param rc The RunnerCore object.
+	*/
 	CUDA_EXPORT u32 get_slot(RunnerCore* rc);
+	
+	/*!
+	Free a slot from the PhysBody array.
+	\note INTERNAL USE ONLY
+	\param rc The RunnerCore object.
+	\param id The id to free
+	*/
 	CUDA_EXPORT void free_slot(RunnerCore* rc, u32 id);
+	
+	/*!
+	Get the next available slot for physics objects.
+	\note INTERNAL USE ONLY.
+	\param rc The RunnerCore object.
+	*/
 	CUDA_EXPORT void find_next_free_slot(RunnerCore* rc);
 }
 	
