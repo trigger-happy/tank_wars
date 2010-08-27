@@ -15,6 +15,7 @@
 */
 #include <limits>
 #include <cstring>
+#include <ctime>
 #include "game_core/tank_ai.h"
 
 #define SHORT_MAX 32767
@@ -150,6 +151,8 @@ void AI::initialize(AI::AI_Core* aic,
 	}
 	memset(static_cast<void*>(aic->genetic_data),
 		   0, MAX_AI_CONTROLLERS*MAX_GENE_DATA*sizeof(int32_t));
+	
+	AI::init_gene_data(aic);
 }
 
 void AI::timestep(AI::AI_Core* aic, f32 dt){
@@ -160,9 +163,14 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 	#elif !defined(__CUDA_ARCH__)
 	for(idx = 0; idx < MAX_AI_CONTROLLERS; ++idx){
 	#endif
-		// code here for performing AI update
+		// update registered tanks that are not invalid
 		if(aic->controlled_tanks[idx] != INVALID_ID){
-			BasicTank::move_forward(aic->tc, aic->controlled_tanks[idx]);
+			//TODO: code here for dodging incoming bullets
+			// get info regarding the incoming bullet
+			// use the info as an index to the genetic array
+			// perform the action based values in the genetic array
+			
+			// future work here for some sort of state machine
 		}
 	}
 }
@@ -171,5 +179,14 @@ void AI::add_tank(AI::AI_Core* aic, tank_id tid){
 	if(aic->next_slot != MAX_AI_CONTROLLERS){
 		aic->controlled_tanks[aic->next_slot] = tid;
 		++(aic->next_slot);
+	}
+}
+
+void AI::init_gene_data(AI::AI_Core* aic){
+	srand(std::time(NULL));
+	for(int i = 0; i < MAX_AI_CONTROLLERS; ++i){
+		for(int j = 0; j < MAX_GENE_DATA; ++j){
+			aic->genetic_data[j][i] = rand();
+		}
 	}
 }

@@ -26,11 +26,12 @@
 namespace AI{
 	// some AI specific info
 	struct AI_Core{
+		typedef u8 gene_type;
 		BasicTank::TankCollection* tc;
 		TankBullet::BulletCollection* bc;
 		u32 next_slot;
 		tank_id controlled_tanks[MAX_AI_CONTROLLERS];
-		u32 genetic_data[MAX_GENE_DATA][MAX_AI_CONTROLLERS];
+		gene_type genetic_data[MAX_GENE_DATA][MAX_AI_CONTROLLERS];
 	};
 	
 	// sensor functions
@@ -103,6 +104,9 @@ namespace AI{
 	\param tid The tank id
 	*/
 	CUDA_EXPORT void add_tank(AI_Core* aic, tank_id tid);
+	
+	// genetic functions
+	CUDA_HOST void init_gene_data(AI_Core* aic);
 }
 
 #endif //TANK_AI_H
