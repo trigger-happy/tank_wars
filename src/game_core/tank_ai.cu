@@ -149,8 +149,10 @@ void AI::initialize(AI::AI_Core* aic,
 	for(int i = 0; i < MAX_AI_CONTROLLERS; ++i){
 		aic->controlled_tanks[i] = INVALID_ID;
 	}
-	memset(static_cast<void*>(aic->genetic_data),
-		   0, MAX_AI_CONTROLLERS*MAX_GENE_DATA*sizeof(int32_t));
+	memset(static_cast<void*>(aic->gene_accel),
+		   0, MAX_AI_CONTROLLERS*MAX_GENE_DATA*sizeof(AI::AI_Core::gene_type));
+	memset(static_cast<void*>(aic->gene_heading),
+		   0, MAX_AI_CONTROLLERS*MAX_GENE_DATA*sizeof(AI::AI_Core::gene_type));
 	
 	AI::init_gene_data(aic);
 }
@@ -186,7 +188,8 @@ void AI::init_gene_data(AI::AI_Core* aic){
 	srand(std::time(NULL));
 	for(int i = 0; i < MAX_AI_CONTROLLERS; ++i){
 		for(int j = 0; j < MAX_GENE_DATA; ++j){
-			aic->genetic_data[j][i] = rand();
+			aic->gene_accel[j][i] = rand()%3;
+			aic->gene_heading[j][i] = rand()%3;
 		}
 	}
 }

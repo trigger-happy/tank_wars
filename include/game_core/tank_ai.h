@@ -20,8 +20,12 @@
 #include "game_core/collision_checker.h"
 #include "util/util.h"
 
-#define MAX_GENE_DATA		64
-#define MAX_AI_CONTROLLERS	MAX_TANKS
+#define NUM_DISTANCE_STATES		4
+#define NUM_LOCATION_STATES		18
+#define NUM_COLLISION_STATES	10
+#define MAX_GENE_DATA			NUM_DISTANCE_STATES * NUM_LOCATION_STATES * NUM_COLLISION_STATES
+#define NUM_GENE_VALUES			3
+#define MAX_AI_CONTROLLERS		MAX_TANKS
 
 namespace AI{
 	// some AI specific info
@@ -31,7 +35,8 @@ namespace AI{
 		TankBullet::BulletCollection* bc;
 		u32 next_slot;
 		tank_id controlled_tanks[MAX_AI_CONTROLLERS];
-		gene_type genetic_data[MAX_GENE_DATA][MAX_AI_CONTROLLERS];
+		gene_type gene_accel[MAX_GENE_DATA][MAX_AI_CONTROLLERS];
+		gene_type gene_heading[MAX_GENE_DATA][MAX_AI_CONTROLLERS];
 	};
 	
 	// sensor functions
