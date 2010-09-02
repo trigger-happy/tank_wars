@@ -188,8 +188,8 @@ void AI::init_gene_data(AI::AI_Core* aic){
 	srand(std::time(NULL));
 	for(int i = 0; i < MAX_AI_CONTROLLERS; ++i){
 		for(int j = 0; j < MAX_GENE_DATA; ++j){
-			aic->gene_accel[j][i] = rand()%3;
-			aic->gene_heading[j][i] = rand()%3;
+			aic->gene_accel[j][i] = rand()%MAX_THRUST_VALUES;
+			aic->gene_heading[j][i] = rand()%MAX_HEADING_VALUES;
 		}
 	}
 }
