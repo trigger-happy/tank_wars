@@ -22,8 +22,13 @@
 
 #define NUM_DISTANCE_STATES		4
 #define DISTANCE_FACTOR			7.5
+
 #define NUM_LOCATION_STATES		18
+#define SECTOR_SIZE				20.0f
+
 #define NUM_COLLISION_STATES	10
+#define MAX_SPEED				20.0f //TODO: adjust this as needed
+
 #define MAX_GENE_DATA			NUM_DISTANCE_STATES * NUM_LOCATION_STATES * NUM_COLLISION_STATES
 
 #define MAX_THRUST_VALUES		3
@@ -84,6 +89,15 @@ namespace AI{
 	CUDA_EXPORT f32 get_tank_dist(AI_Core* aic,
 								  tank_id my_id,
 								  tank_id target_id);
+								 
+	/*!
+	Function for computing the sector where the bullet is.
+	Also taken from the AI Game Engine programming book
+	\param aic The AI_Core involved
+	\param pos The position of the object
+	*/
+	CUDA_EXPORT s32 get_sector(AI_Core* aic,
+							   Physics::vec2 pos);
 								  
 	/*!
 	Update the perception data. Algorithm taken from the AI Game Engine

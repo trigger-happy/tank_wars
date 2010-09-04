@@ -29,6 +29,33 @@ template<typename T>
 CUDA_EXPORT T rads_to_degs(T rads){
 	return (rads * (180/PI));
 }
+
+template<typename T>
+CUDA_EXPORT T clamp_dir_360(T dir){
+	T out_dir_abs = fabs(dir);
+	T out_dir = 0;
+	
+	if(out_dir_abs > 360.0f){
+		if(out_dir_abs > 720.0f){
+			out_dir = fmod(dir, 360.0f);
+		}else{
+			out_dir = ( dir > 0.0f ) ? dir - 360.0f : dir + 360.0f;
+		}
+		out_dir_abs = fabs(out_dir);
+	}else{
+		if(dir < 0.0f){
+			out_dir = dir + 360.0f;
+		}else{
+			out_dir = dir;
+		}
+	}
+	return out_dir;
+}
+
+template<typename T>
+CUDA_EXPORT T lerp(T t, T a, T b){
+	return a + (b - a)*t;
+}
 	
 };
 
