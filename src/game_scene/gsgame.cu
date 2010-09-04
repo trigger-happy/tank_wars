@@ -152,16 +152,13 @@ void GSGame::onFrameRender(CL_GraphicContext* gc){
 	m_testtank2->set_angle(CL_Angle(-rot, cl_degrees));
 	m_testtank2->draw(*gc, pos.x, pos.y);
 	
-	// Debug info
-// 	CL_StringFormat fmt("Dist: %1");
-// 	bullet_id bid = AI::get_nearest_bullet(&m_tanks, &m_bullets, m_player2tank);
-// 	if(bid != INVALID_ID){
-// 		fmt.set_arg(1, AI::get_bullet_dist(&m_tanks, &m_bullets, m_player2tank, bid));
-// 	}else{
-// 		fmt.set_arg(1, 0);
-// 	}
-// 	m_dbgmsg = fmt.get_result();
-// 	m_debugfont->draw_text(*gc, 1, 12, m_dbgmsg, CL_Colorf::red);
+	// Debug info, causes a crash when with --use-cuda
+	CL_StringFormat fmt("States: %1 %2 %3");
+	fmt.set_arg(1, m_ai.collision_state[0]);
+	fmt.set_arg(2, m_ai.direction_state[0]);
+	fmt.set_arg(3, m_ai.distance_state[0]);
+	m_dbgmsg = fmt.get_result();
+	m_debugfont->draw_text(*gc, 1, 12, m_dbgmsg, CL_Colorf::red);
 }
 
 

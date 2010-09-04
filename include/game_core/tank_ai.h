@@ -20,18 +20,35 @@
 #include "game_core/collision_checker.h"
 #include "util/util.h"
 
-#define MAX_GENE_DATA		64
-#define MAX_AI_CONTROLLERS	MAX_TANKS
+#define NUM_DISTANCE_STATES		4
+#define DISTANCE_FACTOR			7.5
+
+#define NUM_LOCATION_STATES		18
+#define SECTOR_SIZE				20.0f
+
+#define NUM_COLLISION_STATES	10
+#define MAX_SPEED				20.0f //TODO: adjust this as needed
+
+#define MAX_GENE_DATA			NUM_DISTANCE_STATES * NUM_LOCATION_STATES * NUM_COLLISION_STATES
+
+#define MAX_THRUST_VALUES		3
+#define MAX_HEADING_VALUES		18
+#define MAX_AI_CONTROLLERS		MAX_TANKS
 
 namespace AI{
+	typedef u32 ai_id;
 	// some AI specific info
 	struct AI_Core{
 		typedef u8 gene_type;
 		BasicTank::TankCollection* tc;
 		TankBullet::BulletCollection* bc;
 		u32 next_slot;
+		s32 collision_state[MAX_AI_CONTROLLERS];
+		s32 direction_state[MAX_AI_CONTROLLERS];
+		s32 distance_state[MAX_AI_CONTROLLERS];
 		tank_id controlled_tanks[MAX_AI_CONTROLLERS];
-		gene_type genetic_data[MAX_GENE_DATA][MAX_AI_CONTROLLERS];
+		gene_type gene_accel[MAX_GENE_DATA][MAX_AI_CONTROLLERS];
+		gene_type gene_heading[MAX_GENE_DATA][MAX_AI_CONTROLLERS];
 	};
 	
 	// sensor functions
@@ -72,6 +89,24 @@ namespace AI{
 	CUDA_EXPORT f32 get_tank_dist(AI_Core* aic,
 								  tank_id my_id,
 								  tank_id target_id);
+								 
+	/*!
+	Function for computing the sector where the bullet is.
+	Also taken from the AI Game Engine programming book
+	\param aic The AI_Core involved
+	\param pos The position of the object
+	*/
+	CUDA_EXPORT s32 get_sector(AI_Core* aic,
+							   Physics::vec2 pos);
+								  
+	/*!
+	Update the perception data. Algorithm taken from the AI Game Engine
+	Programming book.
+	\param aic The AI_Core involved
+	\param id The AI ID
+	*/
+	CUDA_EXPORT void update_perceptions(AI_Core* aic,
+										ai_id id);
 	
 	/*!
 	Get the distance of a bullet to the current tank

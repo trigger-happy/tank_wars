@@ -36,6 +36,37 @@ struct vec2{
 		y = 0;
 	}
 	
+	CUDA_EXPORT void normalize(){
+		f32 l = length();
+		x /= l;
+		y /= l;
+	}
+	
+	CUDA_EXPORT f32 length(){
+		return sqrt(x*x + y*y);
+	}
+	
+	CUDA_EXPORT vec2 operator-=(const vec2& rhs){
+		vec2 temp;
+		x -= rhs.x;
+		y -= rhs.y;
+		temp.x = x;
+		temp.y = y;
+		return temp;
+	}
+	
+	CUDA_EXPORT f32 operator*(const vec2& rhs){
+		f32 temp = (x * rhs.x) + (y * rhs.y);
+		return temp;
+	}
+	
+	CUDA_EXPORT vec2 operator-() const{
+		vec2 temp = *this;
+		temp.x *= -1;
+		temp.y *= -1;
+		return temp;
+	}
+	
 	f32 x;
 	f32 y;
 };
@@ -47,6 +78,7 @@ Purpose of this is to improve memory coallescing on the gpu
 struct vec2_array{
 	CUDA_EXPORT vec2_array();
 	CUDA_EXPORT vec2 get_vec2(u32 id);
+	CUDA_EXPORT void normalize(u32 id);
 	
 	f32 x[MAX_ARRAY_SIZE];
 	f32 y[MAX_ARRAY_SIZE];
@@ -143,6 +175,14 @@ namespace PhysRunner{
 	\return A vec2 object containing the current position
 	*/
 	CUDA_EXPORT vec2 get_cur_pos(RunnerCore* rc, pBody oid);
+	
+	/*!
+	Get the previous position of the physics object.
+	\param rc The RunnerCore object
+	\param oid The index of the physicsbody
+	\return A vec2 object containing the previous position
+	*/
+	CUDA_EXPORT vec2 get_prev_pos(RunnerCore* rc, pBody oid);
 	
 	/*!
 	Get the acceleration of the object
@@ -287,6 +327,22 @@ namespace PhysRunner{
 	\param rc The RunnerCore object.
 	*/
 	CUDA_EXPORT void find_next_free_slot(RunnerCore* rc);
+	
+	/*!
+	Get the velocity of the object
+	\param rc The RunnerCore object
+	\param id The id of the phys object
+	\return The velocity of the object
+	*/
+	CUDA_EXPORT f32 get_cur_velocity(RunnerCore* rc, pBody oid);
+	
+	/*!
+	Get the velocity vector of the object
+	\param rc The RunnerCore object
+	\param id The id of the phys object
+	\return The velocity vector of the object
+	*/
+	CUDA_EXPORT vec2 get_velocity_vector(RunnerCore* rc, pBody oid);
 }
 	
 }

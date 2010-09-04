@@ -19,6 +19,7 @@
 #include "game_core/tank_ai.h"
 
 #define SHORT_MAX 32767
+#define DISTANCE_DEFAULT SHORT_MAX
 
 bullet_id AI::get_nearest_bullet(AI::AI_Core* aic,
 								 tank_id tid){
@@ -149,6 +150,7 @@ void AI::initialize(AI::AI_Core* aic,
 	for(int i = 0; i < MAX_AI_CONTROLLERS; ++i){
 		aic->controlled_tanks[i] = INVALID_ID;
 	}
+<<<<<<< HEAD
 	memset(static_cast<void*>(aic->genetic_data),
 		   0, MAX_AI_CONTROLLERS*MAX_GENE_DATA*sizeof(AI::AI_Core::gene_type));
 	
@@ -165,8 +167,7 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 	#endif
 		// update registered tanks that are not invalid
 		if(aic->controlled_tanks[idx] != INVALID_ID){
-			//TODO: code here for dodging incoming bullets
-			// get info regarding the incoming bullet
+			update_perceptions(aic, idx);
 			// use the info as an index to the genetic array
 			// perform the action based values in the genetic array
 			
@@ -186,7 +187,60 @@ void AI::init_gene_data(AI::AI_Core* aic){
 	srand(std::time(NULL));
 	for(int i = 0; i < MAX_AI_CONTROLLERS; ++i){
 		for(int j = 0; j < MAX_GENE_DATA; ++j){
-			aic->genetic_data[j][i] = rand();
+			aic->gene_accel[j][i] = rand()%MAX_THRUST_VALUES;
+			aic->gene_heading[j][i] = rand()%MAX_HEADING_VALUES;
 		}
 	}
+}
+
+void AI::update_perceptions(AI::AI_Core* aic,
+							ai_id id){
+	if(aic->controlled_tanks[id] != INVALID_ID){
+		tank_id tid = aic->controlled_tanks[id];
+		// reset the states, we'll use a single variable to store data
+		// to optimize register usage
+		s32 temp = -1;
+		u32 dist = DISTANCE_DEFAULT;
+		
+		// get the nearest bullet
+		bullet_id bid = AI::get_nearest_bullet(aic, tid);
+		dist = AI::get_bullet_dist(aic, tid, bid);
+		
+		// set the distance state
+		temp = min((u32)(dist/DISTANCE_FACTOR), NUM_DISTANCE_STATES);
+		aic->distance_state[id] = temp;
+		
+		// set the direction state
+		Physics::PhysRunner::RunnerCore* rc = aic->tc->parent_runner;
+		Physics::vec2 pos = Physics::PhysRunner::get_cur_pos(rc,
+															 aic->tc->phys_id[tid]);
+		Physics::vec2 pos2 = Physics::PhysRunner::get_cur_pos(rc,
+															  aic->bc->phys_id[bid]);
+		pos -= pos2;
+		// save the result for later use
+		pos2 = pos;
+		pos.normalize();
+		temp = AI::get_sector(aic, pos);
+		aic->direction_state[id] = temp;
+		
+		// set the collision state
+		f32 tspeed = Physics::PhysRunner::get_cur_velocity(rc, aic->tc->phys_id[tid]);
+		dist = pos2.length();
+		f32 bspeed = Physics::PhysRunner::get_cur_velocity(rc, aic->bc->phys_id[bid]);
+		f32 tsp_adj = Physics::PhysRunner::get_velocity_vector(rc, aic->tc->phys_id[tid]) * pos;
+		tsp_adj *= tspeed;
+		f32 bsp_adj = Physics::PhysRunner::get_velocity_vector(rc, aic->bc->phys_id[bid]) * -pos;
+		bsp_adj *= bspeed;
+		tspeed = tsp_adj + bsp_adj;
+		tspeed = min(tspeed, MAX_SPEED);
+		temp = (s32)util::lerp(tspeed/MAX_SPEED, 0.0f, 9.0f);
+	}
+}
+
+s32 AI::get_sector(AI::AI_Core* aic,
+			   Physics::vec2 pos){
+	f32 dir = atan2(pos.x, pos.y);
+	dir = util::rads_to_degs(dir);
+	dir = util::clamp_dir_360(dir);
+	return ((s32)(dir/SECTOR_SIZE));
 }
