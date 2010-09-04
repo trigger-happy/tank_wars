@@ -152,11 +152,11 @@ void GSGame::onFrameRender(CL_GraphicContext* gc){
 	m_testtank2->set_angle(CL_Angle(-rot, cl_degrees));
 	m_testtank2->draw(*gc, pos.x, pos.y);
 	
-	// Debug info
+	// Debug info, causes a crash when with --use-cuda
 // 	CL_StringFormat fmt("Dist: %1");
-// 	bullet_id bid = AI::get_nearest_bullet(&m_tanks, &m_bullets, m_player2tank);
-// 	if(bid != INVALID_ID){
-// 		fmt.set_arg(1, AI::get_bullet_dist(&m_tanks, &m_bullets, m_player2tank, bid));
+// 	tank_id tid = AI::get_nearest_enemy(&m_ai, m_playertank);
+// 	if(tid != INVALID_ID){
+// 		fmt.set_arg(1, AI::get_tank_dist(&m_ai, m_playertank, tid));
 // 	}else{
 // 		fmt.set_arg(1, 0);
 // 	}

@@ -19,6 +19,7 @@
 #include "game_core/tank_ai.h"
 
 #define SHORT_MAX 32767
+#define DISTANCE_DEFAULT SHORT_MAX
 
 bullet_id AI::get_nearest_bullet(AI::AI_Core* aic,
 								 tank_id tid){
@@ -167,8 +168,7 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 	#endif
 		// update registered tanks that are not invalid
 		if(aic->controlled_tanks[idx] != INVALID_ID){
-			//TODO: code here for dodging incoming bullets
-			// get info regarding the incoming bullet
+			update_perceptions(aic, idx);
 			// use the info as an index to the genetic array
 			// perform the action based values in the genetic array
 			
@@ -191,5 +191,24 @@ void AI::init_gene_data(AI::AI_Core* aic){
 			aic->gene_accel[j][i] = rand()%MAX_THRUST_VALUES;
 			aic->gene_heading[j][i] = rand()%MAX_HEADING_VALUES;
 		}
+	}
+}
+
+void AI::update_perceptions(AI::AI_Core* aic,
+							ai_id id){
+	if(aic->controlled_tanks[id] != INVALID_ID){
+		tank_id tid = aic->controlled_tanks[id];
+		// reset the states, we'll use a single variable to store data
+		// to optimize register usage
+		s32 temp = -1;
+		u32 dist = DISTANCE_DEFAULT;
+		
+		// get the nearest bullet
+		bullet_id bid = AI::get_nearest_bullet(aic, tid);
+		dist = AI::get_bullet_dist(aic, tid, bid);
+		
+		// set the distance state
+		temp = min((u32)(dist/DISTANCE_FACTOR), NUM_DISTANCE_STATES);
+		aic->distance_state[id] = temp;
 	}
 }
