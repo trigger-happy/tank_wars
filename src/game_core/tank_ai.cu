@@ -150,9 +150,10 @@ void AI::initialize(AI::AI_Core* aic,
 	for(int i = 0; i < MAX_AI_CONTROLLERS; ++i){
 		aic->controlled_tanks[i] = INVALID_ID;
 	}
-<<<<<<< HEAD
-	memset(static_cast<void*>(aic->genetic_data),
+	memset(static_cast<void*>(aic->gene_accel),
 		   0, MAX_AI_CONTROLLERS*MAX_GENE_DATA*sizeof(AI::AI_Core::gene_type));
+	memset(static_cast<void*>(aic->gene_heading),
+			0, MAX_AI_CONTROLLERS*MAX_GENE_DATA*sizeof(AI::AI_Core::gene_type));
 	
 	AI::init_gene_data(aic);
 }
