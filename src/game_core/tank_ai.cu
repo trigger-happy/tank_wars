@@ -168,6 +168,9 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 	#endif
 		// update registered tanks that are not invalid
 		if(aic->controlled_tanks[idx] != INVALID_ID){
+			// DEBUG
+			BasicTank::move_forward(aic->tc, aic->controlled_tanks[idx]);
+			
 			update_perceptions(aic, idx);
 			// use the info as an index to the genetic array
 			// perform the action based values in the genetic array
@@ -235,6 +238,7 @@ void AI::update_perceptions(AI::AI_Core* aic,
 		tspeed = tsp_adj + bsp_adj;
 		tspeed = min(tspeed, MAX_SPEED);
 		temp = (s32)util::lerp(tspeed/MAX_SPEED, 0.0f, 9.0f);
+		aic->collision_state[id] = temp;
 	}
 }
 

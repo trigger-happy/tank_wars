@@ -152,7 +152,7 @@ void GSGame::onFrameRender(CL_GraphicContext* gc){
 	m_testtank2->set_angle(CL_Angle(-rot, cl_degrees));
 	m_testtank2->draw(*gc, pos.x, pos.y);
 	
-	// Debug info, causes a crash when with --use-cuda
+	// Debug info
 	CL_StringFormat fmt("States: %1 %2 %3");
 	fmt.set_arg(1, m_ai.collision_state[0]);
 	fmt.set_arg(2, m_ai.direction_state[0]);
