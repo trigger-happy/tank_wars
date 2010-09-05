@@ -153,7 +153,7 @@ void AI::initialize(AI::AI_Core* aic,
 	memset(static_cast<void*>(aic->gene_accel),
 		   0, MAX_AI_CONTROLLERS*MAX_GENE_DATA*sizeof(AI::AI_Core::gene_type));
 	memset(static_cast<void*>(aic->gene_heading),
-		   0, MAX_AI_CONTROLLERS*MAX_GENE_DATA*sizeof(AI::AI_Core::gene_type));
+			0, MAX_AI_CONTROLLERS*MAX_GENE_DATA*sizeof(AI::AI_Core::gene_type));
 	
 	AI::init_gene_data(aic);
 }
