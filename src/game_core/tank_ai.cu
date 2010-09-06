@@ -155,6 +155,14 @@ void AI::initialize(AI::AI_Core* aic,
 		   0, MAX_AI_CONTROLLERS*MAX_GENE_DATA*sizeof(AI::AI_Core::gene_type));
 	memset(static_cast<void*>(aic->gene_heading),
 			0, MAX_AI_CONTROLLERS*MAX_GENE_DATA*sizeof(AI::AI_Core::gene_type));
+	memset(static_cast<void*>(aic->bullet_vector),
+		   0, MAX_AI_CONTROLLERS*sizeof(s32));
+	memset(static_cast<void*>(aic->tank_vector),
+		   0, MAX_AI_CONTROLLERS*sizeof(s32));
+	memset(static_cast<void*>(aic->distance_state),
+		   0, MAX_AI_CONTROLLERS*sizeof(s32));
+	memset(static_cast<void*>(aic->direction_state),
+		   0, MAX_AI_CONTROLLERS*sizeof(s32));
 	
 	AI::init_gene_data(aic);
 }
@@ -204,6 +212,8 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 				}else if(aic->gene_heading[index][idx] > cur_rot){
 					BasicTank::turn_right(aic->tc, my_tank);
 				}
+			}else{
+				BasicTank::stop(aic->tc, my_tank);
 			}
 			//TODO: state machine here in the future?
 		}

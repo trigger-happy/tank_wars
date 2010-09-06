@@ -37,7 +37,7 @@
 
 #define MAX_THRUST_VALUES		3
 #define MAX_HEADING_VALUES		18
-#define MAX_AI_CONTROLLERS		MAX_TANKS
+#define MAX_AI_CONTROLLERS		8
 
 namespace AI{
 	typedef u32 ai_id;
