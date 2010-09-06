@@ -16,6 +16,7 @@
 #include <limits>
 #include <cstring>
 #include <ctime>
+#include "exports.h"
 #include "game_core/tank_ai.h"
 
 #define SHORT_MAX 32767
@@ -169,7 +170,14 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 		// update registered tanks that are not invalid
 		if(aic->controlled_tanks[idx] != INVALID_ID){
 			// DEBUG
-// 			BasicTank::move_forward(aic->tc, aic->controlled_tanks[idx]);
+			float x = Physics::PhysRunner::get_cur_pos(aic->tc->parent_runner,
+													   aic->tc->phys_id[aic->controlled_tanks[idx]]).x;
+			if(x < -25){
+				BasicTank::move_backward(aic->tc, aic->controlled_tanks[idx]);
+			}else if(x > 24){
+				BasicTank::move_forward(aic->tc, aic->controlled_tanks[idx]);
+			}
+// 			BasicTank::turn_left(aic->tc, aic->controlled_tanks[idx]);
 			
 			update_perceptions(aic, idx);
 			// use the info as an index to the genetic array
@@ -236,9 +244,8 @@ void AI::update_perceptions(AI::AI_Core* aic,
 		f32 bsp_adj = Physics::PhysRunner::get_velocity_vector(rc, aic->bc->phys_id[bid]) * -pos;
 		bsp_adj *= bspeed;
 		tspeed = tsp_adj + bsp_adj;
-		tspeed = min(tspeed, MAX_SPEED);
-		//TODO: 60 is the number of frames in a second, change this later
-		temp = (s32)util::lerp(60*tspeed/MAX_SPEED, 0.0f, 9.0f);
+		tspeed = min(tspeed, MAX_SPEED/60);
+		temp = (s32)util::lerp(tspeed/(MAX_SPEED/60), 0.0f, 9.0f);
 		aic->collision_state[id] = temp;
 	}
 }
