@@ -171,17 +171,41 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 			// convert from milliseconds to seconds
 			dt /= 1000.0f;
 		}
+		tank_id my_tank = aic->controlled_tanks[idx];
 		// update registered tanks that are not invalid
-		if(aic->controlled_tanks[idx] != INVALID_ID){
+		if(my_tank != INVALID_ID){
 			// DEBUG
-			BasicTank::move_forward(aic->tc, aic->controlled_tanks[idx]);
-			BasicTank::turn_left(aic->tc, aic->controlled_tanks[idx]);
+// 			BasicTank::move_forward(aic->tc, my_tank);
+// 			BasicTank::turn_left(aic->tc, my_tank);
 			
 			update_perceptions(aic, idx, dt);
-			// use the info as an index to the genetic array
-			// perform the action based values in the genetic array
-			
-			// future work here for some sort of state machine
+			s32 index = aic->bullet_vector[idx] * aic->tank_vector[idx] *
+						aic->direction_state[idx] * aic->distance_state[idx];
+			if(index > 0){
+				// valid index, access the action from the array
+				switch(aic->gene_accel[index][idx]){
+					case 0:
+						BasicTank::stop(aic->tc, my_tank);
+						break;
+					case 1:
+						BasicTank::move_forward(aic->tc, my_tank);
+						break;
+					case 2:
+						BasicTank::move_backward(aic->tc, my_tank);
+						break;
+				}
+				// let's try to get to the right heading
+				f32 cur_rot = Physics::PhysRunner::get_rotation(aic->tc->parent_runner,
+																aic->tc->phys_id[my_tank]);
+				cur_rot = util::clamp_dir_360(cur_rot);
+				cur_rot = AI::get_vector(cur_rot);
+				if(aic->gene_heading[index][idx] < cur_rot){
+					BasicTank::turn_left(aic->tc, my_tank);
+				}else if(aic->gene_heading[index][idx] > cur_rot){
+					BasicTank::turn_right(aic->tc, my_tank);
+				}
+			}
+			//TODO: state machine here in the future?
 		}
 	}
 }
