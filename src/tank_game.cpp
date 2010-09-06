@@ -103,7 +103,7 @@ int GameDisplay::main(){
 			// read windowing messages
 			CL_KeepAlive::process();
 			
-			// get the elapsed frame time
+			// get the elapsed frame time, it's now in milliseconds
 			s_deltatime = s_frame_timer.elapsed()*1000;
 			
 			// sleep until we reach the next frame time iteration

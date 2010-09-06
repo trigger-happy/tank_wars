@@ -153,10 +153,11 @@ void GSGame::onFrameRender(CL_GraphicContext* gc){
 	m_testtank2->draw(*gc, pos.x, pos.y);
 	
 	// Debug info
-	CL_StringFormat fmt("States: %1 %2 %3");
-	fmt.set_arg(1, m_ai.collision_state[0]);
-	fmt.set_arg(2, m_ai.direction_state[0]);
-	fmt.set_arg(3, m_ai.distance_state[0]);
+	CL_StringFormat fmt("States: %1 %2 %3 %4");
+	fmt.set_arg(1, m_ai.bullet_vector[0]);
+	fmt.set_arg(2, m_ai.tank_vector[0]);
+	fmt.set_arg(3, m_ai.direction_state[0]);
+	fmt.set_arg(4, m_ai.distance_state[0]);
 	m_dbgmsg = fmt.get_result();
 	m_debugfont->draw_text(*gc, 1, 12, m_dbgmsg, CL_Colorf::red);
 }

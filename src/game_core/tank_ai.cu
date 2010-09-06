@@ -167,19 +167,17 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 	#elif !defined(__CUDA_ARCH__)
 	for(idx = 0; idx < MAX_AI_CONTROLLERS; ++idx){
 	#endif
+		if(idx == 0){
+			// convert from milliseconds to seconds
+			dt /= 1000.0f;
+		}
 		// update registered tanks that are not invalid
 		if(aic->controlled_tanks[idx] != INVALID_ID){
 			// DEBUG
-			float x = Physics::PhysRunner::get_cur_pos(aic->tc->parent_runner,
-													   aic->tc->phys_id[aic->controlled_tanks[idx]]).x;
-			if(x < -25){
-				BasicTank::move_backward(aic->tc, aic->controlled_tanks[idx]);
-			}else if(x > 24){
-				BasicTank::move_forward(aic->tc, aic->controlled_tanks[idx]);
-			}
-// 			BasicTank::turn_left(aic->tc, aic->controlled_tanks[idx]);
+			BasicTank::move_forward(aic->tc, aic->controlled_tanks[idx]);
+			BasicTank::turn_left(aic->tc, aic->controlled_tanks[idx]);
 			
-			update_perceptions(aic, idx);
+			update_perceptions(aic, idx, dt);
 			// use the info as an index to the genetic array
 			// perform the action based values in the genetic array
 			
@@ -206,7 +204,8 @@ void AI::init_gene_data(AI::AI_Core* aic){
 }
 
 void AI::update_perceptions(AI::AI_Core* aic,
-							ai_id id){
+							ai_id id,
+							f32 dt){
 	if(aic->controlled_tanks[id] != INVALID_ID){
 		tank_id tid = aic->controlled_tanks[id];
 		// reset the states, we'll use a single variable to store data
@@ -216,44 +215,54 @@ void AI::update_perceptions(AI::AI_Core* aic,
 		
 		// get the nearest bullet
 		bullet_id bid = AI::get_nearest_bullet(aic, tid);
-		dist = AI::get_bullet_dist(aic, tid, bid);
-		
-		// set the distance state
-		temp = min((u32)(dist/DISTANCE_FACTOR), NUM_DISTANCE_STATES);
-		aic->distance_state[id] = temp;
-		
-		// set the direction state
-		Physics::PhysRunner::RunnerCore* rc = aic->tc->parent_runner;
-		Physics::vec2 pos = Physics::PhysRunner::get_cur_pos(rc,
-															 aic->tc->phys_id[tid]);
-		Physics::vec2 pos2 = Physics::PhysRunner::get_cur_pos(rc,
-															  aic->bc->phys_id[bid]);
-		pos -= pos2;
-		// save the result for later use
-		pos2 = pos;
-		pos.normalize();
-		temp = AI::get_sector(aic, pos);
-		aic->direction_state[id] = temp;
-		
-		// set the collision state
-		f32 tspeed = Physics::PhysRunner::get_cur_velocity(rc, aic->tc->phys_id[tid]);
-		dist = pos2.length();
-		f32 bspeed = Physics::PhysRunner::get_cur_velocity(rc, aic->bc->phys_id[bid]);
-		f32 tsp_adj = Physics::PhysRunner::get_velocity_vector(rc, aic->tc->phys_id[tid]) * pos;
-		tsp_adj *= tspeed;
-		f32 bsp_adj = Physics::PhysRunner::get_velocity_vector(rc, aic->bc->phys_id[bid]) * -pos;
-		bsp_adj *= bspeed;
-		tspeed = tsp_adj + bsp_adj;
-		tspeed = min(tspeed, MAX_SPEED/60);
-		temp = (s32)util::lerp(tspeed/(MAX_SPEED/60), 0.0f, 9.0f);
-		aic->collision_state[id] = temp;
+		if(bid == INVALID_ID){
+			aic->distance_state[id] = -1;
+			aic->direction_state[id] = -1;
+			aic->tank_vector[id] = -1;
+			aic->bullet_vector[id] = -1;
+		}else{
+			dist = AI::get_bullet_dist(aic, tid, bid);
+			
+			// set the distance state
+			temp = min((u32)(dist/DISTANCE_FACTOR), NUM_DISTANCE_STATES);
+			aic->distance_state[id] = temp;
+			
+			// set the direction state
+			Physics::PhysRunner::RunnerCore* rc = aic->tc->parent_runner;
+			Physics::vec2 pos = Physics::PhysRunner::get_cur_pos(rc,
+																aic->tc->phys_id[tid]);
+			Physics::vec2 pos2 = Physics::PhysRunner::get_cur_pos(rc,
+																aic->bc->phys_id[bid]);
+			pos -= pos2;
+			// save the result for later use
+			pos2 = pos;
+			pos.normalize();
+			temp = AI::get_sector(pos);
+			aic->direction_state[id] = temp;
+			           
+			// get the tank vector
+			temp = Physics::PhysRunner::get_rotation(rc,
+													 aic->tc->phys_id[tid]);
+			temp = AI::get_vector(temp);
+			aic->tank_vector[id] = temp;
+			
+			// get the bullet vector
+			temp = Physics::PhysRunner::get_rotation(rc,
+													 aic->bc->phys_id[bid]);
+			temp = AI::get_vector(temp);
+			aic->bullet_vector[id] = temp;
+		}
 	}
 }
 
-s32 AI::get_sector(AI::AI_Core* aic,
-			   Physics::vec2 pos){
+s32 AI::get_sector(Physics::vec2 pos){
 	f32 dir = atan2(pos.x, pos.y);
 	dir = util::rads_to_degs(dir);
 	dir = util::clamp_dir_360(dir);
 	return ((s32)(dir/SECTOR_SIZE));
+}
+
+s32 AI::get_vector(f32 rot){
+	rot = util::clamp_dir_360(rot);
+	return ((s32)(rot/VECTOR_SIZE));
 }

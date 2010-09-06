@@ -24,12 +24,16 @@
 #define DISTANCE_FACTOR			7.5
 
 #define NUM_LOCATION_STATES		18
-#define SECTOR_SIZE				20.0f
+#define SECTOR_SIZE				(360/NUM_LOCATION_STATES)
 
-#define NUM_COLLISION_STATES	10
-#define MAX_SPEED				20.0f //TODO: adjust this as needed
+#define NUM_BULLET_VECTORS		8
+#define NUM_TANK_VECTORS		8
+#define VECTOR_SIZE				(360/NUM_BULLET_VECTORS)
 
-#define MAX_GENE_DATA			NUM_DISTANCE_STATES * NUM_LOCATION_STATES * NUM_COLLISION_STATES
+#define MAX_GENE_DATA			NUM_DISTANCE_STATES * \
+								NUM_LOCATION_STATES * \
+								NUM_BULLET_VECTORS * \
+								NUM_TANK_VECTORS
 
 #define MAX_THRUST_VALUES		3
 #define MAX_HEADING_VALUES		18
@@ -43,7 +47,8 @@ namespace AI{
 		BasicTank::TankCollection* tc;
 		TankBullet::BulletCollection* bc;
 		u32 next_slot;
-		s32 collision_state[MAX_AI_CONTROLLERS];
+		s32 bullet_vector[MAX_AI_CONTROLLERS];
+		s32 tank_vector[MAX_AI_CONTROLLERS];
 		s32 direction_state[MAX_AI_CONTROLLERS];
 		s32 distance_state[MAX_AI_CONTROLLERS];
 		tank_id controlled_tanks[MAX_AI_CONTROLLERS];
@@ -93,20 +98,28 @@ namespace AI{
 	/*!
 	Function for computing the sector where the bullet is.
 	Also taken from the AI Game Engine programming book
-	\param aic The AI_Core involved
 	\param pos The position of the object
+	\return The sector of the object
 	*/
-	CUDA_EXPORT s32 get_sector(AI_Core* aic,
-							   Physics::vec2 pos);
+	CUDA_EXPORT s32 get_sector(Physics::vec2 pos);
+							   
+	/*!
+	Function for discretizing the vector (for both tank and bullet)
+	\param rot The rotation of the object
+	\return The vector of the object
+	*/
+	CUDA_EXPORT s32 get_vector(f32 rot);
 								  
 	/*!
 	Update the perception data. Algorithm taken from the AI Game Engine
 	Programming book.
 	\param aic The AI_Core involved
 	\param id The AI ID
+	\param dt The timestep in seconds
 	*/
 	CUDA_EXPORT void update_perceptions(AI_Core* aic,
-										ai_id id);
+										ai_id id,
+										f32 dt);
 	
 	/*!
 	Get the distance of a bullet to the current tank
