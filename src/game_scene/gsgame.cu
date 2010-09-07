@@ -71,7 +71,7 @@ GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
 	m_player2tank = BasicTank::spawn_tank(&m_tanks, params, 180, 1);
 	m_player_input = 0;
 	m_player2_input = 0;
-	AI::add_tank(&m_ai, m_player2tank);
+	AI::add_tank(&m_ai, m_player2tank, AI_TYPE_ATTACKER);
 	
 	// stuff for cuda
 	if(GameDisplay::s_usecuda){
@@ -134,10 +134,16 @@ void GSGame::onFrameRender(CL_GraphicContext* gc){
 	apply_transform(gc, pos);
 	m_background->draw(*gc, pos.x, pos.y);
 	
-	// draw the bullets
+	// draw the bullets, yes, we're cheating the numbers
+	// OOP can wait another day
 	pos = TankBullet::get_bullet_pos(&m_bullets, 0);
 	apply_transform(gc, pos);
 	if(m_bullets.state[0] != BULLET_STATE_INACTIVE){
+		m_testbullet->draw(*gc, pos.x, pos.y);
+	}
+	pos = TankBullet::get_bullet_pos(&m_bullets, 1);
+	apply_transform(gc, pos);
+	if(m_bullets.state[1] != BULLET_STATE_INACTIVE){
 		m_testbullet->draw(*gc, pos.x, pos.y);
 	}
 	

@@ -39,6 +39,10 @@
 #define MAX_HEADING_VALUES		18
 #define MAX_AI_CONTROLLERS		8
 
+#define AI_TYPE_INVALID			0
+#define AI_TYPE_EVADER			1
+#define AI_TYPE_ATTACKER		2
+
 namespace AI{
 	typedef u32 ai_id;
 	// some AI specific info
@@ -51,6 +55,7 @@ namespace AI{
 		s32 tank_vector[MAX_AI_CONTROLLERS];
 		s32 direction_state[MAX_AI_CONTROLLERS];
 		s32 distance_state[MAX_AI_CONTROLLERS];
+		s32 ai_type[MAX_AI_CONTROLLERS];
 		tank_id controlled_tanks[MAX_AI_CONTROLLERS];
 		gene_type gene_accel[MAX_GENE_DATA][MAX_AI_CONTROLLERS];
 		gene_type gene_heading[MAX_GENE_DATA][MAX_AI_CONTROLLERS];
@@ -150,8 +155,9 @@ namespace AI{
 	Add a new tank for the AI to control
 	\param aic The AI core
 	\param tid The tank id
+	\param ait The AI type
 	*/
-	CUDA_EXPORT void add_tank(AI_Core* aic, tank_id tid);
+	CUDA_EXPORT void add_tank(AI_Core* aic, tank_id tid, s32 ait);
 	
 	// genetic functions
 	CUDA_HOST void init_gene_data(AI_Core* aic);

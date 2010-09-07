@@ -163,6 +163,8 @@ void AI::initialize(AI::AI_Core* aic,
 		   0, MAX_AI_CONTROLLERS*sizeof(s32));
 	memset(static_cast<void*>(aic->direction_state),
 		   0, MAX_AI_CONTROLLERS*sizeof(s32));
+	memset(static_cast<void*>(aic->ai_type),
+		   0, MAX_AI_CONTROLLERS*sizeof(s32));
 	
 	AI::init_gene_data(aic);
 }
@@ -186,45 +188,73 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 				// DEBUG
 				// 			BasicTank::move_forward(aic->tc, my_tank);
 				// 			BasicTank::turn_left(aic->tc, my_tank);
-				
+
+				// update the sensors
 				update_perceptions(aic, idx, dt);
-				s32 index = aic->bullet_vector[idx] * aic->tank_vector[idx] *
-				aic->direction_state[idx] * aic->distance_state[idx];
-				if(index > 0){
-					// valid index, access the action from the array
-					switch(aic->gene_accel[index][idx]){
-						case 0:
-							BasicTank::stop(aic->tc, my_tank);
-							break;
-						case 1:
-							BasicTank::move_forward(aic->tc, my_tank);
-							break;
-						case 2:
-							BasicTank::move_backward(aic->tc, my_tank);
-							break;
+
+				// perform AI actions
+				if(aic->ai_type[idx] == AI_TYPE_EVADER){
+					s32 index = aic->bullet_vector[idx] * aic->tank_vector[idx] *
+					aic->direction_state[idx] * aic->distance_state[idx];
+					if(index > 0){
+						// valid index, access the action from the array
+						switch(aic->gene_accel[index][idx]){
+							case 0:
+								BasicTank::stop(aic->tc, my_tank);
+								break;
+							case 1:
+								BasicTank::move_forward(aic->tc, my_tank);
+								break;
+							case 2:
+								BasicTank::move_backward(aic->tc, my_tank);
+								break;
+						}
+						// let's try to get to the right heading
+						f32 cur_rot = Physics::PhysRunner::get_rotation(aic->tc->parent_runner,
+																		aic->tc->phys_id[my_tank]);
+																		cur_rot = util::clamp_dir_360(cur_rot);
+																		cur_rot = AI::get_vector(cur_rot);
+						if(aic->gene_heading[index][idx] < cur_rot){
+							BasicTank::turn_left(aic->tc, my_tank);
+						}else if(aic->gene_heading[index][idx] > cur_rot){
+							BasicTank::turn_right(aic->tc, my_tank);
+						}
+					}else{
+						BasicTank::stop(aic->tc, my_tank);
 					}
-					// let's try to get to the right heading
-					f32 cur_rot = Physics::PhysRunner::get_rotation(aic->tc->parent_runner,
-																	aic->tc->phys_id[my_tank]);
-																	cur_rot = util::clamp_dir_360(cur_rot);
-																	cur_rot = AI::get_vector(cur_rot);
-					if(aic->gene_heading[index][idx] < cur_rot){
-						BasicTank::turn_left(aic->tc, my_tank);
-					}else if(aic->gene_heading[index][idx] > cur_rot){
-						BasicTank::turn_right(aic->tc, my_tank);
-					}
-				}else{
-					BasicTank::stop(aic->tc, my_tank);
+					//TODO: state machine here in the future?
+				}else if(aic->ai_type[idx] == AI_TYPE_ATTACKER){
+					// get the nearest target to shoot at
+					tank_id tid = aic->controlled_tanks[idx];
+					tank_id target = AI::get_nearest_enemy(aic, tid);
+					
+					// get the positions
+					Physics::vec2 target_pos = BasicTank::get_tank_pos(aic->tc, target);
+					Physics::vec2 my_pos = BasicTank::get_tank_pos(aic->tc, tid);
+					target_pos -= my_pos;
+
+					// get the necessary rotation
+					f32 dir = atan2(target_pos.x, target_pos.y);
+					dir = util::rads_to_degs(dir);
+					dir = util::clamp_dir_360(dir);
+
+					// cheat our rotation
+					Physics::PhysRunner::set_rotation(aic->tc->parent_runner,
+													  aic->tc->phys_id[tid],
+													  90-dir);
+					
+					// fire away like a trigger-happy thing
+					BasicTank::fire(aic->tc, tid);
 				}
-				//TODO: state machine here in the future?
 			}
 		}
 	}
 }
 
-void AI::add_tank(AI::AI_Core* aic, tank_id tid){
+void AI::add_tank( AI::AI_Core* aic, tank_id tid, s32 ait){
 	if(aic->next_slot != MAX_AI_CONTROLLERS){
 		aic->controlled_tanks[aic->next_slot] = tid;
+		aic->ai_type[aic->next_slot] = ait;
 		++(aic->next_slot);
 	}
 }
@@ -242,51 +272,55 @@ void AI::init_gene_data(AI::AI_Core* aic){
 void AI::update_perceptions(AI::AI_Core* aic,
 							ai_id id,
 							f32 dt){
+	//TODO: break this up into smaller functions
 	if(aic->controlled_tanks[id] != INVALID_ID){
 		tank_id tid = aic->controlled_tanks[id];
-		// reset the states, we'll use a single variable to store data
-		// to optimize register usage
-		s32 temp = -1;
-		u32 dist = DISTANCE_DEFAULT;
-		
-		// get the nearest bullet
-		bullet_id bid = AI::get_nearest_bullet(aic, tid);
-		if(bid == INVALID_ID){
-			aic->distance_state[id] = -1;
-			aic->direction_state[id] = -1;
-			aic->tank_vector[id] = -1;
-			aic->bullet_vector[id] = -1;
-		}else{
-			dist = AI::get_bullet_dist(aic, tid, bid);
-			
-			// set the distance state
-			temp = min((u32)(dist/DISTANCE_FACTOR), NUM_DISTANCE_STATES);
-			aic->distance_state[id] = temp;
-			
-			// set the direction state
-			Physics::PhysRunner::RunnerCore* rc = aic->tc->parent_runner;
-			Physics::vec2 pos = Physics::PhysRunner::get_cur_pos(rc,
-																aic->tc->phys_id[tid]);
-			Physics::vec2 pos2 = Physics::PhysRunner::get_cur_pos(rc,
-																aic->bc->phys_id[bid]);
-			pos -= pos2;
-			// save the result for later use
-			pos2 = pos;
-			pos.normalize();
-			temp = AI::get_sector(pos);
-			aic->direction_state[id] = temp;
-			           
-			// get the tank vector
-			temp = Physics::PhysRunner::get_rotation(rc,
-													 aic->tc->phys_id[tid]);
-			temp = AI::get_vector(temp);
-			aic->tank_vector[id] = temp;
-			
-			// get the bullet vector
-			temp = Physics::PhysRunner::get_rotation(rc,
-													 aic->bc->phys_id[bid]);
-			temp = AI::get_vector(temp);
-			aic->bullet_vector[id] = temp;
+		if(aic->ai_type[id] == AI_TYPE_EVADER){
+			// reset the states, we'll use a single variable to store data
+			// to optimize register usage
+			s32 temp = -1;
+			u32 dist = DISTANCE_DEFAULT;
+
+			// get the nearest bullet
+			bullet_id bid = AI::get_nearest_bullet(aic, tid);
+			if(bid == INVALID_ID){
+				aic->distance_state[id] = -1;
+				aic->direction_state[id] = -1;
+				aic->tank_vector[id] = -1;
+				aic->bullet_vector[id] = -1;
+			}else{
+				dist = AI::get_bullet_dist(aic, tid, bid);
+
+				// set the distance state
+				temp = min((u32)(dist/DISTANCE_FACTOR), NUM_DISTANCE_STATES);
+				aic->distance_state[id] = temp;
+
+				// set the direction state
+				Physics::PhysRunner::RunnerCore* rc = aic->tc->parent_runner;
+				Physics::vec2 pos = Physics::PhysRunner::get_cur_pos(rc,
+																	aic->tc->phys_id[tid]);
+				Physics::vec2 pos2 = Physics::PhysRunner::get_cur_pos(rc,
+																	aic->bc->phys_id[bid]);
+				pos -= pos2;
+				// save the result for later use
+				pos2 = pos;
+				pos.normalize();
+				temp = AI::get_sector(pos);
+				aic->direction_state[id] = temp;
+
+				// get the tank vector
+				temp = Physics::PhysRunner::get_rotation(rc,
+														aic->tc->phys_id[tid]);
+				temp = AI::get_vector(temp);
+				aic->tank_vector[id] = temp;
+
+				// get the bullet vector
+				temp = Physics::PhysRunner::get_rotation(rc,
+														aic->bc->phys_id[bid]);
+				temp = AI::get_vector(temp);
+				aic->bullet_vector[id] = temp;
+			}
+		}else if(aic->ai_type[id] == AI_TYPE_ATTACKER){
 		}
 	}
 }
