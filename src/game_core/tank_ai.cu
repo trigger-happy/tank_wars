@@ -227,24 +227,26 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 					// get the nearest target to shoot at
 					tank_id tid = aic->controlled_tanks[idx];
 					tank_id target = AI::get_nearest_enemy(aic, tid);
-					
-					// get the positions
-					Physics::vec2 target_pos = BasicTank::get_tank_pos(aic->tc, target);
-					Physics::vec2 my_pos = BasicTank::get_tank_pos(aic->tc, tid);
-					target_pos -= my_pos;
+					if(target != INVALID_ID){
+						
+						// get the positions
+						Physics::vec2 target_pos = BasicTank::get_tank_pos(aic->tc, target);
+						Physics::vec2 my_pos = BasicTank::get_tank_pos(aic->tc, tid);
+						target_pos -= my_pos;
 
-					// get the necessary rotation
-					f32 dir = atan2(target_pos.x, target_pos.y);
-					dir = util::rads_to_degs(dir);
-					dir = util::clamp_dir_360(dir);
+						// get the necessary rotation
+						f32 dir = atan2(target_pos.x, target_pos.y);
+						dir = util::rads_to_degs(dir);
+						dir = util::clamp_dir_360(dir);
 
-					// cheat our rotation
-					Physics::PhysRunner::set_rotation(aic->tc->parent_runner,
-													  aic->tc->phys_id[tid],
-													  90-dir);
-					
-					// fire away like a trigger-happy thing
-					BasicTank::fire(aic->tc, tid);
+						// cheat our rotation
+						Physics::PhysRunner::set_rotation(aic->tc->parent_runner,
+														aic->tc->phys_id[tid],
+														90-dir);
+
+						// fire away like a trigger-happy thing
+						BasicTank::fire(aic->tc, tid);
+					}
 				}
 			}
 		}

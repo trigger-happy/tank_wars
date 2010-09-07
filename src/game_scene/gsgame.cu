@@ -71,6 +71,7 @@ GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
 	m_player2tank = BasicTank::spawn_tank(&m_tanks, params, 180, 1);
 	m_player_input = 0;
 	m_player2_input = 0;
+	AI::add_tank(&m_ai, m_playertank, AI_TYPE_EVADER);
 	AI::add_tank(&m_ai, m_player2tank, AI_TYPE_ATTACKER);
 	
 	// stuff for cuda
