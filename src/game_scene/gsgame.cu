@@ -137,7 +137,9 @@ void GSGame::onFrameRender(CL_GraphicContext* gc){
 	// draw the bullets
 	pos = TankBullet::get_bullet_pos(&m_bullets, 0);
 	apply_transform(gc, pos);
-	m_testbullet->draw(*gc, pos.x, pos.y);
+	if(m_bullets.state[0] != BULLET_STATE_INACTIVE){
+		m_testbullet->draw(*gc, pos.x, pos.y);
+	}
 	
 	// draw the tanks
 	pos = BasicTank::get_tank_pos(&m_tanks, m_playertank);
@@ -153,11 +155,15 @@ void GSGame::onFrameRender(CL_GraphicContext* gc){
 	m_testtank2->draw(*gc, pos.x, pos.y);
 	
 	// Debug info
-	CL_StringFormat fmt("States: %1 %2 %3 %4");
+	CL_StringFormat fmt("States: %1 %2 %3 %4 | Player pos: %5 %6");
 	fmt.set_arg(1, m_ai.bullet_vector[0]);
 	fmt.set_arg(2, m_ai.tank_vector[0]);
 	fmt.set_arg(3, m_ai.direction_state[0]);
 	fmt.set_arg(4, m_ai.distance_state[0]);
+	pos = Physics::PhysRunner::get_cur_pos(m_physrunner.get(),
+														 m_tanks.phys_id[m_playertank]);
+	fmt.set_arg(5, pos.x);
+	fmt.set_arg(6, pos.y);
 	m_dbgmsg = fmt.get_result();
 	m_debugfont->draw_text(*gc, 1, 12, m_dbgmsg, CL_Colorf::red);
 }

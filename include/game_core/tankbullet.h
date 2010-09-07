@@ -33,7 +33,7 @@ namespace TankBullet{
 	
 	struct BulletCollection{
 		Physics::PhysRunner::RunnerCore* parent_runner;
-		Physics::vec2_array initial_pos;
+		Physics::vec2_array travel_dist;
 		u32 phys_id[MAX_BULLETS];
 		u32 state[MAX_BULLETS];
 		u32 faction[MAX_BULLETS];

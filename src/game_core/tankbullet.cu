@@ -65,14 +65,13 @@ void TankBullet::update(TankBullet::BulletCollection* bc, f32 dt){
 	#endif
 	
 		if(bc->state[idx] == BULLET_STATE_TRAVELLING){
-				Physics::vec2 temp;
+				Physics::vec2 temp, temp2;
 				temp = Physics::PhysRunner::get_cur_pos(rc, bc->phys_id[idx]);
-				f32 xdiff = fabsf(bc->initial_pos.x[bc->phys_id[idx]]
-				- temp.x);
-				f32 ydiff = fabsf(bc->initial_pos.y[bc->phys_id[idx]]
-				- temp.y);
-				f32 sq_dist = (xdiff * xdiff) + (ydiff * ydiff);
-				if(sq_dist >= MAX_BULLET_RANGE * MAX_BULLET_RANGE){
+				temp2 = Physics::PhysRunner::get_prev_pos(rc, bc->phys_id[idx]);
+				bc->travel_dist.x[bc->phys_id[idx]] += temp.x - temp2.x;
+				bc->travel_dist.y[bc->phys_id[idx]] += temp.y - temp2.y;
+				f32 dist = bc->travel_dist.get_vec2(idx).length();
+				if(dist >= MAX_BULLET_RANGE){
 					TankBullet::deactivate(bc, bc->phys_id[idx]);
 				}
 			}
@@ -86,8 +85,8 @@ void TankBullet::fire_bullet(TankBullet::BulletCollection* bc,
 							 Physics::vec2 pos){
 	if(bc->state[bid] != BULLET_STATE_TRAVELLING){
 		Physics::PhysRunner::set_rotation(bc->parent_runner, bid, rot_degrees);
-		bc->initial_pos.x[bid] = pos.x;
-		bc->initial_pos.y[bid] = pos.y;
+		bc->travel_dist.x[bid] = 0;
+		bc->travel_dist.y[bid] = 0;
 		Physics::vec2 params;
 		f32 rotation_rads = util::degs_to_rads(rot_degrees);
 		params.x = INITIAL_BULLET_ACCELERATION * cosf(rotation_rads);
