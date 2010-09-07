@@ -73,16 +73,14 @@ void BasicTank::destroy(BasicTank::TankCollection* tank){
 }
 
 void BasicTank::update(BasicTank::TankCollection* tt, f32 dt){
-	int idx = 0;
-	#if __CUDA_ARCH__
-		idx = threadIdx.x;
-		if(idx < MAX_TANKS){
-	#elif !defined(__CUDA_ARCH__)
-		for(idx = 0; idx < MAX_TANKS; ++idx){
-	#endif
-			//TODO: code here for bounds checking
-			// don't let the tank go beyond the walls
-		}
+// 	int idx = 0;
+// 	#if __CUDA_ARCH__
+// 		idx = threadIdx.x;
+// 		if(idx < MAX_TANKS){
+// 	#elif !defined(__CUDA_ARCH__)
+// 		for(idx = 0; idx < MAX_TANKS; ++idx){
+// 	#endif
+// 		}
 }
 
 void BasicTank::move_forward(BasicTank::TankCollection* tt, tank_id tid){

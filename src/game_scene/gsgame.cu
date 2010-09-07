@@ -142,17 +142,21 @@ void GSGame::onFrameRender(CL_GraphicContext* gc){
 	}
 	
 	// draw the tanks
-	pos = BasicTank::get_tank_pos(&m_tanks, m_playertank);
-	apply_transform(gc, pos);
-	f32 rot = BasicTank::get_tank_rot(&m_tanks, m_playertank);
-	m_testtank->set_angle(CL_Angle(-rot, cl_degrees));
-	m_testtank->draw(*gc, pos.x, pos.y);
-	
-	pos = BasicTank::get_tank_pos(&m_tanks, m_player2tank);
-	apply_transform(gc, pos);
-	rot = BasicTank::get_tank_rot(&m_tanks, m_player2tank);
-	m_testtank2->set_angle(CL_Angle(-rot, cl_degrees));
-	m_testtank2->draw(*gc, pos.x, pos.y);
+	if(m_tanks.state[m_playertank] != TANK_STATE_INACTIVE){
+		pos = BasicTank::get_tank_pos(&m_tanks, m_playertank);
+		apply_transform(gc, pos);
+		f32 rot = BasicTank::get_tank_rot(&m_tanks, m_playertank);
+		m_testtank->set_angle(CL_Angle(-rot, cl_degrees));
+		m_testtank->draw(*gc, pos.x, pos.y);
+	}
+
+	if(m_tanks.state[m_player2tank] != TANK_STATE_INACTIVE){
+		pos = BasicTank::get_tank_pos(&m_tanks, m_player2tank);
+		apply_transform(gc, pos);
+		f32 rot = BasicTank::get_tank_rot(&m_tanks, m_player2tank);
+		m_testtank2->set_angle(CL_Angle(-rot, cl_degrees));
+		m_testtank2->draw(*gc, pos.x, pos.y);
+	}
 	
 	// Debug info
 	CL_StringFormat fmt("States: %1 %2 %3 %4 | Player pos: %5 %6");
