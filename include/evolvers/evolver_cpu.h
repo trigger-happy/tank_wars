@@ -16,7 +16,11 @@
 
 #ifndef EVOLVER_CPU_H
 #define EVOLVER_CPU_H
+#include <boost/scoped_ptr.hpp>
 #include "evolvers/ievolver.h"
+#include "game_core/tankbullet.h"
+#include "game_core/basictank.h"
+#include "game_core/tank_ai.h"
 
 class Evolver_cpu : public iEvolver<Evolver_cpu>{
 public:
@@ -26,6 +30,13 @@ private:
 	void cleanup_impl();
 	void frame_step_impl(float dt);
 	void retrieve_state_impl();
+
+private:
+	boost::scoped_ptr<Physics::PhysRunner::RunnerCore> m_physrunner;
+	TankBullet::BulletCollection m_bullets;
+	BasicTank::TankCollection m_tanks;
+	AI::AI_Core m_ai;
+	
 };
 
 #endif // EVOLVER_CPU_H
