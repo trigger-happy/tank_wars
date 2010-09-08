@@ -39,6 +39,11 @@ private:
 	bool is_game_over_impl();
 	
 private:
+	// internal functions
+	void copy_to_device();
+	void copy_from_device();
+	
+private:
 	// CPU stuff
 	std::vector<Physics::PhysRunner::RunnerCore> m_runner;
 	std::vector<TankBullet::BulletCollection> m_bullets;

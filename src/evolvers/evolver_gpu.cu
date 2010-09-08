@@ -46,33 +46,8 @@ void Evolver_gpu::initialize_impl(){
 	cudaMalloc(reinterpret_cast<void**>(&m_cuda_ai),
 				NUM_INSTANCES*sizeof(AI::AI_Core));
 				
-
-	for(u32 i = 0; i < NUM_INSTANCES; ++i){
-		// reset the pointers
-		BasicTank::reset_pointers(&m_tanks[i],
-								  m_cuda_runner+i,
-								  m_cuda_bullets+i);
-		TankBullet::reset_phys_pointer(&m_bullets[i],
-									   m_cuda_runner+i);
-					
-		m_ai[i].bc = m_cuda_bullets + i;
-		m_ai[i].tc = m_cuda_tanks + i;
-	}		
 	// copy over the stuff to GPU mem
-	cudaMemcpy(m_cuda_runner, &m_runner[0],
-				NUM_INSTANCES*sizeof(Physics::PhysRunner::RunnerCore),
-				cudaMemcpyHostToDevice);
-				
-	cudaMemcpy(m_cuda_bullets, &m_bullets[0],
-				NUM_INSTANCES*sizeof(TankBullet::BulletCollection),
-				cudaMemcpyHostToDevice);
-				
-	cudaMemcpy(m_cuda_tanks, &m_tanks[0],
-				NUM_INSTANCES*sizeof(BasicTank::TankCollection),
-				cudaMemcpyHostToDevice);
-	
-	cudaMemcpy(m_cuda_ai, &m_ai[0],
-				sizeof(AI::AI_Core), cudaMemcpyHostToDevice);
+	copy_to_device();
 }
 
 void Evolver_gpu::cleanup_impl(){
@@ -120,18 +95,7 @@ void Evolver_gpu::frame_step_impl(f32 dt){
 }
 
 void Evolver_gpu::retrieve_state_impl(){
-	cudaMemcpy(&m_bullets[0], m_cuda_bullets,
-			   NUM_INSTANCES*sizeof(TankBullet::BulletCollection),
-			   cudaMemcpyDeviceToHost);
-	cudaMemcpy(&m_tanks[0], m_cuda_tanks,
-			   NUM_INSTANCES*sizeof(BasicTank::TankCollection),
-			   cudaMemcpyDeviceToHost);
-	cudaMemcpy(&m_runner[0], m_cuda_runner,
-			   NUM_INSTANCES*sizeof(Physics::PhysRunner::RunnerCore),
-			   cudaMemcpyDeviceToHost);
-	cudaMemcpy(&m_ai[0], m_cuda_ai,
-			   NUM_INSTANCES*sizeof(AI::AI_Core),
-			   cudaMemcpyDeviceToHost);
+	copy_from_device();
 }
 
 void Evolver_gpu::evolve_ga_impl(){
@@ -149,4 +113,60 @@ void Evolver_gpu::prepare_game_state_impl(){
 
 bool Evolver_gpu::is_game_over_impl(){
 	return false;
+}
+
+void Evolver_gpu::copy_to_device(){
+	for(u32 i = 0; i < NUM_INSTANCES; ++i){
+		// reset the pointers
+		BasicTank::reset_pointers(&m_tanks[i],
+								  m_cuda_runner+i,
+								  m_cuda_bullets+i);
+		TankBullet::reset_phys_pointer(&m_bullets[i],
+									   m_cuda_runner+i);
+					
+		m_ai[i].bc = m_cuda_bullets + i;
+		m_ai[i].tc = m_cuda_tanks + i;
+	}
+	
+	cudaMemcpy(m_cuda_runner, &m_runner[0],
+				NUM_INSTANCES*sizeof(Physics::PhysRunner::RunnerCore),
+				cudaMemcpyHostToDevice);
+				
+	cudaMemcpy(m_cuda_bullets, &m_bullets[0],
+				NUM_INSTANCES*sizeof(TankBullet::BulletCollection),
+				cudaMemcpyHostToDevice);
+				
+	cudaMemcpy(m_cuda_tanks, &m_tanks[0],
+				NUM_INSTANCES*sizeof(BasicTank::TankCollection),
+				cudaMemcpyHostToDevice);
+	
+	cudaMemcpy(m_cuda_ai, &m_ai[0],
+				sizeof(AI::AI_Core), cudaMemcpyHostToDevice);
+}
+
+void Evolver_gpu::copy_from_device(){
+	cudaMemcpy(&m_bullets[0], m_cuda_bullets,
+			   NUM_INSTANCES*sizeof(TankBullet::BulletCollection),
+			   cudaMemcpyDeviceToHost);
+	cudaMemcpy(&m_tanks[0], m_cuda_tanks,
+			   NUM_INSTANCES*sizeof(BasicTank::TankCollection),
+			   cudaMemcpyDeviceToHost);
+	cudaMemcpy(&m_runner[0], m_cuda_runner,
+			   NUM_INSTANCES*sizeof(Physics::PhysRunner::RunnerCore),
+			   cudaMemcpyDeviceToHost);
+	cudaMemcpy(&m_ai[0], m_cuda_ai,
+			   NUM_INSTANCES*sizeof(AI::AI_Core),
+			   cudaMemcpyDeviceToHost);
+			   
+	for(u32 i = 0; i < NUM_INSTANCES; ++i){
+		// reset the pointers
+		BasicTank::reset_pointers(&m_tanks[i],
+								  &m_runner[i],
+								  &m_bullets[i]);
+		TankBullet::reset_phys_pointer(&m_bullets[i],
+									   &m_runner[i]);
+					
+		m_ai[i].bc = &m_bullets[i];
+		m_ai[i].tc = &m_tanks[i];
+	}
 }
