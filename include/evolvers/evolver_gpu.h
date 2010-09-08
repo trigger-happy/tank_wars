@@ -30,12 +30,13 @@ private:
 	friend class iEvolver<Evolver_gpu>;
 	void initialize_impl();
 	void cleanup_impl();
-	void frame_step_impl(float dt);
+	void frame_step_impl(f32 dt);
 	void retrieve_state_impl();
 	void evolve_ga_impl();
 	u32 retrieve_score_impl();
 	void save_best_gene_impl(const std::string& fname);
 	void prepare_game_state_impl();
+	bool is_game_over_impl();
 	
 private:
 	// CPU stuff
@@ -45,10 +46,10 @@ private:
 	std::vector<AI::AI_Core> m_ai;
 	
 	// GPU stuff
-	std::vector<Physics::PhysRunner::RunnerCore*> m_cuda_runner;
-	std::vector<TankBullet::BulletCollection*> m_cuda_bullets;
-	std::vector<BasicTank::TankCollection*> m_cuda_tanks;
-	std::vector<AI::AI_Core*> m_cuda_ai;
+	Physics::PhysRunner::RunnerCore* m_cuda_runner;
+	TankBullet::BulletCollection* m_cuda_bullets;
+	BasicTank::TankCollection* m_cuda_tanks;
+	AI::AI_Core* m_cuda_ai;
 };
 
 #endif // EVOLVER_GPU_H

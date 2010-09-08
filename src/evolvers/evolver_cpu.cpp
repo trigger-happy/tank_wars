@@ -41,3 +41,7 @@ void Evolver_cpu::save_best_gene_impl(const std::string& fname){
 
 void Evolver_cpu::prepare_game_state_impl(){
 }
+
+bool Evolver_cpu::is_game_over_impl(){
+	return false;
+}

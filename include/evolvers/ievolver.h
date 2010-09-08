@@ -81,6 +81,13 @@ public:
 	void prepare_game_state(){
 		static_cast<Derived*>(this)->prepare_game_state_impl();
 	}
+	
+	/*!
+	Check if all the tanks in the current generation are dead
+	*/
+	bool is_game_over(){
+		return static_cast<Derived*>(this)->is_game_over_impl();
+	}
 };
 
 #endif //IEVOLVER_H

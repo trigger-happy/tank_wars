@@ -48,6 +48,10 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 			
 			// retrieve the state for debugging purposes
 			evl.retrieve_state();
+			
+			if(evl.is_game_over()){
+				break;
+			}
 		}
 		
 		// get the score of the best individual

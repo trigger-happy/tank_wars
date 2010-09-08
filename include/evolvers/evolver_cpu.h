@@ -36,6 +36,7 @@ private:
 	u32 retrieve_score_impl();
 	void save_best_gene_impl(const std::string& fname);
 	void prepare_game_state_impl();
+	bool is_game_over_impl();
 
 private:
 	std::vector<Physics::PhysRunner::RunnerCore> m_physrunner;
