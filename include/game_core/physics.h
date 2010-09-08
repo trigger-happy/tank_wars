@@ -20,7 +20,7 @@
 #include "types.h"
 #include "exports.h"
 
-#define MAX_ARRAY_SIZE	256
+#define MAX_ARRAY_SIZE	32
 #define OFFSCREEN_X		-33
 #define OFFSCREEN_Y		25
 #define INVALID_ID		MAX_ARRAY_SIZE+1

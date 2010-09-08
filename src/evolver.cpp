@@ -17,6 +17,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cmath>
 #include <boost/program_options.hpp>
 #include "evolvers/evolver_cpu.h"
 #include "evolvers/evolver_gpu.h"

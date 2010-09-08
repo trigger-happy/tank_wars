@@ -17,6 +17,8 @@ Boston, MA 02110-1301, USA.
 #ifndef IEVOLVER_H
 #define IEVOLVER_H
 
+#define NUM_INSTANCES 1024
+
 template<typename Derived>
 class iEvolver{
 public:
