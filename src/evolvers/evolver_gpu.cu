@@ -22,6 +22,17 @@
 #define CUDA_THREADS	MAX_ARRAY_SIZE
 
 void Evolver_gpu::initialize_impl(){
+	// resize the vectors
+	m_runner.resize(NUM_INSTANCES);
+	m_bullets.resize(NUM_INSTANCES);
+	m_tanks.resize(NUM_INSTANCES);
+	m_ai.resize(NUM_INSTANCES);
+	
+	m_cuda_runner.resize(NUM_INSTANCES);
+	m_cuda_bullets.resize(NUM_INSTANCES);
+	m_cuda_tanks.resize(NUM_INSTANCES);
+	m_cuda_ai.resize(NUM_INSTANCES);
+	
 	// setup everything on the CPU
 	for(u32 i = 0; i < NUM_INSTANCES; ++i){
 		Physics::PhysRunner::initialize(&m_runner[i]);
@@ -64,8 +75,6 @@ void Evolver_gpu::initialize_impl(){
 
 void Evolver_gpu::cleanup_impl(){
 	for(u32 i = 0; i < NUM_INSTANCES; ++i){
-		BasicTank::destroy(&m_tanks[i]);
-		TankBullet::destroy(&m_bullets[i]);
 		cudaFree(m_cuda_tanks[i]);
 		cudaFree(m_cuda_bullets[i]);
 		cudaFree(m_cuda_runner[i]);

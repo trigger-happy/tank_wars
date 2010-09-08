@@ -17,6 +17,7 @@
 #ifndef EVOLVER_GPU_H
 #define EVOLVER_GPU_H
 #include <string>
+#include <vector>
 #include <boost/scoped_ptr.hpp>
 #include "game_core/basictank.h"
 #include "game_core/tankbullet.h"
@@ -38,16 +39,16 @@ private:
 	
 private:
 	// CPU stuff
-	Physics::PhysRunner::RunnerCore m_runner[NUM_INSTANCES];
-	TankBullet::BulletCollection m_bullets[NUM_INSTANCES];
-	BasicTank::TankCollection m_tanks[NUM_INSTANCES];
-	AI::AI_Core m_ai[NUM_INSTANCES];
+	std::vector<Physics::PhysRunner::RunnerCore> m_runner;
+	std::vector<TankBullet::BulletCollection> m_bullets;
+	std::vector<BasicTank::TankCollection> m_tanks;
+	std::vector<AI::AI_Core> m_ai;
 	
 	// GPU stuff
-	Physics::PhysRunner::RunnerCore* m_cuda_runner[NUM_INSTANCES];
-	TankBullet::BulletCollection* m_cuda_bullets[NUM_INSTANCES];
-	BasicTank::TankCollection* m_cuda_tanks[NUM_INSTANCES];
-	AI::AI_Core* m_cuda_ai[NUM_INSTANCES];
+	std::vector<Physics::PhysRunner::RunnerCore*> m_cuda_runner;
+	std::vector<TankBullet::BulletCollection*> m_cuda_bullets;
+	std::vector<BasicTank::TankCollection*> m_cuda_tanks;
+	std::vector<AI::AI_Core*> m_cuda_ai;
 };
 
 #endif // EVOLVER_GPU_H

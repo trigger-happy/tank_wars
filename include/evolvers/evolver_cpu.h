@@ -17,6 +17,7 @@
 #ifndef EVOLVER_CPU_H
 #define EVOLVER_CPU_H
 #include <string>
+#include <vector>
 #include <boost/scoped_ptr.hpp>
 #include "evolvers/ievolver.h"
 #include "game_core/tankbullet.h"
@@ -37,10 +38,10 @@ private:
 	void prepare_game_state_impl();
 
 private:
-	boost::scoped_ptr<Physics::PhysRunner::RunnerCore> m_physrunner;
-	TankBullet::BulletCollection m_bullets;
-	BasicTank::TankCollection m_tanks;
-	AI::AI_Core m_ai;
+	std::vector<Physics::PhysRunner::RunnerCore> m_physrunner;
+	std::vector<TankBullet::BulletCollection> m_bullets;
+	std::vector<BasicTank::TankCollection> m_tanks;
+	std::vector<AI::AI_Core> m_ai;
 	
 };
 
