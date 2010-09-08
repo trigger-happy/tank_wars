@@ -27,21 +27,44 @@
 #define TIME_STEP		0.0166666667 // 60 fps
 
 namespace po = boost::program_options;
+using namespace std;
 
 template<typename T>
-void perform_evolution(iEvolver<T>& evl){
+void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 	evl.initialize();
 	
 	//TODO: change this to the appropriate terminating condition
 	// terminating condition will be the score of the best individual in the
 	// latest generation
+	u32 num_generations = 0;
+	f32 highest_score = 0.0f;
 	for(int i = 0; i < MAX_GENERATIONS; ++i){
 		for(int j = 0; j < MAX_FRAMESTEPS; ++j){
+			// perform a frame step
 			evl.frame_step(TIME_STEP);
+			
+			// retrieve the state for debugging purposes
 			evl.retrieve_state();
 		}
-		//TODO: perform some GA magic here
+		// perform the genetic algorithm
+		evl.evolve_ga();
+		
+		// get the score of the best individual
+		highest_score = evl.retrieve_highest_score();
+		cout << "Generation " << i << " score is " << highest_score << endl;
+		if(highest_score >= 0.999f){
+			// close to 1.0f
+			num_generations = i+1;
+			break;
+		}
 	}
+	
+	// summary of the evolution process
+	cout << "Number of generations: " << num_generations << endl;
+	cout << "Best score: " << highest_score << endl;
+	
+	// save the data
+	evl.save_best_gene(fname);
 	
 	evl.cleanup();
 }

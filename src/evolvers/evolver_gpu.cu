@@ -81,3 +81,10 @@ void Evolver_gpu::retrieve_state_impl(){
 
 void Evolver_gpu::evolve_ga_impl(){
 }
+
+u32 Evolver_gpu::retrieve_score_impl(){
+	return 0;
+}
+
+void Evolver_gpu::save_best_gene_impl(const std::string& fname){
+}

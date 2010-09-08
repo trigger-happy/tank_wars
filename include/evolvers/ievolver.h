@@ -16,6 +16,8 @@ Boston, MA 02110-1301, USA.
 
 #ifndef IEVOLVER_H
 #define IEVOLVER_H
+#include <string>
+#include "types.h"
 
 #define NUM_INSTANCES 1024
 
@@ -53,10 +55,26 @@ public:
 	}
 	
 	/*!
+	Perform the genetic algorithms to prepare the next generation
 	*/
 	void evolve_ga(){
 		static_cast<Derived*>(this)->evolve_ga_impl();
 	}
+	
+	/*!
+	Retrieve the score of the best individual
+	*/
+	u32 retrieve_highest_score(){
+		static_cast<Derived*>(this)->retrieve_score_impl();
+	}
+	
+	/*!
+	Save the gene of the best individual
+	*/
+	void save_best_gene(const std::string& fname){
+		static_cast<Derived*>(this)->save_best_gene_impl(fname);
+	}
+	
 };
 
 #endif //IEVOLVER_H

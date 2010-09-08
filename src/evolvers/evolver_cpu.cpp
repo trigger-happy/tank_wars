@@ -31,3 +31,10 @@ void Evolver_cpu::retrieve_state_impl(){
 
 void Evolver_cpu::evolve_ga_impl(){
 }
+
+u32 Evolver_cpu::retrieve_score_impl(){
+	return 0;
+}
+
+void Evolver_cpu::save_best_gene_impl(const std::string& fname){
+}

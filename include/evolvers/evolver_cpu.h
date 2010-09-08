@@ -16,6 +16,7 @@
 
 #ifndef EVOLVER_CPU_H
 #define EVOLVER_CPU_H
+#include <string>
 #include <boost/scoped_ptr.hpp>
 #include "evolvers/ievolver.h"
 #include "game_core/tankbullet.h"
@@ -31,6 +32,8 @@ private:
 	void frame_step_impl(float dt);
 	void retrieve_state_impl();
 	void evolve_ga_impl();
+	u32 retrieve_score_impl();
+	void save_best_gene_impl(const std::string& fname);
 
 private:
 	boost::scoped_ptr<Physics::PhysRunner::RunnerCore> m_physrunner;
