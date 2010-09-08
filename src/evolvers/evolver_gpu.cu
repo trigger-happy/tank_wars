@@ -152,16 +152,11 @@ void Evolver_gpu::prepare_game_state_impl(){
 	copy_to_device();
 }
 
-#include <iostream>
 bool Evolver_gpu::is_game_over_impl(){
 	bool all_dead = true;
 	for(int i = 0; i < NUM_INSTANCES; ++i){
 		// tank 0 is the one dodging, check its status
 		all_dead &= (m_tanks[i].state[0] == TANK_STATE_INACTIVE);
-	}
-	// DEBUG
-	if(m_tanks[0].state[0] == TANK_STATE_INACTIVE){
-		std::cout << "tank 0 died" << std::endl;
 	}
 	return all_dead;
 }
