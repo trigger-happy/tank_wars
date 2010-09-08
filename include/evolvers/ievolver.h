@@ -51,6 +51,12 @@ public:
 	void retrieve_state(){
 		static_cast<Derived*>(this)->retrieve_state_impl();
 	}
+	
+	/*!
+	*/
+	void evolve_ga(){
+		static_cast<Derived*>(this)->evolve_ga_impl();
+	}
 };
 
 #endif //IEVOLVER_H

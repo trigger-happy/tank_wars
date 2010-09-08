@@ -78,3 +78,6 @@ void Evolver_gpu::frame_step_impl(float dt){
 
 void Evolver_gpu::retrieve_state_impl(){
 }
+
+void Evolver_gpu::evolve_ga_impl(){
+}

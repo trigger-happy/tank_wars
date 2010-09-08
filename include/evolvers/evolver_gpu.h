@@ -30,6 +30,7 @@ private:
 	void cleanup_impl();
 	void frame_step_impl(float dt);
 	void retrieve_state_impl();
+	void evolve_ga_impl();
 	
 private:
 	// CPU stuff

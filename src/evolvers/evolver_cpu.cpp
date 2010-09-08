@@ -28,3 +28,6 @@ void Evolver_cpu::frame_step_impl(float dt){
 
 void Evolver_cpu::retrieve_state_impl(){
 }
+
+void Evolver_cpu::evolve_ga_impl(){
+}
