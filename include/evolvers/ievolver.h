@@ -75,6 +75,12 @@ public:
 		static_cast<Derived*>(this)->save_best_gene_impl(fname);
 	}
 	
+	/*!
+	Pre-fitness setup
+	*/
+	void prepare_game_state(){
+		static_cast<Derived*>(this)->prepare_game_state_impl();
+	}
 };
 
 #endif //IEVOLVER_H

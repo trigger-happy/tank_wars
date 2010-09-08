@@ -88,3 +88,6 @@ u32 Evolver_gpu::retrieve_score_impl(){
 
 void Evolver_gpu::save_best_gene_impl(const std::string& fname){
 }
+
+void Evolver_gpu::prepare_game_state_impl(){
+}

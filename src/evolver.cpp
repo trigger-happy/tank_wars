@@ -39,6 +39,9 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 	u32 num_generations = 0;
 	f32 highest_score = 0.0f;
 	for(int i = 0; i < MAX_GENERATIONS; ++i){
+		// setup the initial game state
+		evl.prepare_game_state();
+		
 		for(int j = 0; j < MAX_FRAMESTEPS; ++j){
 			// perform a frame step
 			evl.frame_step(TIME_STEP);

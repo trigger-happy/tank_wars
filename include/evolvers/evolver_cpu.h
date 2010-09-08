@@ -34,6 +34,7 @@ private:
 	void evolve_ga_impl();
 	u32 retrieve_score_impl();
 	void save_best_gene_impl(const std::string& fname);
+	void prepare_game_state_impl();
 
 private:
 	boost::scoped_ptr<Physics::PhysRunner::RunnerCore> m_physrunner;
