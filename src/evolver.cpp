@@ -49,8 +49,6 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 			// retrieve the state for debugging purposes
 			evl.retrieve_state();
 		}
-		// perform the genetic algorithm
-		evl.evolve_ga();
 		
 		// get the score of the best individual
 		highest_score = evl.retrieve_highest_score();
@@ -60,6 +58,9 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 			num_generations = i+1;
 			break;
 		}
+		
+		// perform the genetic algorithm
+		evl.evolve_ga();
 	}
 	
 	// summary of the evolution process
