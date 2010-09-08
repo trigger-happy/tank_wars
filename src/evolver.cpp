@@ -24,7 +24,7 @@
 
 #define MAX_GENERATIONS	10
 #define MAX_FRAMESTEPS	18000 // 5 minutes
-#define TIME_STEP		0.0166666667 // 60 fps
+#define TIME_STEP		1000.0f/60.0f // 60 fps
 
 namespace po = boost::program_options;
 using namespace std;

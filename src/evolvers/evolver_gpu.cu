@@ -36,6 +36,12 @@ void Evolver_gpu::initialize_impl(){
 		AI::initialize(&m_ai[i], &m_tanks[i], &m_bullets[i]);
 	}
 	
+	// create a backup copy for quick re-initialization
+	m_ai_b = m_ai;
+	m_runner_b = m_runner;
+	m_tanks_b = m_tanks;
+	m_bullets_b = m_bullets;
+	
 	// now we start up the GPU stuff
 	cudaMalloc(reinterpret_cast<void**>(&m_cuda_runner),
 				NUM_INSTANCES*sizeof(Physics::PhysRunner::RunnerCore));
@@ -92,6 +98,16 @@ void Evolver_gpu::frame_step_impl(f32 dt){
 													   m_cuda_bullets,
 													   m_cuda_tanks,
 													   m_cuda_ai);
+	// CPU based
+	// force it
+// 	copy_from_device();
+// 	for(int i = 0; i < NUM_INSTANCES; ++i){
+// 		AI::timestep(&m_ai[i], dt);
+// 		Physics::PhysRunner::timestep(&m_runner[i], dt);
+// 		TankBullet::update(&m_bullets[i], dt);
+// 		BasicTank::update(&m_tanks[i], dt);
+// 	}
+// 	copy_to_device();
 }
 
 void Evolver_gpu::retrieve_state_impl(){
@@ -109,10 +125,45 @@ void Evolver_gpu::save_best_gene_impl(const std::string& fname){
 }
 
 void Evolver_gpu::prepare_game_state_impl(){
+	// get the backup buffer and put it into current one
+	m_ai = m_ai_b;
+	m_runner = m_runner_b;
+	m_tanks = m_tanks_b;
+	m_bullets = m_bullets_b;
+	
+	// setup stuff on the current buffer
+	Physics::vec2 params;
+	for(int i = 0; i < NUM_INSTANCES; ++i){
+		params.x = -25;
+		tank_id evading_tank = BasicTank::spawn_tank(&m_tanks[i],
+													 params,
+													 0,
+													 0);
+		params.x = 15;
+		tank_id attacking_tank = BasicTank::spawn_tank(&m_tanks[i],
+													   params,
+													   180,
+													   1);
+		AI::add_tank(&m_ai[i], evading_tank, AI_TYPE_EVADER);
+		AI::add_tank(&m_ai[i], attacking_tank, AI_TYPE_ATTACKER);
+	}
+	
+	// send it over to the device
+	copy_to_device();
 }
 
+#include <iostream>
 bool Evolver_gpu::is_game_over_impl(){
-	return false;
+	bool all_dead = true;
+	for(int i = 0; i < NUM_INSTANCES; ++i){
+		// tank 0 is the one dodging, check its status
+		all_dead &= (m_tanks[i].state[0] == TANK_STATE_INACTIVE);
+	}
+	// DEBUG
+	if(m_tanks[0].state[0] == TANK_STATE_INACTIVE){
+		std::cout << "tank 0 died" << std::endl;
+	}
+	return all_dead;
 }
 
 void Evolver_gpu::copy_to_device(){
@@ -141,7 +192,7 @@ void Evolver_gpu::copy_to_device(){
 				cudaMemcpyHostToDevice);
 	
 	cudaMemcpy(m_cuda_ai, &m_ai[0],
-				sizeof(AI::AI_Core), cudaMemcpyHostToDevice);
+				NUM_INSTANCES*sizeof(AI::AI_Core), cudaMemcpyHostToDevice);
 }
 
 void Evolver_gpu::copy_from_device(){
