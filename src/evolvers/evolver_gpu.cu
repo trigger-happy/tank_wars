@@ -13,6 +13,8 @@
    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
    Boston, MA 02110-1301, USA.
 */
+#include <fstream>
+#include <algorithm>
 #include <cuda.h>
 #include "exports.h"
 #include "evolvers/evolver_gpu.h"
@@ -21,7 +23,10 @@
 #define CUDA_BLOCKS		NUM_INSTANCES
 #define CUDA_THREADS	MAX_ARRAY_SIZE
 
+using namespace std;
+
 void Evolver_gpu::initialize_impl(){
+	
 	// resize the vectors
 	m_runner.resize(NUM_INSTANCES);
 	m_bullets.resize(NUM_INSTANCES);
@@ -118,14 +123,42 @@ void Evolver_gpu::evolve_ga_impl(){
 }
 
 u32 Evolver_gpu::retrieve_score_impl(){
-	return 0;
+	score_map::iterator best_pos;
+	best_pos = max_element(m_population_score.begin(),
+						   m_population_score.end());
+	return best_pos->second;
 }
 
-void Evolver_gpu::save_best_gene_impl(const std::string& fname){
+void Evolver_gpu::save_best_gene_impl(const string& fname){
+	// make sure that we have the stuff from the GPU
+	copy_from_device();
+
+	// find the individual with the highest score
+	score_map::iterator best_pos;
+	best_pos = max_element(m_population_score.begin(),
+						   m_population_score.end());
+	
+	ofstream fout(fname.c_str());
+	fout.seekp(ios::end);
+
+	// assume that we just want AI_CONTROLLER 0
+	// write out the accel gene 1st
+	u32 index = best_pos->first;
+	for(int i = 0; i < MAX_GENE_DATA; ++i){
+		fout << m_ai[index].gene_accel[i][0];
+	}
+
+	// write out the heading gene next
+	for(int i = 0; i < MAX_GENE_DATA; ++i){
+		fout << m_ai[index].gene_heading[i][0];
+	}
+	
+	fout.close();
 }
 
 void Evolver_gpu::prepare_game_state_impl(){
 	// get the backup buffer and put it into current one
+	//TODO: figure out how to save the genetic data
 	m_ai = m_ai_b;
 	m_runner = m_runner_b;
 	m_tanks = m_tanks_b;

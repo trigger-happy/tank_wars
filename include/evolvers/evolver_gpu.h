@@ -18,6 +18,8 @@
 #define EVOLVER_GPU_H
 #include <string>
 #include <vector>
+#include <map>
+#include <utility>
 #include <boost/scoped_ptr.hpp>
 #include "game_core/basictank.h"
 #include "game_core/tankbullet.h"
@@ -44,6 +46,10 @@ private:
 	void copy_from_device();
 	
 private:
+	typedef std::map<u32, u32> score_map;
+	// genetic stuff
+	score_map m_population_score;
+	
 	// CPU stuff
 	std::vector<Physics::PhysRunner::RunnerCore> m_runner;
 	std::vector<TankBullet::BulletCollection> m_bullets;
