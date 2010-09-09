@@ -39,6 +39,7 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 	u32 num_generations = 0;
 	f32 highest_score = 0.0f;
 	for(int i = 0; i < MAX_GENERATIONS; ++i){
+		cout << "Running generation " << i << endl;
 		// setup the initial game state
 		evl.prepare_game_state();
 		
@@ -56,6 +57,7 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 		
 		// get the score of the best individual
 		highest_score = evl.retrieve_highest_score();
+		highest_score /= MAX_FRAMESTEPS;
 		cout << "Generation " << i << " score is " << highest_score << endl;
 		if(highest_score >= 0.999f){
 			// close to 1.0f
