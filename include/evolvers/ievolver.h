@@ -19,7 +19,7 @@ Boston, MA 02110-1301, USA.
 #include <string>
 #include "types.h"
 
-#define NUM_INSTANCES 1024
+#define NUM_INSTANCES 2048
 
 template<typename Derived>
 class iEvolver{

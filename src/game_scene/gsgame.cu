@@ -16,6 +16,7 @@
     License along with this library; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
+#include <fstream>
 #include <cuda.h>
 #include "game_display.h"
 #include "game_scene/gsgame.h"
@@ -74,6 +75,20 @@ GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
 	m_player2_input = 0;
 	AI::add_tank(&m_ai, m_playertank, AI_TYPE_EVADER);
 	AI::add_tank(&m_ai, m_player2tank, AI_TYPE_ATTACKER);
+
+	// load a saved gene for viewing
+	if(GameDisplay::s_view_gene){
+		std::ifstream fin("report.dat");
+		AI::AI_Core::gene_type tempval;
+		for(int i = 0; i < MAX_GENE_DATA; ++i){
+			fin.read((char*)&tempval, sizeof(tempval));
+			m_ai.gene_accel[i][0] = tempval;
+		}
+		for(int i = 0; i < MAX_GENE_DATA; ++i){
+			fin.read((char*)&tempval, sizeof(tempval));
+			m_ai.gene_heading[i][0] = tempval;
+		}
+	}
 	
 	// stuff for cuda
 	if(GameDisplay::s_usecuda){

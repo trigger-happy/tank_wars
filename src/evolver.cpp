@@ -65,6 +65,9 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 			break;
 		}
 		
+		// save the data
+		evl.save_best_gene(fname);
+		
 		// perform the genetic algorithm
 		evl.evolve_ga();
 	}
@@ -72,9 +75,6 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 	// summary of the evolution process
 	cout << "Number of generations: " << num_generations << endl;
 	cout << "Best score: " << highest_score << endl;
-	
-	// save the data
-	evl.save_best_gene(fname);
 	
 	evl.cleanup();
 }

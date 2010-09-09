@@ -24,7 +24,7 @@
 #define CUDA_THREADS	MAX_ARRAY_SIZE
 
 // top 15% will be elite
-#define ELITE_COUNT		(NUM_INSTANCES*0.01f)
+#define ELITE_COUNT		(NUM_INSTANCES*0.15f)
 // 25% mutation rate
 #define MUTATION_RATE	25
 
@@ -157,15 +157,17 @@ void reproduce(AI::AI_Core* child, AI::AI_Core* dad, AI::AI_Core* mom){
 }
 
 void mutate(AI::AI_Core* mutant){
-	// mutate the thrust value
-	u32 pos = rand() % MAX_GENE_DATA;
-	AI::AI_Core::gene_type mval = rand() % MAX_THRUST_VALUES;
-	mutant->gene_accel[pos][0] = mval;
-
-	// mutate the heading value
-	pos = rand() % MAX_GENE_DATA;
-	mval = rand() % MAX_HEADING_VALUES;
-	mutant->gene_heading[pos][0] = mval;
+	for(int i = 0; i < MAX_GENE_DATA*0.1f; ++i){
+		// mutate the thrust value
+		u32 pos = rand() % MAX_GENE_DATA;
+		AI::AI_Core::gene_type mval = rand() % MAX_THRUST_VALUES;
+		mutant->gene_accel[pos][0] = mval;
+		
+		// mutate the heading value
+		pos = rand() % MAX_GENE_DATA;
+		mval = rand() % MAX_HEADING_VALUES;
+		mutant->gene_heading[pos][0] = mval;
+	}
 }
 
 void Evolver_gpu::evolve_ga_impl(){
@@ -190,8 +192,8 @@ void Evolver_gpu::evolve_ga_impl(){
 		}else{
 			// time to reproduce given whatever else there may be
 			// we'll force only the 1st half of the set of parents
-			u32 p1 = rand() % score_data.size()/4;
-			u32 p2 = rand() % score_data.size()/4;
+			u32 p1 = rand() % score_data.size()/2;
+			u32 p2 = rand() % score_data.size()/2;
 			reproduce(&next_gen[i], &m_ai[score_data[p1].first],
 					  &m_ai[score_data[p2].first]);
 
@@ -221,18 +223,20 @@ void Evolver_gpu::save_best_gene_impl(const string& fname){
 						   m_population_score.end());
 	
 	ofstream fout(fname.c_str());
-	fout.seekp(ios::end);
+// 	fout.seekp(ios::end);
 
 	// assume that we just want AI_CONTROLLER 0
 	// write out the accel gene 1st
-	u32 index = best_pos->first;
-	for(int i = 0; i < MAX_GENE_DATA; ++i){
-		fout << m_ai[index].gene_accel[i][0];
-	}
+	if(fout.is_open()){
+		u32 index = best_pos->first;
+		for(int i = 0; i < MAX_GENE_DATA; ++i){
+			fout << m_ai[index].gene_accel[i][0];
+		}
 
-	// write out the heading gene next
-	for(int i = 0; i < MAX_GENE_DATA; ++i){
-		fout << m_ai[index].gene_heading[i][0];
+		// write out the heading gene next
+		for(int i = 0; i < MAX_GENE_DATA; ++i){
+			fout << m_ai[index].gene_heading[i][0];
+		}
 	}
 	
 	fout.close();
