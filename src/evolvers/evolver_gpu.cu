@@ -207,20 +207,30 @@ void Evolver_gpu::evolve_ga_impl(){
 }
 
 u32 Evolver_gpu::retrieve_score_impl(){
-	score_map::iterator best_pos;
-	best_pos = std::max_element(m_population_score.begin(),
-						   m_population_score.end());
-	return best_pos->second;
+	u32 score = 0;
+	u32 pos_found = 0;
+	for(int i = 0; i < m_population_score.size(); ++i){
+		if(m_population_score[i] > score){
+			pos_found = i;
+			score = m_population_score[i];
+		}
+	}
+	return score;
 }
 
 void Evolver_gpu::save_best_gene_impl(const string& fname){
 	// make sure that we have the stuff from the GPU
-	copy_from_device();
+// 	copy_from_device();
 
 	// find the individual with the highest score
 	score_map::iterator best_pos;
-	best_pos = max_element(m_population_score.begin(),
-						   m_population_score.end());
+	u32 score_find = retrieve_score_impl();
+	for(best_pos = m_population_score.begin();
+		best_pos != m_population_score.end(); ++best_pos){
+		if(score_find == best_pos->second){
+			break;
+		}
+	}
 	
 	ofstream fout(fname.c_str());
 // 	fout.seekp(ios::end);
@@ -229,13 +239,16 @@ void Evolver_gpu::save_best_gene_impl(const string& fname){
 	// write out the accel gene 1st
 	if(fout.is_open()){
 		u32 index = best_pos->first;
+		AI::AI_Core::gene_type tempval;
 		for(int i = 0; i < MAX_GENE_DATA; ++i){
-			fout << m_ai[index].gene_accel[i][0];
+			tempval = m_ai[index].gene_accel[i][0];
+			fout.write((const char*)&tempval, sizeof(tempval));
 		}
 
 		// write out the heading gene next
 		for(int i = 0; i < MAX_GENE_DATA; ++i){
-			fout << m_ai[index].gene_heading[i][0];
+			tempval = m_ai[index].gene_heading[i][0];
+			fout.write((const char*)&tempval, sizeof(tempval));
 		}
 	}
 	

@@ -214,11 +214,11 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 																		aic->tc->phys_id[my_tank]);
 																		cur_rot = util::clamp_dir_360(cur_rot);
 																		cur_rot = AI::get_vector(cur_rot);
-						if(aic->gene_heading[index][idx] < cur_rot){
-							BasicTank::turn_left(aic->tc, my_tank);
-						}else if(aic->gene_heading[index][idx] > cur_rot){
-							BasicTank::turn_right(aic->tc, my_tank);
-						}
+// 						if(aic->gene_heading[index][idx] < cur_rot){
+// 							BasicTank::turn_left(aic->tc, my_tank);
+// 						}else if(aic->gene_heading[index][idx] > cur_rot){
+// 							BasicTank::turn_right(aic->tc, my_tank);
+// 						}
 					}else{
 						BasicTank::stop(aic->tc, my_tank);
 					}
