@@ -246,7 +246,10 @@ void Evolver_gpu::prepare_game_state_impl(){
 	m_population_score.clear();
 	m_framecount = 0;
 	// get the backup buffer and put it into current one
-	//TODO: figure out how to save the genetic data
+	// cheapshot way of saving genetic data
+	for(int i = 0; i < NUM_INSTANCES; ++i){
+		copy_genes(&m_ai_b[i], &m_ai[i]);
+	}
 	m_ai = m_ai_b;
 	m_runner = m_runner_b;
 	m_tanks = m_tanks_b;
