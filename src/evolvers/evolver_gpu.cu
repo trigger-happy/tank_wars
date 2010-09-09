@@ -26,7 +26,7 @@
 using namespace std;
 
 void Evolver_gpu::initialize_impl(){
-	
+	m_framecount = 0;
 	// resize the vectors
 	m_runner.resize(NUM_INSTANCES);
 	m_bullets.resize(NUM_INSTANCES);
@@ -103,6 +103,7 @@ void Evolver_gpu::frame_step_impl(f32 dt){
 													   m_cuda_bullets,
 													   m_cuda_tanks,
 													   m_cuda_ai);
+	++m_framecount;
 	// CPU based
 	// force it
 // 	copy_from_device();
@@ -157,6 +158,7 @@ void Evolver_gpu::save_best_gene_impl(const string& fname){
 }
 
 void Evolver_gpu::prepare_game_state_impl(){
+	m_framecount = 0;
 	// get the backup buffer and put it into current one
 	//TODO: figure out how to save the genetic data
 	m_ai = m_ai_b;
@@ -186,10 +188,15 @@ void Evolver_gpu::prepare_game_state_impl(){
 }
 
 bool Evolver_gpu::is_game_over_impl(){
+	//NOTE: we'll also use this function to save their score if needed
 	bool all_dead = true;
 	for(int i = 0; i < NUM_INSTANCES; ++i){
 		// tank 0 is the one dodging, check its status
 		all_dead &= (m_tanks[i].state[0] == TANK_STATE_INACTIVE);
+		if(m_tanks[i].state[0] == TANK_STATE_INACTIVE){
+			// this tank is dead, save the score
+			m_population_score[i] = m_framecount;
+		}
 	}
 	return all_dead;
 }
