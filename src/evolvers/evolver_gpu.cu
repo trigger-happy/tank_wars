@@ -23,6 +23,11 @@
 #define CUDA_BLOCKS		NUM_INSTANCES
 #define CUDA_THREADS	MAX_ARRAY_SIZE
 
+// top 15% will be elite
+#define ELITE_COUNT		(NUM_INSTANCES*0.01f)
+// 25% mutation rate
+#define MUTATION_RATE	25
+
 using namespace std;
 
 void Evolver_gpu::initialize_impl(){
@@ -120,12 +125,88 @@ void Evolver_gpu::retrieve_state_impl(){
 	copy_from_device();
 }
 
+template<typename T>
+bool score_sort(const pair<T, T>& lhs, const pair<T, T>& rhs){
+	if(lhs.second > rhs.second){
+		return true;
+	}
+	return false;
+}
+
+void copy_genes(AI::AI_Core* dest, AI::AI_Core* src){
+	for(u32 i = 0; i < MAX_GENE_DATA; ++i){
+		dest->gene_accel[i][0] = src->gene_accel[i][0];
+		dest->gene_heading[i][0] = src->gene_heading[i][0];
+	}
+}
+
+void reproduce(AI::AI_Core* child, AI::AI_Core* dad, AI::AI_Core* mom){
+	u32 pos = rand() % MAX_GENE_DATA;
+	
+	// copy dad's [0,pos) genes
+	for(u32 i = 0; i < pos; ++i){
+		child->gene_accel[i][0] = dad->gene_accel[i][0];
+		child->gene_heading[i][0] = dad->gene_heading[i][0];
+	}
+	
+	// copy mom's [pos, MAX_GENE_DATA) genes
+	for(u32 i = pos; i < MAX_GENE_DATA; ++i){
+		child->gene_accel[i][0] = mom->gene_accel[i][0];
+		child->gene_heading[i][0] = mom->gene_heading[i][0];
+	}
+}
+
+void mutate(AI::AI_Core* mutant){
+	// mutate the thrust value
+	u32 pos = rand() % MAX_GENE_DATA;
+	AI::AI_Core::gene_type mval = rand() % MAX_THRUST_VALUES;
+	mutant->gene_accel[pos][0] = mval;
+
+	// mutate the heading value
+	pos = rand() % MAX_GENE_DATA;
+	mval = rand() % MAX_HEADING_VALUES;
+	mutant->gene_heading[pos][0] = mval;
+}
+
 void Evolver_gpu::evolve_ga_impl(){
+	// copy over the data to the vector for easy sorting
+	vector<pair<u32, u32> > score_data(m_population_score.size());
+	for(u32 i = 0; i < score_data.size(); ++i){
+		score_data[i].first = i;
+		score_data[i].second = m_population_score[i];
+	}
+	
+	// sort it from highest score to lowest score
+	sort(score_data.begin(), score_data.end(), score_sort<u32>);
+
+	// perform the reproduction process
+	// score_data[n].first is the index to the individual
+	// second is the score
+	vector<AI::AI_Core> next_gen = m_ai;
+	for(u32 i = 0; i < score_data.size(); ++i){
+		if(i < ELITE_COUNT){
+			// copy over the elite genes
+			copy_genes(&next_gen[i], &m_ai[score_data[i].first]);
+		}else{
+			// time to reproduce given whatever else there may be
+			// we'll force only the 1st half of the set of parents
+			u32 p1 = rand() % score_data.size()/4;
+			u32 p2 = rand() % score_data.size()/4;
+			reproduce(&next_gen[i], &m_ai[score_data[p1].first],
+					  &m_ai[score_data[p2].first]);
+
+			// random chance to mutate
+			u32 m = rand() % 100;
+			if(m < MUTATION_RATE){
+				mutate(&next_gen[i]);
+			}
+		}
+	}
 }
 
 u32 Evolver_gpu::retrieve_score_impl(){
 	score_map::iterator best_pos;
-	best_pos = max_element(m_population_score.begin(),
+	best_pos = std::max_element(m_population_score.begin(),
 						   m_population_score.end());
 	return best_pos->second;
 }
@@ -158,6 +239,7 @@ void Evolver_gpu::save_best_gene_impl(const string& fname){
 }
 
 void Evolver_gpu::prepare_game_state_impl(){
+	m_population_score.clear();
 	m_framecount = 0;
 	// get the backup buffer and put it into current one
 	//TODO: figure out how to save the genetic data
@@ -193,7 +275,8 @@ bool Evolver_gpu::is_game_over_impl(){
 	for(int i = 0; i < NUM_INSTANCES; ++i){
 		// tank 0 is the one dodging, check its status
 		all_dead &= (m_tanks[i].state[0] == TANK_STATE_INACTIVE);
-		if(m_tanks[i].state[0] == TANK_STATE_INACTIVE){
+		if(m_tanks[i].state[0] == TANK_STATE_INACTIVE
+			&& (m_population_score.find(i) == m_population_score.end())){
 			// this tank is dead, save the score
 			m_population_score[i] = m_framecount;
 		}

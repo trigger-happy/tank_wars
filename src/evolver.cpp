@@ -22,7 +22,7 @@
 #include "evolvers/evolver_cpu.h"
 #include "evolvers/evolver_gpu.h"
 
-#define MAX_GENERATIONS	10
+#define MAX_GENERATIONS	1000
 #define MAX_FRAMESTEPS	18000 // 5 minutes
 #define TIME_STEP		1000.0f/60.0f // 60 fps
 
@@ -80,6 +80,8 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 }
 
 int main(int argc, char* argv[]){
+	// seed the random values
+	srand(std::time(NULL));
 	po::options_description desc("Available options");
 	desc.add_options()
 		("help", "display this help message")
