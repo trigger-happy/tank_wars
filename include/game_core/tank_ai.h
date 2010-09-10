@@ -45,10 +45,13 @@
 #define AI_TYPE_EVADER			1
 #define AI_TYPE_ATTACKER		2
 
+#define FRAMES_PER_UPDATE		60
+
 namespace AI{
 	typedef u32 ai_id;
 	// some AI specific info
 	struct AI_Core{
+		u32 frame_count;
 		typedef u8 gene_type;
 		BasicTank::TankCollection* tc;
 		TankBullet::BulletCollection* bc;
