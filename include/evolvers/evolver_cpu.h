@@ -27,7 +27,7 @@
 #include "game_core/basictank.h"
 #include "game_core/tank_ai.h"
 
-#define MAX_THREADS		64
+#define MAX_THREADS		8
 
 struct frame_updater{
 	Physics::PhysRunner::RunnerCore* runners;
