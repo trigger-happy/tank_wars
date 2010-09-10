@@ -17,9 +17,16 @@ Boston, MA 02110-1301, USA.
 #ifndef IEVOLVER_H
 #define IEVOLVER_H
 #include <string>
+#include <utility>
 #include "types.h"
+#include "game_core/tank_ai.h"
 
 #define NUM_INSTANCES 1024
+
+// top 5% will be elite
+#define ELITE_COUNT		(NUM_INSTANCES*0.05f)
+// 15% mutation rate
+#define MUTATION_RATE	15
 
 template<typename Derived>
 class iEvolver{
@@ -89,5 +96,58 @@ public:
 		return static_cast<Derived*>(this)->is_game_over_impl();
 	}
 };
+
+template<typename T>
+bool score_sort(const std::pair<T, T>& lhs, const std::pair<T, T>& rhs){
+	if(lhs.second > rhs.second){
+		return true;
+	}if(lhs.second == rhs.second){
+		return lhs.first < rhs.first;
+	}
+	return false;
+}
+
+// declare them as templates just because i'm fed up with organizing
+// the source code
+
+template<typename T>
+void copy_genes(T* dest, T* src){
+	for(u32 i = 0; i < MAX_GENE_DATA; ++i){
+		dest->gene_accel[i][0] = src->gene_accel[i][0];
+		dest->gene_heading[i][0] = src->gene_heading[i][0];
+	}
+}
+
+template<typename T>
+void reproduce(T* child, T* dad, T* mom){
+	u32 pos = rand() % MAX_GENE_DATA;
+	
+	// copy dad's [0,pos) genes
+	for(u32 i = 0; i < pos; ++i){
+		child->gene_accel[i][0] = dad->gene_accel[i][0];
+		child->gene_heading[i][0] = dad->gene_heading[i][0];
+	}
+	
+	// copy mom's [pos, MAX_GENE_DATA) genes
+	for(u32 i = pos; i < MAX_GENE_DATA; ++i){
+		child->gene_accel[i][0] = mom->gene_accel[i][0];
+		child->gene_heading[i][0] = mom->gene_heading[i][0];
+	}
+}
+
+template<typename T>
+void mutate(T* mutant){
+	for(int i = 0; i < MAX_GENE_DATA*0.1f; ++i){
+		// mutate the thrust value
+		u32 pos = rand() % MAX_GENE_DATA;
+		AI::AI_Core::gene_type mval = rand() % MAX_THRUST_VALUES;
+		mutant->gene_accel[pos][0] = mval;
+		
+		// mutate the heading value
+		pos = rand() % MAX_GENE_DATA;
+		mval = rand() % MAX_HEADING_VALUES;
+		mutant->gene_heading[pos][0] = mval;
+	}
+}
 
 #endif //IEVOLVER_H

@@ -24,11 +24,6 @@
 #define CUDA_BLOCKS		NUM_INSTANCES
 #define CUDA_THREADS	MAX_ARRAY_SIZE
 
-// top 5% will be elite
-#define ELITE_COUNT		(NUM_INSTANCES*0.05f)
-// 15% mutation rate
-#define MUTATION_RATE	15
-
 using namespace std;
 
 void Evolver_gpu::initialize_impl(){
@@ -124,53 +119,6 @@ void Evolver_gpu::frame_step_impl(f32 dt){
 
 void Evolver_gpu::retrieve_state_impl(){
 	copy_from_device();
-}
-
-template<typename T>
-bool score_sort(const pair<T, T>& lhs, const pair<T, T>& rhs){
-	if(lhs.second > rhs.second){
-		return true;
-	}if(lhs.second == rhs.second){
-		return lhs.first < rhs.first;
-	}
-	return false;
-}
-
-void copy_genes(AI::AI_Core* dest, AI::AI_Core* src){
-	for(u32 i = 0; i < MAX_GENE_DATA; ++i){
-		dest->gene_accel[i][0] = src->gene_accel[i][0];
-		dest->gene_heading[i][0] = src->gene_heading[i][0];
-	}
-}
-
-void reproduce(AI::AI_Core* child, AI::AI_Core* dad, AI::AI_Core* mom){
-	u32 pos = rand() % MAX_GENE_DATA;
-	
-	// copy dad's [0,pos) genes
-	for(u32 i = 0; i < pos; ++i){
-		child->gene_accel[i][0] = dad->gene_accel[i][0];
-		child->gene_heading[i][0] = dad->gene_heading[i][0];
-	}
-	
-	// copy mom's [pos, MAX_GENE_DATA) genes
-	for(u32 i = pos; i < MAX_GENE_DATA; ++i){
-		child->gene_accel[i][0] = mom->gene_accel[i][0];
-		child->gene_heading[i][0] = mom->gene_heading[i][0];
-	}
-}
-
-void mutate(AI::AI_Core* mutant){
-	for(int i = 0; i < MAX_GENE_DATA*0.1f; ++i){
-		// mutate the thrust value
-		u32 pos = rand() % MAX_GENE_DATA;
-		AI::AI_Core::gene_type mval = rand() % MAX_THRUST_VALUES;
-		mutant->gene_accel[pos][0] = mval;
-		
-		// mutate the heading value
-		pos = rand() % MAX_GENE_DATA;
-		mval = rand() % MAX_HEADING_VALUES;
-		mutant->gene_heading[pos][0] = mval;
-	}
 }
 
 void Evolver_gpu::evolve_ga_impl(){
