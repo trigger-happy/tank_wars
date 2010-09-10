@@ -21,6 +21,7 @@
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
 #include <boost/scoped_ptr.hpp>
+#include <boost/timer.hpp>
 
 #include "game_scene/igamescene.h"
 #include "game_core/tankbullet.h"
@@ -85,6 +86,9 @@ private:
 	BasicTank::TankCollection* m_cuda_tanks;
 	AI::AI_Core* m_cuda_ai;
 // 	u8* m_cuda_player_input;
+
+	// timer for debugging
+	boost::timer m_timer;
 };
 
 #endif // GSGAME_H
