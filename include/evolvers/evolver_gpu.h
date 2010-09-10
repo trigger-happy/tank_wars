@@ -49,6 +49,8 @@ private:
 	typedef std::map<u32, u32> score_map;
 	// genetic stuff
 	score_map m_population_score;
+	// for debugging purposes
+	std::vector<std::pair<u32, u32> > m_last_score;
 
 	// frame counter
 	u32 m_framecount;

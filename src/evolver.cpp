@@ -22,7 +22,7 @@
 #include "evolvers/evolver_cpu.h"
 #include "evolvers/evolver_gpu.h"
 
-#define MAX_GENERATIONS	10000
+#define MAX_GENERATIONS	100000
 #define MAX_FRAMESTEPS	18000 // 5 minutes
 #define TIME_STEP		1000.0f/60.0f // 60 fps
 

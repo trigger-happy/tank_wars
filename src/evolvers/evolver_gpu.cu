@@ -13,6 +13,7 @@
    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
    Boston, MA 02110-1301, USA.
 */
+#include <iostream>
 #include <fstream>
 #include <algorithm>
 #include <cuda.h>
@@ -23,10 +24,10 @@
 #define CUDA_BLOCKS		NUM_INSTANCES
 #define CUDA_THREADS	MAX_ARRAY_SIZE
 
-// top 15% will be elite
-#define ELITE_COUNT		(NUM_INSTANCES*0.15f)
-// 25% mutation rate
-#define MUTATION_RATE	25
+// top 5% will be elite
+#define ELITE_COUNT		(NUM_INSTANCES*0.05f)
+// 5% mutation rate
+#define MUTATION_RATE	5
 
 using namespace std;
 
@@ -129,6 +130,8 @@ template<typename T>
 bool score_sort(const pair<T, T>& lhs, const pair<T, T>& rhs){
 	if(lhs.second > rhs.second){
 		return true;
+	}if(lhs.second == rhs.second){
+		return lhs.first < rhs.first;
 	}
 	return false;
 }
@@ -180,27 +183,36 @@ void Evolver_gpu::evolve_ga_impl(){
 	
 	// sort it from highest score to lowest score
 	sort(score_data.begin(), score_data.end(), score_sort<u32>);
+	if(m_last_score.size() == 0){
+		m_last_score = score_data;
+	}else{
+		bool result = equal(score_data.begin(), score_data.end(),
+							m_last_score.begin());
+		if(result){
+			cout << "GENES DIDN'T EVOLVE" << endl;
+		}
+		m_last_score = score_data;
+	}
 
 	// perform the reproduction process
 	// score_data[n].first is the index to the individual
 	// second is the score
-	vector<AI::AI_Core> next_gen = m_ai;
 	for(u32 i = 0; i < score_data.size(); ++i){
 		if(i < ELITE_COUNT){
 			// copy over the elite genes
-			copy_genes(&next_gen[i], &m_ai[score_data[i].first]);
+			copy_genes(&m_ai_b[i], &m_ai[score_data[i].first]);
 		}else{
 			// time to reproduce given whatever else there may be
 			// we'll force only the 1st half of the set of parents
 			u32 p1 = rand() % score_data.size()/2;
 			u32 p2 = rand() % score_data.size()/2;
-			reproduce(&next_gen[i], &m_ai[score_data[p1].first],
+			reproduce(&m_ai_b[i], &m_ai[score_data[p1].first],
 					  &m_ai[score_data[p2].first]);
 
 			// random chance to mutate
 			u32 m = rand() % 100;
 			if(m < MUTATION_RATE){
-				mutate(&next_gen[i]);
+				mutate(&m_ai_b[i]);
 			}
 		}
 	}
@@ -258,11 +270,8 @@ void Evolver_gpu::save_best_gene_impl(const string& fname){
 void Evolver_gpu::prepare_game_state_impl(){
 	m_population_score.clear();
 	m_framecount = 0;
+	
 	// get the backup buffer and put it into current one
-	// cheapshot way of saving genetic data
-	for(int i = 0; i < NUM_INSTANCES; ++i){
-		copy_genes(&m_ai_b[i], &m_ai[i]);
-	}
 	m_ai = m_ai_b;
 	m_runner = m_runner_b;
 	m_tanks = m_tanks_b;
