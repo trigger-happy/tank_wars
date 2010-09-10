@@ -181,6 +181,11 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 		if(idx == 0){
 			// convert from milliseconds to seconds
 			dt /= 1000.0f;
+			if(aic->frame_count >= FRAMES_PER_UPDATE){
+				aic->frame_count = 0;
+			}else{
+				aic->frame_count += 1;
+			}
 		}
 		tank_id my_tank = aic->controlled_tanks[idx];
 		// update registered tanks that are not invalid
@@ -195,44 +200,38 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 
 				// perform AI actions
 				if(aic->ai_type[idx] == AI_TYPE_EVADER){
-					if(idx == 0){
 						// check how many frames has passed
-						if(aic->frame_count >= FRAMES_PER_UPDATE){
-							aic->frame_count = 0;
-							s32 index = aic->bullet_vector[idx] * aic->tank_vector[idx] *
-							aic->direction_state[idx] * aic->distance_state[idx];
-							if(index > 0){
-								// valid index, access the action from the array
-								switch(aic->gene_accel[index][idx]){
-									case 0:
-										BasicTank::stop(aic->tc, my_tank);
-										break;
-									case 1:
-										BasicTank::move_forward(aic->tc, my_tank);
-										break;
-									case 2:
-										BasicTank::move_backward(aic->tc, my_tank);
-										break;
-								}
-								// let's try to get to the right heading
-								f32 cur_rot = Physics::PhysRunner::get_rotation(aic->tc->parent_runner,
-																				aic->tc->phys_id[my_tank]);
-																				cur_rot = util::clamp_dir_360(cur_rot);
-																				cur_rot = AI::get_vector(cur_rot);
-								if(aic->gene_heading[index][idx] < cur_rot){
-									BasicTank::turn_left(aic->tc, my_tank);
-								}else if(aic->gene_heading[index][idx] > cur_rot){
-									BasicTank::turn_right(aic->tc, my_tank);
-								}
-							}else{
-								BasicTank::stop(aic->tc, my_tank);
+					if(aic->frame_count == FRAMES_PER_UPDATE){
+						s32 index = aic->bullet_vector[idx] * aic->tank_vector[idx] *
+						aic->direction_state[idx] * aic->distance_state[idx];
+						if(index > 0){
+							// valid index, access the action from the array
+							switch(aic->gene_accel[index][idx]){
+								case 0:
+									BasicTank::stop(aic->tc, my_tank);
+									break;
+								case 1:
+									BasicTank::move_forward(aic->tc, my_tank);
+									break;
+								case 2:
+									BasicTank::move_backward(aic->tc, my_tank);
+									break;
 							}
-							//TODO: state machine here in the future?
+							// let's try to get to the right heading
+							f32 cur_rot = Physics::PhysRunner::get_rotation(aic->tc->parent_runner,
+																			aic->tc->phys_id[my_tank]);
+																			cur_rot = util::clamp_dir_360(cur_rot);
+																			cur_rot = AI::get_vector(cur_rot);
+							if(aic->gene_heading[index][idx] < cur_rot){
+								BasicTank::turn_left(aic->tc, my_tank);
+							}else if(aic->gene_heading[index][idx] > cur_rot){
+								BasicTank::turn_right(aic->tc, my_tank);
+							}
 						}else{
-							aic->frame_count += 1;
-						}	
+							BasicTank::stop(aic->tc, my_tank);
+						}
+						//TODO: state machine here in the future?
 					}
-					
 				}else if(aic->ai_type[idx] == AI_TYPE_ATTACKER){
 					// get the nearest target to shoot at
 					tank_id tid = aic->controlled_tanks[idx];

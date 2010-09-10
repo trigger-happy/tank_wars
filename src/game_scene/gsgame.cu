@@ -69,7 +69,7 @@ GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
 	Physics::vec2 params;
 	params.x = -25;
 	m_playertank = BasicTank::spawn_tank(&m_tanks, params, 90, 0);
-	params.x = 6;
+	params.x = 3;
 	params.y = 12;
 	m_player2tank = BasicTank::spawn_tank(&m_tanks, params, 180, 1);
 	params.x = 20;

@@ -26,8 +26,8 @@
 
 // top 5% will be elite
 #define ELITE_COUNT		(NUM_INSTANCES*0.05f)
-// 5% mutation rate
-#define MUTATION_RATE	5
+// 15% mutation rate
+#define MUTATION_RATE	15
 
 using namespace std;
 
@@ -287,7 +287,7 @@ void Evolver_gpu::prepare_game_state_impl(){
 													 0);
 		AI::add_tank(&m_ai[i], evading_tank, AI_TYPE_EVADER);
 		
-		params.x = 6;
+		params.x = 3;
 		params.y = 12;
 		tank_id attacking_tank = BasicTank::spawn_tank(&m_tanks[i],
 													   params,
