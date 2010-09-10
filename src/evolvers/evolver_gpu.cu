@@ -285,12 +285,22 @@ void Evolver_gpu::prepare_game_state_impl(){
 													 params,
 													 90,
 													 0);
-		params.x = 15;
+		AI::add_tank(&m_ai[i], evading_tank, AI_TYPE_EVADER);
+		
+		params.x = 6;
+		params.y = 12;
 		tank_id attacking_tank = BasicTank::spawn_tank(&m_tanks[i],
 													   params,
 													   180,
 													   1);
-		AI::add_tank(&m_ai[i], evading_tank, AI_TYPE_EVADER);
+		AI::add_tank(&m_ai[i], attacking_tank, AI_TYPE_ATTACKER);
+		
+		params.x = 20;
+		params.y = -12;
+		attacking_tank = BasicTank::spawn_tank(&m_tanks[i],
+											   params,
+											   180,
+											   1);
 		AI::add_tank(&m_ai[i], attacking_tank, AI_TYPE_ATTACKER);
 	}
 	
