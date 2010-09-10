@@ -23,7 +23,7 @@
 #include "evolvers/evolver_cpu.h"
 #include "evolvers/evolver_gpu.h"
 
-#define MAX_GENERATIONS	128
+#define MAX_GENERATIONS	64
 #define MAX_FRAMESTEPS	18000 // 5 minutes
 #define TIME_STEP		1000.0f/60.0f // 60 fps
 
@@ -60,8 +60,8 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 		// get the score of the best individual
 		highest_score = evl.retrieve_highest_score();
 		highest_score /= MAX_FRAMESTEPS;
-		cout << "Generation " << i << " score is "
-			<< highest_score << " finished at: " << evol_timer.elapsed() << endl;
+		cout << "Generation: " << i << " score: "
+			<< highest_score << " time: " << evol_timer.elapsed() << endl;
 		if(highest_score >= 0.999f){
 			// close to 1.0f
 			num_generations = i+1;
