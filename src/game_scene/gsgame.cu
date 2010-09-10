@@ -146,6 +146,10 @@ void GSGame::onSceneActivate(){
 	m_timer.restart();
 }
 
+#include <iostream>
+
+using namespace std;
+
 void GSGame::onFrameRender(CL_GraphicContext* gc){
 	if(GameDisplay::s_usecuda){
 		// re-assign the pointer to the CPU version

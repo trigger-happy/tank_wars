@@ -19,6 +19,7 @@
 #include <vector>
 #include <cmath>
 #include <boost/program_options.hpp>
+#include <boost/timer.hpp>
 #include "evolvers/evolver_cpu.h"
 #include "evolvers/evolver_gpu.h"
 
@@ -39,6 +40,7 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 	u32 num_generations = 0;
 	f32 highest_score = 0.0f;
 	for(int i = 0; i < MAX_GENERATIONS; ++i){
+		boost::timer evol_timer;
 		cout << "Running generation " << i << endl;
 		// setup the initial game state
 		evl.prepare_game_state();
@@ -58,7 +60,8 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 		// get the score of the best individual
 		highest_score = evl.retrieve_highest_score();
 		highest_score /= MAX_FRAMESTEPS;
-		cout << "Generation " << i << " score is " << highest_score << endl;
+		cout << "Generation " << i << " score is "
+			<< highest_score << " finished at: " << evol_timer.elapsed() << endl;
 		if(highest_score >= 0.999f){
 			// close to 1.0f
 			num_generations = i+1;
@@ -98,11 +101,31 @@ int main(int argc, char* argv[]){
 	}
 	
 	if(vm.count("cpu")){
+		boost::timer t;
 		Evolver_cpu evc;
 		perform_evolution(evc);
+		cout << "Total evolution time: " << t.elapsed() << endl;
 	}else if(vm.count("gpu")){
+		boost::timer t;
 		Evolver_gpu evg;
 		perform_evolution(evg);
+		cout << "Total evolution time: " << t.elapsed() << endl;
+	}else{
+		// perform both
+		cout << "Performing CPU evolution" << endl;
+		{
+			boost::timer t;
+			Evolver_cpu evc;
+			perform_evolution(evc);
+			cout << "Total evolution time: " << t.elapsed() << endl;
+		}
+		cout << "Performing GPU evolution" << endl;
+		{
+			boost::timer t;
+			Evolver_gpu evg;
+			perform_evolution(evg);
+			cout << "Total evolution time: " << t.elapsed() << endl;
+		}
 	}
 	
 	return 0;
