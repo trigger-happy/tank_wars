@@ -69,12 +69,17 @@ GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
 	Physics::vec2 params;
 	params.x = -25;
 	m_playertank = BasicTank::spawn_tank(&m_tanks, params, 90, 0);
-	params.x = 15;
+	params.x = 12;
+	params.y = 12;
 	m_player2tank = BasicTank::spawn_tank(&m_tanks, params, 180, 1);
+	params.x = 18;
+	params.y = -12;
+	m_player3tank = BasicTank::spawn_tank(&m_tanks, params, 180, 1);
 	m_player_input = 0;
 	m_player2_input = 0;
 	AI::add_tank(&m_ai, m_playertank, AI_TYPE_EVADER);
 	AI::add_tank(&m_ai, m_player2tank, AI_TYPE_ATTACKER);
+	AI::add_tank(&m_ai, m_player3tank, AI_TYPE_ATTACKER);
 
 	// load a saved gene for viewing
 	if(GameDisplay::s_view_gene){
@@ -153,15 +158,12 @@ void GSGame::onFrameRender(CL_GraphicContext* gc){
 	
 	// draw the bullets, yes, we're cheating the numbers
 	// OOP can wait another day
-	pos = TankBullet::get_bullet_pos(&m_bullets, 0);
-	apply_transform(gc, pos);
-	if(m_bullets.state[0] != BULLET_STATE_INACTIVE){
-		m_testbullet->draw(*gc, pos.x, pos.y);
-	}
-	pos = TankBullet::get_bullet_pos(&m_bullets, 1);
-	apply_transform(gc, pos);
-	if(m_bullets.state[1] != BULLET_STATE_INACTIVE){
-		m_testbullet->draw(*gc, pos.x, pos.y);
+	for(int i = 0; i < 3; ++i){
+		pos = TankBullet::get_bullet_pos(&m_bullets, i);
+		apply_transform(gc, pos);
+		if(m_bullets.state[i] != BULLET_STATE_INACTIVE){
+			m_testbullet->draw(*gc, pos.x, pos.y);
+		}
 	}
 	
 	// draw the tanks
@@ -177,6 +179,14 @@ void GSGame::onFrameRender(CL_GraphicContext* gc){
 		pos = BasicTank::get_tank_pos(&m_tanks, m_player2tank);
 		apply_transform(gc, pos);
 		f32 rot = BasicTank::get_tank_rot(&m_tanks, m_player2tank);
+		m_testtank2->set_angle(CL_Angle(-rot, cl_degrees));
+		m_testtank2->draw(*gc, pos.x, pos.y);
+	}
+	
+	if(m_tanks.state[m_player3tank] != TANK_STATE_INACTIVE){
+		pos = BasicTank::get_tank_pos(&m_tanks, m_player3tank);
+		apply_transform(gc, pos);
+		f32 rot = BasicTank::get_tank_rot(&m_tanks, m_player3tank);
 		m_testtank2->set_angle(CL_Angle(-rot, cl_degrees));
 		m_testtank2->draw(*gc, pos.x, pos.y);
 	}
