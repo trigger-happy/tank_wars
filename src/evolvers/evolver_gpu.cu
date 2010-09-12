@@ -23,6 +23,7 @@
 
 #define CUDA_BLOCKS		NUM_INSTANCES
 #define CUDA_THREADS	MAX_ARRAY_SIZE
+#define RETRIEVE_INTERVAL	60
 
 using namespace std;
 
@@ -118,7 +119,9 @@ void Evolver_gpu::frame_step_impl(f32 dt){
 }
 
 void Evolver_gpu::retrieve_state_impl(){
-	copy_from_device();
+	if(m_framecount % RETRIEVE_INTERVAL == 0){
+		copy_from_device();
+	}
 }
 
 void Evolver_gpu::evolve_ga_impl(){

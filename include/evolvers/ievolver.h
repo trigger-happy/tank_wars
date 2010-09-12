@@ -72,7 +72,7 @@ public:
 	Retrieve the score of the best individual
 	*/
 	u32 retrieve_highest_score(){
-		static_cast<Derived*>(this)->retrieve_score_impl();
+		return static_cast<Derived*>(this)->retrieve_score_impl();
 	}
 	
 	/*!
