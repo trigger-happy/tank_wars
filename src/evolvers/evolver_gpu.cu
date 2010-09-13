@@ -82,27 +82,33 @@ __global__ void internal_frame_step(f32 dt,
 									AI::AI_Core* aic,
 									u32* scores){
 	// perform all the AI operations
+	__syncthreads();
 	AI::timestep(&aic[blockIdx.x], dt);
 	
 	// perform the physics operations
 	Physics::PhysRunner::timestep(&runners[blockIdx.x], dt);
 	
 	// update the bullets
+	__syncthreads();
 	TankBullet::update(&bullets[blockIdx.x], dt);
 	
 	// update the tanks
+	__syncthreads();
 	BasicTank::update(&tanks[blockIdx.x], dt);
 	
 	// collision check
+	__syncthreads();
 	if(threadIdx.x < MAX_BULLETS){
 		Collision::bullet_tank_check(&bullets[blockIdx.x],
 									 &tanks[blockIdx.x],
 									 threadIdx.x);
 	}
+	__syncthreads();
 	if(threadIdx.x < MAX_TANKS){
 		Collision::tank_tank_check(&tanks[blockIdx.x],
 								   threadIdx.x);
 	}
+	__syncthreads();
 	if(tanks[blockIdx.x].state[0] != TANK_STATE_INACTIVE
 		&& threadIdx.x == 0){
 		scores[blockIdx.x] += 1;

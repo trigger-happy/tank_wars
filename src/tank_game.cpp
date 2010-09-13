@@ -92,9 +92,9 @@ int GameDisplay::main(){
 				// use the real delta time if the frame rate is slow
 				// otherwise, we hard lock to default frame rate
 				f32 dt = FRAME_TIME;
-				if(s_deltatime > FRAME_TIME){
+				/*if(s_deltatime > FRAME_TIME){
 					dt = s_deltatime;
-				}
+				}*/
 				
 				// perform a frame update
 				s_scene_stack.top()->onFrameUpdate(dt, &keyboard, &mouse);

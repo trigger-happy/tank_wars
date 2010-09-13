@@ -128,6 +128,7 @@ GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
 		cudaMemcpy(m_cuda_ai, &m_ai,
 				   sizeof(m_ai), cudaMemcpyHostToDevice);
 	}
+	m_frames_elapsed = 0;
 }
 
 GSGame::~GSGame(){
@@ -206,7 +207,7 @@ void GSGame::onFrameRender(CL_GraphicContext* gc){
 														 m_tanks.phys_id[m_playertank]);
 	fmt.set_arg(5, pos.x);
 	fmt.set_arg(6, pos.y);
-	fmt.set_arg(7, m_timer.elapsed());
+	fmt.set_arg(7, m_frames_elapsed);
 	m_dbgmsg = fmt.get_result();
 	m_debugfont->draw_text(*gc, 1, 12, m_dbgmsg, CL_Colorf::red);
 }
@@ -363,5 +364,8 @@ void GSGame::onFrameUpdate(double dt,
 	m_background->update();
 	m_testbullet->update();
 	m_testtank->update();
+	if(m_tanks.state[0] != TANK_STATE_INACTIVE){
+		++m_frames_elapsed;
+	}
 }
 

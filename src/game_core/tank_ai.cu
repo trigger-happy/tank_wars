@@ -187,6 +187,9 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 				aic->frame_count += 1;
 			}
 		}
+		#if __CUDA_ARCH__
+		__syncthreads();
+		#endif
 		tank_id my_tank = aic->controlled_tanks[idx];
 		// update registered tanks that are not invalid
 		if(my_tank != INVALID_ID){

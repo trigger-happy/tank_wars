@@ -89,6 +89,7 @@ private:
 
 	// timer for debugging
 	boost::timer m_timer;
+	u32 m_frames_elapsed;
 };
 
 #endif // GSGAME_H
