@@ -16,6 +16,7 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
+#include <iostream>
 #include <cuda.h>
 #include "exports.h"
 #include "evolvers/evolver_gpu.h"
@@ -205,7 +206,7 @@ void Evolver_gpu::save_best_gene_impl(const string& fname){
 		}
 	}
 	
-	ofstream fout(fname.c_str());
+	ofstream fout(fname.c_str(), ios::trunc);
 // 	fout.seekp(ios::end);
 
 	// assume that we just want AI_CONTROLLER 0
@@ -226,11 +227,13 @@ void Evolver_gpu::save_best_gene_impl(const string& fname){
 	}
 	
 	fout.close();
+	int x;
+	cin >> x;
 }
 
 void Evolver_gpu::prepare_game_state_impl(){
 	m_population_score.clear();
-	m_score.resize(NUM_INSTANCES, 0);
+	fill(m_score.begin(), m_score.end(), 0);
 	m_framecount = 0;
 	
 	// get the backup buffer and put it into current one
