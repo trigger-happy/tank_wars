@@ -34,6 +34,7 @@ struct frame_updater{
 	TankBullet::BulletCollection* bullets;
 	BasicTank::TankCollection* tanks;
 	AI::AI_Core* aic;
+	u32* scores;
 	u32 start_index;
 	u32 end_index;
 	u32 dt;
@@ -61,6 +62,7 @@ private:
 	score_map m_population_score;
 	// for debugging purposes
 	std::vector<std::pair<u32, u32> > m_last_score;
+	std::vector<u32> m_score;
 
 	// frame counter
 	u32 m_framecount;

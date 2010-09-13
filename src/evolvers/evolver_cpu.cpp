@@ -21,6 +21,8 @@
 
 using namespace std;
 
+#define RETRIEVE_INTERVAL	60
+
 void frame_updater::operator()(){
 	for(u32 i = start_index; i < end_index; ++i){
 		AI::timestep(&aic[i], dt);
@@ -35,6 +37,9 @@ void frame_updater::operator()(){
 		for(u32 j = 0; j < MAX_TANKS; ++j){
 			Collision::tank_tank_check(&tanks[i], j);
 		}
+		if(tanks[i].state[0] != TANK_STATE_INACTIVE){
+			scores[i] += 1;
+		}
 	}
 }
 
@@ -45,6 +50,7 @@ void Evolver_cpu::initialize_impl(){
 	m_bullets.resize(NUM_INSTANCES);
 	m_tanks.resize(NUM_INSTANCES);
 	m_ai.resize(NUM_INSTANCES);
+	m_score.resize(NUM_INSTANCES);
 	
 	// setup everything on the CPU
 	for(u32 i = 0; i < NUM_INSTANCES; ++i){
@@ -69,6 +75,7 @@ void Evolver_cpu::initialize_impl(){
 		m_updaters[i].end_index = m_updaters[i].start_index +
 									(NUM_INSTANCES/MAX_THREADS);
 		m_updaters[i].tanks = &m_tanks[0];
+		m_updaters[i].scores = &m_score[0];
 	}
 }
 
@@ -192,6 +199,7 @@ void Evolver_cpu::prepare_game_state_impl(){
 	m_runner = m_runner_b;
 	m_tanks = m_tanks_b;
 	m_bullets = m_bullets_b;
+	fill(m_score.begin(), m_score.end(), 0);
 
 	// setup the stuff on the current buffer
 	Physics::vec2 params;
@@ -222,16 +230,19 @@ void Evolver_cpu::prepare_game_state_impl(){
 }
 
 bool Evolver_cpu::is_game_over_impl(){
-	//NOTE: we'll also use this function to save their score if needed
-	bool all_dead = true;
-	for(int i = 0; i < NUM_INSTANCES; ++i){
-		// tank 0 is the one dodging, check its status
-		all_dead &= (m_tanks[i].state[0] == TANK_STATE_INACTIVE);
-		if(m_tanks[i].state[0] == TANK_STATE_INACTIVE
-			&& (m_population_score.find(i) == m_population_score.end())){
-			// this tank is dead, save the score
-			m_population_score[i] = m_framecount;
+	if(m_framecount % RETRIEVE_INTERVAL == 0){
+		bool all_dead = true;
+		for(int i = 0; i < NUM_INSTANCES; ++i){
+			// tank 0 is the one dodging, check its status
+			all_dead &= (m_tanks[i].state[0] == TANK_STATE_INACTIVE);
 		}
+		if(all_dead){
+			for(int i = 0; i < NUM_INSTANCES; ++i){
+				m_population_score[i] = m_score[i];
+			}
+		}
+		return all_dead;
+	}else{
+		return false;
 	}
-	return all_dead;
 }
