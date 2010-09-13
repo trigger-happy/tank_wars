@@ -28,6 +28,7 @@
 
 #include "game_scene/igamescene.h"
 
+#include "game_scene/gsgame.h"
 #include "game_scene/gsmenu.h"
 
 // in milliseconds
@@ -74,7 +75,11 @@ int GameDisplay::main(){
 		
 		CL_ResourceManager resources("resources/game_resource.xml");
 		menu_scene.reset(new GSMenu(gc, resources));
-		s_scene_stack.push(menu_scene.get());
+		if(s_view_gene){
+			s_scene_stack.push(new GSGame(gc, resources));
+		}else{
+			s_scene_stack.push(menu_scene.get());
+		}
 		
 		while(!keyboard.get_keycode(CL_KEY_ESCAPE) && s_running){
 			// restart the frame timer
@@ -114,6 +119,10 @@ int GameDisplay::main(){
 #else
 			//Sleep(FRAME_TIME - s_deltatime);
 #endif
+		}
+		if(s_view_gene){
+			delete s_scene_stack.top();
+			s_scene_stack.pop();
 		}
 	}catch(CL_Exception& e){
 		CL_ConsoleWindow console("error console", 80, 160);
