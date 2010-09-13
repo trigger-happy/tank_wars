@@ -65,11 +65,11 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 			break;
 		}
 		
-		// save the data
-		evl.save_best_gene(fname);
-		
 		// perform the genetic algorithm
 		evl.evolve_ga();
+		
+		// save the data
+		evl.save_best_gene(fname);
 	}
 	
 	// summary of the evolution process
