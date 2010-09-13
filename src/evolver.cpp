@@ -33,10 +33,7 @@ using namespace std;
 template<typename T>
 void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 	evl.initialize();
-	
-	//TODO: change this to the appropriate terminating condition
-	// terminating condition will be the score of the best individual in the
-	// latest generation
+
 	u32 num_generations = 0;
 	f32 highest_score = 0.0f;
 	for(int i = 0; i < MAX_GENERATIONS; ++i){

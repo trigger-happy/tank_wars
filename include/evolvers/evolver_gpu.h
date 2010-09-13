@@ -51,6 +51,7 @@ private:
 	score_map m_population_score;
 	// for debugging purposes
 	std::vector<std::pair<u32, u32> > m_last_score;
+	std::vector<u32> m_score;
 
 	// frame counter
 	u32 m_framecount;
@@ -73,6 +74,7 @@ private:
 	TankBullet::BulletCollection* m_cuda_bullets;
 	BasicTank::TankCollection* m_cuda_tanks;
 	AI::AI_Core* m_cuda_ai;
+	u32* m_cuda_score;
 };
 
 #endif // EVOLVER_GPU_H

@@ -34,6 +34,7 @@ void Evolver_gpu::initialize_impl(){
 	m_bullets.resize(NUM_INSTANCES);
 	m_tanks.resize(NUM_INSTANCES);
 	m_ai.resize(NUM_INSTANCES);
+	m_score.resize(NUM_INSTANCES, 0);
 	
 	// setup everything on the CPU
 	for(u32 i = 0; i < NUM_INSTANCES; ++i){
@@ -58,6 +59,8 @@ void Evolver_gpu::initialize_impl(){
 				NUM_INSTANCES*sizeof(BasicTank::TankCollection));
 	cudaMalloc(reinterpret_cast<void**>(&m_cuda_ai),
 				NUM_INSTANCES*sizeof(AI::AI_Core));
+	cudaMalloc(reinterpret_cast<void**>(&m_cuda_score),
+			   NUM_INSTANCES*sizeof(u32));
 				
 	// copy over the stuff to GPU mem
 	copy_to_device();
@@ -68,13 +71,15 @@ void Evolver_gpu::cleanup_impl(){
 	cudaFree(m_cuda_bullets);
 	cudaFree(m_cuda_runner);
 	cudaFree(m_cuda_ai);
+	cudaFree(m_cuda_score);
 }
 
 __global__ void internal_frame_step(f32 dt,
 									Physics::PhysRunner::RunnerCore* runners,
 									TankBullet::BulletCollection* bullets,
 									BasicTank::TankCollection* tanks,
-									AI::AI_Core* aic){
+									AI::AI_Core* aic,
+									u32* scores){
 	// perform all the AI operations
 	AI::timestep(&aic[blockIdx.x], dt);
 	
@@ -97,6 +102,10 @@ __global__ void internal_frame_step(f32 dt,
 		Collision::tank_tank_check(&tanks[blockIdx.x],
 								   threadIdx.x);
 	}
+	if(tanks[blockIdx.x].state[0] != TANK_STATE_INACTIVE
+		&& threadIdx.x == 0){
+		scores[blockIdx.x] += 1;
+	}
 }
 
 void Evolver_gpu::frame_step_impl(f32 dt){
@@ -104,8 +113,8 @@ void Evolver_gpu::frame_step_impl(f32 dt){
 													   m_cuda_runner,
 													   m_cuda_bullets,
 													   m_cuda_tanks,
-													   m_cuda_ai);
-	++m_framecount;
+													   m_cuda_ai,
+													   m_cuda_score);
 	// CPU based
 	// force it
 // 	copy_from_device();
@@ -220,6 +229,7 @@ void Evolver_gpu::save_best_gene_impl(const string& fname){
 
 void Evolver_gpu::prepare_game_state_impl(){
 	m_population_score.clear();
+	m_score.resize(NUM_INSTANCES, 0);
 	m_framecount = 0;
 	
 	// get the backup buffer and put it into current one
@@ -260,15 +270,15 @@ void Evolver_gpu::prepare_game_state_impl(){
 }
 
 bool Evolver_gpu::is_game_over_impl(){
-	//NOTE: we'll also use this function to save their score if needed
 	bool all_dead = true;
 	for(int i = 0; i < NUM_INSTANCES; ++i){
 		// tank 0 is the one dodging, check its status
 		all_dead &= (m_tanks[i].state[0] == TANK_STATE_INACTIVE);
-		if(m_tanks[i].state[0] == TANK_STATE_INACTIVE
-			&& (m_population_score.find(i) == m_population_score.end())){
-			// this tank is dead, save the score
-			m_population_score[i] = m_framecount;
+	}
+	if(all_dead){
+		for(int i = 0; i < NUM_INSTANCES; ++i){
+			m_population_score[i] = m_score[i];
+			m_score[i] = 0;
 		}
 	}
 	return all_dead;
@@ -301,6 +311,8 @@ void Evolver_gpu::copy_to_device(){
 	
 	cudaMemcpy(m_cuda_ai, &m_ai[0],
 				NUM_INSTANCES*sizeof(AI::AI_Core), cudaMemcpyHostToDevice);
+	cudaMemcpy(m_cuda_score, &m_score[0],
+			   NUM_INSTANCES*sizeof(u32), cudaMemcpyHostToDevice);
 }
 
 void Evolver_gpu::copy_from_device(){
@@ -315,6 +327,9 @@ void Evolver_gpu::copy_from_device(){
 			   cudaMemcpyDeviceToHost);
 	cudaMemcpy(&m_ai[0], m_cuda_ai,
 			   NUM_INSTANCES*sizeof(AI::AI_Core),
+			   cudaMemcpyDeviceToHost);
+	cudaMemcpy(&m_score[0], m_cuda_score,
+			   NUM_INSTANCES*sizeof(u32),
 			   cudaMemcpyDeviceToHost);
 			   
 	for(u32 i = 0; i < NUM_INSTANCES; ++i){
