@@ -21,6 +21,8 @@
 #include "game_core/tankbullet.h"
 #include "types.h"
 
+#define MAX_BODY_RECORD 18000
+
 // for the AI records
 struct ai_key{
 	u32 id;
@@ -37,16 +39,12 @@ struct ai_data{
 struct sim_key{
 	u32 id;
 	u32 generation;
-	u32 timestep;
-};
-
-struct sim_info{
-	BasicTank::TankCollection tc;
-	TankBullet::BulletCollection bc;
 };
 
 struct sim_data{
-	Physics::PhysRunner::RunnerCore runner;
+	BasicTank::TankCollection tc;
+	TankBullet::BulletCollection bc;
+	Physics::physBody bodies[MAX_BODY_RECORD];
 };
 
 #endif //DS_TYPES_H

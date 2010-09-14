@@ -18,11 +18,14 @@
 using namespace std;
 using namespace kyotocabinet;
 
-DataStore::DataStore(const string& dbname){
-	m_status = m_db.open(dbname, PolyDB::OWRITER | PolyDB::OREADER | PolyDB::OCREATE);
+DataStore::DataStore(const std::string& aidb, const std::string& simdb){
+	m_status = m_aidb.open(aidb, PolyDB::OWRITER | PolyDB::OREADER | PolyDB::OCREATE);
+	m_status &= m_simdb.open(simdb, PolyDB::OWRITER | PolyDB::OREADER | PolyDB::OCREATE);
 }
 
 DataStore::~DataStore(){
+	m_aidb.close();
+	m_simdb.close();
 }
 
 bool DataStore::save_gene_data(const ai_key& key,
@@ -39,7 +42,7 @@ bool DataStore::save_gene_data(const ai_key& key,
 	}
 
 	// save the data
-	result = m_db.set(reinterpret_cast<const char*>(&key), sizeof(ai_key),
+	result = m_aidb.set(reinterpret_cast<const char*>(&key), sizeof(ai_key),
 					  reinterpret_cast<const char*>(&aid), sizeof(ai_data));
 	return result;
 }
@@ -49,7 +52,7 @@ bool DataStore::get_gene_data(const ai_key& key,
 	bool result = true;
 	ai_data aid;
 
-	result = m_db.get(reinterpret_cast<const char*>(&key), sizeof(ai_key),
+	result = m_aidb.get(reinterpret_cast<const char*>(&key), sizeof(ai_key),
 					  reinterpret_cast<char*>(&aid), sizeof(ai_data));
 
 	// copy the gene from aid to aic

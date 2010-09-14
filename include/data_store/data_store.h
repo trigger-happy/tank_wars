@@ -21,10 +21,11 @@
 
 class DataStore{
 public:
-	DataStore(const std::string& dbname);
+	DataStore(const std::string& aidb,
+			  const std::string& simdb);
 	~DataStore();
 
-	inline bool is_open() const{
+	inline bool is_ok() const{
 		return m_status;
 	}
 
@@ -34,11 +35,16 @@ public:
 	bool get_gene_data(const ai_key& key,
 					   AI::AI_Core& aic);
 
-	inline const char* get_error() const{
-		return m_db.error().name();
+	inline const char* get_ai_error() const{
+		return m_aidb.error().name();
+	}
+
+	inline const char* get_sim_error() const{
+		return m_simdb.error().name();
 	}
 private:
-	kyotocabinet::PolyDB m_db;
+	kyotocabinet::PolyDB m_aidb;
+	kyotocabinet::PolyDB m_simdb;
 	bool m_status;
 };
 
