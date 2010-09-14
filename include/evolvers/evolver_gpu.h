@@ -55,20 +55,7 @@ private:
 
 	// frame counter
 	u32 m_framecount;
-	
-	// CPU stuff
-	std::vector<Physics::PhysRunner::RunnerCore> m_runner;
-	std::vector<TankBullet::BulletCollection> m_bullets;
-	std::vector<BasicTank::TankCollection> m_tanks;
-	std::vector<AI::AI_Core> m_ai;
-	
-	// backup of initial data for clean slate
-	std::vector<Physics::PhysRunner::RunnerCore> m_runner_b;
-	std::vector<TankBullet::BulletCollection> m_bullets_b;
-	std::vector<BasicTank::TankCollection> m_tanks_b;
-	std::vector<AI::AI_Core> m_ai_b;
-	
-	
+
 	// GPU stuff
 	Physics::PhysRunner::RunnerCore* m_cuda_runner;
 	TankBullet::BulletCollection* m_cuda_bullets;

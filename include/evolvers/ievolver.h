@@ -18,6 +18,7 @@ Boston, MA 02110-1301, USA.
 #define IEVOLVER_H
 #include <string>
 #include <utility>
+#include <vector>
 #include "types.h"
 #include "game_core/tank_ai.h"
 
@@ -95,6 +96,19 @@ public:
 	bool is_game_over(){
 		return static_cast<Derived*>(this)->is_game_over_impl();
 	}
+
+protected:
+	// CPU stuff
+	std::vector<Physics::PhysRunner::RunnerCore> m_runner;
+	std::vector<TankBullet::BulletCollection> m_bullets;
+	std::vector<BasicTank::TankCollection> m_tanks;
+	std::vector<AI::AI_Core> m_ai;
+	
+	// backup of initial data for clean slate
+	std::vector<Physics::PhysRunner::RunnerCore> m_runner_b;
+	std::vector<TankBullet::BulletCollection> m_bullets_b;
+	std::vector<BasicTank::TankCollection> m_tanks_b;
+	std::vector<AI::AI_Core> m_ai_b;
 };
 
 template<typename T>
