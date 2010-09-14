@@ -56,10 +56,11 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 		
 		// get the score of the best individual
 		highest_score = evl.retrieve_highest_score();
-		highest_score /= MAX_FRAMESTEPS;
-		cout << "Generation: " << i << " score: "
-			<< highest_score << " time: " << evol_timer.elapsed() << endl;
-		if(highest_score >= 0.999f){
+		//highest_score /= MAX_FRAMESTEPS;
+		cout << "Generation: " << i << " frames: "
+			<< highest_score  << " score: " << highest_score/MAX_FRAMESTEPS
+			<< " time: " << evol_timer.elapsed() << endl;
+		if(highest_score/MAX_FRAMESTEPS >= 0.999f){
 			// close to 1.0f
 			num_generations = i+1;
 			break;
