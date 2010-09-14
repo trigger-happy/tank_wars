@@ -74,10 +74,10 @@ int GameDisplay::main(){
 		CL_InputDevice& mouse = window.get_ic().get_mouse();
 		
 		CL_ResourceManager resources("resources/game_resource.xml");
-		menu_scene.reset(new GSMenu(gc, resources));
 		if(s_view_gene){
 			s_scene_stack.push(new GSGame(gc, resources));
 		}else{
+			menu_scene.reset(new GSMenu(gc, resources));
 			s_scene_stack.push(menu_scene.get());
 		}
 		
