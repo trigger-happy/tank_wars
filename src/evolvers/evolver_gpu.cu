@@ -208,14 +208,14 @@ void Evolver_gpu::save_best_gene_impl(const string& fname){
 // 	copy_from_device();
 
 	// find the individual with the highest score
-	score_map::iterator best_pos;
-	u32 score_find = retrieve_score_impl();
-	for(best_pos = m_population_score.begin();
-		best_pos != m_population_score.end(); ++best_pos){
-		if(score_find == best_pos->second){
-			break;
-		}
-	}
+// 	score_map::iterator best_pos;
+// 	u32 score_find = retrieve_score_impl();
+// 	for(best_pos = m_population_score.begin();
+// 		best_pos != m_population_score.end(); ++best_pos){
+// 		if(score_find == best_pos->second){
+// 			break;
+// 		}
+// 	}
 	
 	ofstream fout(fname.c_str(), ios::trunc);
 // 	fout.seekp(ios::end);
@@ -223,7 +223,7 @@ void Evolver_gpu::save_best_gene_impl(const string& fname){
 	// assume that we just want AI_CONTROLLER 0
 	// write out the accel gene 1st
 	if(fout.is_open()){
-		u32 index = best_pos->first;
+		u32 index = m_last_score[0].first;
 		AI::AI_Core::gene_type tempval;
 		for(int i = 0; i < MAX_GENE_DATA; ++i){
 			tempval = m_ai[index].gene_accel[i][0];
