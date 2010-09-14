@@ -226,20 +226,18 @@ void Evolver_gpu::save_best_gene_impl(const string& fname){
 		u32 index = best_pos->first;
 		AI::AI_Core::gene_type tempval;
 		for(int i = 0; i < MAX_GENE_DATA; ++i){
-			tempval = m_ai_b[index].gene_accel[i][0];
+			tempval = m_ai[index].gene_accel[i][0];
 			fout.write((const char*)&tempval, sizeof(tempval));
 		}
 
 		// write out the heading gene next
 		for(int i = 0; i < MAX_GENE_DATA; ++i){
-			tempval = m_ai_b[index].gene_heading[i][0];
+			tempval = m_ai[index].gene_heading[i][0];
 			fout.write((const char*)&tempval, sizeof(tempval));
 		}
 	}
 	
 	fout.close();
-	int x;
-	cin >> x;
 }
 
 void Evolver_gpu::prepare_game_state_impl(){
