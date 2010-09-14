@@ -60,6 +60,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 
 #uncomment clanlib later
 list(APPEND LINK_LIBS ${LINK_LIBS}
+			kyotocabinet
 			${CMAKE_THREAD_LIBS_INIT}
 			${OPENGL_LIBRARIES}
 			${Boost_LIBRARIES}

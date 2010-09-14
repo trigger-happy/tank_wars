@@ -7,6 +7,7 @@ list(APPEND TANKGAME_SRC
 			tank_game.cpp)
 			
 list(APPEND EVOLVER_SRC
+			data_store/data_store.cpp
 			evolvers/evolver_gpu.cu
 			evolvers/evolver_cpu.cpp
 			evolver.cpp)
