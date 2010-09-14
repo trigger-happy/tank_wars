@@ -93,7 +93,6 @@ void Evolver_cpu::frame_step_impl(float dt){
 		// rejoin the threads
 		m_threads[i].join();
 	}
-	++m_framecount;
 }
 
 void Evolver_cpu::retrieve_state_impl(){

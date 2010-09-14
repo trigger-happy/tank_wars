@@ -122,7 +122,6 @@ void Evolver_gpu::frame_step_impl(f32 dt){
 													   m_cuda_tanks,
 													   m_cuda_ai,
 													   m_cuda_score);
-	++m_framecount;
 	// CPU based
 	// force it
 // 	copy_from_device();

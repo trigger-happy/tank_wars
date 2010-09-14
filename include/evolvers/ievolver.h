@@ -58,6 +58,7 @@ public:
 	*/
 	void frame_step(float dt){
 		static_cast<Derived*>(this)->frame_step_impl(dt);
+		++m_framecount;
 	}
 	
 	/*!
@@ -114,6 +115,9 @@ protected:
 	std::vector<TankBullet::BulletCollection> m_bullets_b;
 	std::vector<BasicTank::TankCollection> m_tanks_b;
 	std::vector<AI::AI_Core> m_ai_b;
+	
+	// frame counter
+	u32 m_framecount;
 
 private:
 	// for data storage

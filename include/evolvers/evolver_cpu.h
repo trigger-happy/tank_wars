@@ -63,9 +63,6 @@ private:
 	// for debugging purposes
 	std::vector<std::pair<u32, u32> > m_last_score;
 	std::vector<u32> m_score;
-
-	// frame counter
-	u32 m_framecount;
 	
 	// threads
 	boost::array<boost::thread, MAX_THREADS> m_threads;

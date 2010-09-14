@@ -53,9 +53,6 @@ private:
 	std::vector<std::pair<u32, u32> > m_last_score;
 	std::vector<u32> m_score;
 
-	// frame counter
-	u32 m_framecount;
-
 	// GPU stuff
 	Physics::PhysRunner::RunnerCore* m_cuda_runner;
 	TankBullet::BulletCollection* m_cuda_bullets;
