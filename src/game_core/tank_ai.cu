@@ -153,17 +153,17 @@ void AI::initialize(AI::AI_Core* aic,
 		aic->controlled_tanks[i] = INVALID_ID;
 	}
 	memset(static_cast<void*>(aic->gene_accel),
-		   0, MAX_AI_CONTROLLERS*MAX_GENE_DATA*sizeof(AI::AI_Core::gene_type));
+		   0, MAX_AI_EVADERS*MAX_GENE_DATA*sizeof(AI::AI_Core::gene_type));
 	memset(static_cast<void*>(aic->gene_heading),
-			0, MAX_AI_CONTROLLERS*MAX_GENE_DATA*sizeof(AI::AI_Core::gene_type));
+		   0, MAX_AI_EVADERS*MAX_GENE_DATA*sizeof(AI::AI_Core::gene_type));
 	memset(static_cast<void*>(aic->bullet_vector),
-		   0, MAX_AI_CONTROLLERS*sizeof(s32));
+		   0, MAX_AI_EVADERS*sizeof(s32));
 	memset(static_cast<void*>(aic->tank_vector),
-		   0, MAX_AI_CONTROLLERS*sizeof(s32));
+		   0, MAX_AI_EVADERS*sizeof(s32));
 	memset(static_cast<void*>(aic->distance_state),
-		   0, MAX_AI_CONTROLLERS*sizeof(s32));
+		   0, MAX_AI_EVADERS*sizeof(s32));
 	memset(static_cast<void*>(aic->direction_state),
-		   0, MAX_AI_CONTROLLERS*sizeof(s32));
+		   0, MAX_AI_EVADERS*sizeof(s32));
 	memset(static_cast<void*>(aic->ai_type),
 		   0, MAX_AI_CONTROLLERS*sizeof(s32));
 	
@@ -274,7 +274,7 @@ void AI::add_tank( AI::AI_Core* aic, tank_id tid, s32 ait){
 }
 
 void AI::init_gene_data(AI::AI_Core* aic){
-	for(int i = 0; i < MAX_AI_CONTROLLERS; ++i){
+	for(int i = 0; i < MAX_AI_EVADERS; ++i){
 		for(int j = 0; j < MAX_GENE_DATA; ++j){
 			aic->gene_accel[j][i] = rand()%MAX_THRUST_VALUES;
 			aic->gene_heading[j][i] = rand()%MAX_HEADING_VALUES;

@@ -39,6 +39,7 @@
 #define MAX_THRUST_VALUES		3
 #define MAX_HEADING_VALUES		18
 #define MAX_AI_CONTROLLERS		3
+#define MAX_AI_EVADERS			1
 
 #define AI_TYPE_INVALID			0
 #define AI_TYPE_EVADER			1
@@ -55,14 +56,14 @@ namespace AI{
 		BasicTank::TankCollection* tc;
 		TankBullet::BulletCollection* bc;
 		u32 next_slot;
-		s32 bullet_vector[MAX_AI_CONTROLLERS];
-		s32 tank_vector[MAX_AI_CONTROLLERS];
-		s32 direction_state[MAX_AI_CONTROLLERS];
-		s32 distance_state[MAX_AI_CONTROLLERS];
+		s32 bullet_vector[MAX_AI_EVADERS];
+		s32 tank_vector[MAX_AI_EVADERS];
+		s32 direction_state[MAX_AI_EVADERS];
+		s32 distance_state[MAX_AI_EVADERS];
 		s32 ai_type[MAX_AI_CONTROLLERS];
 		tank_id controlled_tanks[MAX_AI_CONTROLLERS];
-		gene_type gene_accel[MAX_GENE_DATA][MAX_AI_CONTROLLERS];
-		gene_type gene_heading[MAX_GENE_DATA][MAX_AI_CONTROLLERS];
+		gene_type gene_accel[MAX_GENE_DATA][MAX_AI_EVADERS];
+		gene_type gene_heading[MAX_GENE_DATA][MAX_AI_EVADERS];
 	};
 	
 	// sensor functions
