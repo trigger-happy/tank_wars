@@ -32,7 +32,7 @@ using namespace std;
 
 template<typename T>
 void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
-	evl.initialize();
+	evl.initialize("genes.db", "simulation.db");
 
 	u32 num_generations = 0;
 	f32 highest_score = 0.0f;
@@ -70,7 +70,7 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 		evl.evolve_ga();
 		
 		// save the data
-		evl.save_best_gene(fname);
+		evl.save_genes(fname);
 	}
 	
 	// summary of the evolution process

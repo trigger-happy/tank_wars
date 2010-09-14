@@ -21,6 +21,7 @@ Boston, MA 02110-1301, USA.
 #include <vector>
 #include "types.h"
 #include "game_core/tank_ai.h"
+#include "data_store/data_store.h"
 
 #define NUM_INSTANCES 1024
 
@@ -35,8 +36,10 @@ public:
 	/*!
 	Initialize the evolver
 	*/
-	void initialize(){
+	void initialize(const std::string& aidb,
+					const std::string& simdb){
 		static_cast<Derived*>(this)->initialize_impl();
+		m_ds = new DataStore(aidb, simdb);
 	}
 	
 	/*!
@@ -44,6 +47,8 @@ public:
 	*/
 	void cleanup(){
 		static_cast<Derived*>(this)->cleanup_impl();
+		delete m_ds;
+		m_ds = NULL;
 	}
 	
 	/*!
@@ -77,10 +82,10 @@ public:
 	}
 	
 	/*!
-	Save the gene of the best individual
+	Save the genes of all individuals in the current generation
 	*/
-	void save_best_gene(const std::string& fname){
-		static_cast<Derived*>(this)->save_best_gene_impl(fname);
+	void save_genes(const std::string& fname){
+		//static_cast<Derived*>(this)->save_best_gene_impl(fname);
 	}
 	
 	/*!
@@ -109,6 +114,10 @@ protected:
 	std::vector<TankBullet::BulletCollection> m_bullets_b;
 	std::vector<BasicTank::TankCollection> m_tanks_b;
 	std::vector<AI::AI_Core> m_ai_b;
+
+private:
+	// for data storage
+	DataStore* m_ds;
 };
 
 template<typename T>

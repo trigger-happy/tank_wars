@@ -13,19 +13,24 @@
 	the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 	Boston, MA 02110-1301, USA.
 */
+#include <kcpolydb.h>
 #include "data_store/data_store.h"
 
 using namespace std;
 using namespace kyotocabinet;
 
 DataStore::DataStore(const std::string& aidb, const std::string& simdb){
-	m_status = m_aidb.open(aidb, PolyDB::OWRITER | PolyDB::OREADER | PolyDB::OCREATE);
-	m_status &= m_simdb.open(simdb, PolyDB::OWRITER | PolyDB::OREADER | PolyDB::OCREATE);
+	m_aidb = new PolyDB();
+	m_simdb = new PolyDB();
+	m_status = m_aidb->open(aidb, PolyDB::OWRITER | PolyDB::OREADER | PolyDB::OCREATE);
+	m_status &= m_simdb->open(simdb, PolyDB::OWRITER | PolyDB::OREADER | PolyDB::OCREATE);
 }
 
 DataStore::~DataStore(){
-	m_aidb.close();
-	m_simdb.close();
+	m_aidb->close();
+	m_simdb->close();
+	delete m_aidb;
+	delete m_simdb;
 }
 
 bool DataStore::save_gene_data(const ai_key& key,
@@ -42,7 +47,7 @@ bool DataStore::save_gene_data(const ai_key& key,
 	}
 
 	// save the data
-	result = m_aidb.set(reinterpret_cast<const char*>(&key), sizeof(ai_key),
+	result = m_aidb->set(reinterpret_cast<const char*>(&key), sizeof(ai_key),
 					  reinterpret_cast<const char*>(&aid), sizeof(ai_data));
 	return result;
 }
@@ -52,7 +57,7 @@ bool DataStore::get_gene_data(const ai_key& key,
 	bool result = true;
 	ai_data aid;
 
-	result = m_aidb.get(reinterpret_cast<const char*>(&key), sizeof(ai_key),
+	result = m_aidb->get(reinterpret_cast<const char*>(&key), sizeof(ai_key),
 					  reinterpret_cast<char*>(&aid), sizeof(ai_data));
 
 	// copy the gene from aid to aic
@@ -64,4 +69,12 @@ bool DataStore::get_gene_data(const ai_key& key,
 	}
 	
 	return result;
+}
+
+const char* DataStore::get_ai_error() const{
+	return m_aidb->error().name();
+}
+
+const char* DataStore::get_sim_error() const{
+	return m_simdb->error().name();
 }

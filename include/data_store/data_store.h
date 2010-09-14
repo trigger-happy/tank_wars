@@ -16,8 +16,11 @@
 #ifndef DATA_STORE_H
 #define DATA_STORE_H
 #include <string>
-#include <kcpolydb.h>
 #include "data_store/ds_types.h"
+
+namespace kyotocabinet{
+	class PolyDB;
+}
 
 class DataStore{
 public:
@@ -35,16 +38,13 @@ public:
 	bool get_gene_data(const ai_key& key,
 					   AI::AI_Core& aic);
 
-	inline const char* get_ai_error() const{
-		return m_aidb.error().name();
-	}
+	const char* get_ai_error() const;
 
-	inline const char* get_sim_error() const{
-		return m_simdb.error().name();
-	}
+	const char* get_sim_error() const;
+	
 private:
-	kyotocabinet::PolyDB m_aidb;
-	kyotocabinet::PolyDB m_simdb;
+	kyotocabinet::PolyDB* m_aidb;
+	kyotocabinet::PolyDB* m_simdb;
 	bool m_status;
 };
 
