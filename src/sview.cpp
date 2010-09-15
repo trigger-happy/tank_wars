@@ -23,12 +23,15 @@
 #include <boost/lambda/lambda.hpp>
 #include <boost/timer.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/program_options.hpp>
 #include "game_display.h"
 #include "types.h"
 
 #include "game_scene/igamescene.h"
 
 #include "game_scene/gssim_view.h"
+
+#include "data_store/data_store.h"
 
 // in milliseconds
 #define FRAME_TIME 1000.0/60.0
@@ -39,6 +42,12 @@ std::stack<iGameScene*>	GameDisplay::s_scene_stack;
 bool					GameDisplay::s_running = true;
 bool					GameDisplay::s_usecuda = false;
 bool					GameDisplay::s_view_gene = false;
+
+// prototype, don't care about programming practices for now
+DataStore* g_db;
+sim_key g_sk;
+
+namespace po = boost::program_options;
 
 void GameDisplay::push_scene(iGameScene* scene){
 	if(!s_scene_stack.empty()){
@@ -64,14 +73,22 @@ int GameDisplay::main(){
 	CL_SetupGL setup_gl;
 	
 	try{
-		CL_DisplayWindow window("Simulation View", 800, 600);
+		CL_StringFormat fmt("SV ID: %1 GEN: %2");
+		fmt.set_arg(1, g_sk.id);
+		fmt.set_arg(2, g_sk.generation);
+		CL_DisplayWindow window(fmt.get_result(), 800, 600);
 		
 		CL_GraphicContext& gc = window.get_gc();
 		CL_InputDevice& keyboard = window.get_ic().get_keyboard();
 		CL_InputDevice& mouse = window.get_ic().get_mouse();
 		
 		CL_ResourceManager resources("resources/game_resource.xml");
-		s_scene_stack.push(new GSSimView(gc, resources));
+		
+		sim_data* sd = new sim_data;
+		g_db->get_sim_data(g_sk, *sd);
+		
+		GSSimView* sv = new GSSimView(gc, resources, *sd);
+		s_scene_stack.push(sv);
 		
 		while(!keyboard.get_keycode(CL_KEY_ESCAPE) && s_running){
 			// restart the frame timer
@@ -123,7 +140,48 @@ int GameDisplay::main(){
 }
 
 int main(int argc, char* argv[]){
-	//TODO: replace this with boost::program_options
+	srand(std::time(NULL));
+	po::options_description desc("Gene viewer options");
+	desc.add_options()
+	("help", "Show this help message")
+	//("use-cuda", "Use CUDA")
+	("generation", po::value<u32>(), "The generation number")
+	("id", po::value<u32>(), "The id of the gene to view")
+	("db", po::value<std::string>(), "The gene database, default is simulation.kch");
 	
+	po::variables_map vm;
+	po::store(po::parse_command_line(argc, argv, desc), vm);
+	po::notify(vm);
+	
+	if(vm.count("help")){
+		std::cout << desc << std::endl;
+		return 0;
+	}
+	/*
+	if(vm.count("use-cuda")){
+		GameDisplay::s_usecuda = true;
+	}
+	*/
+	
+	// set the default values
+	g_sk.id = 0;
+	g_sk.generation = 1;
+	std::string aidb = "genes.kch";
+	std::string simdb = "simulation.kch";
+	
+	if(vm.count("generation")){
+		g_sk.generation = vm["generation"].as<u32>();
+	}
+	
+	if(vm.count("id")){
+		g_sk.id = vm["id"].as<u32>();
+	}
+	
+	if(vm.count("db")){
+		aidb = vm["db"].as<std::string>();
+	}
+	
+	g_db = new DataStore(aidb, simdb);
 	GameDisplay::main();
+	delete g_db;
 }

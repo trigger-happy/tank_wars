@@ -24,14 +24,18 @@ Boston, MA 02110-1301, USA.
 #include "game_core/tank_ai.h"
 #include "data_store/data_store.h"
 
-#define NUM_INSTANCES 128
+#define SAVE_SIM_DATA
+
+#ifdef SAVE_SIM_DATA
+#define NUM_INSTANCES 16
+#else
+#define NUM_INSTANCES 1024
+#endif
 
 // top 5% will be elite
 #define ELITE_COUNT		(NUM_INSTANCES*0.05f)
 // 15% mutation rate
 #define MUTATION_RATE	15
-
-//#define SAVE_SIM_DATA
 
 template<typename Derived>
 class iEvolver{
@@ -80,6 +84,7 @@ public:
 		#ifdef SAVE_SIM_DATA
 		// save the current frame data
 		for(u32 i = 0; i < NUM_INSTANCES; ++i){
+// 			std::cout << "I: " << i << " F: " << m_framecount << std::endl;
 			sim_key sk;
 			sk.id = i;
 			sk.generation = m_gen_count;

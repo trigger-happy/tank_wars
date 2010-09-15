@@ -27,6 +27,7 @@
 #include "game_core/tankbullet.h"
 #include "game_core/basictank.h"
 #include "game_core/tank_ai.h"
+#include "data_store/ds_types.h"
 #include "types.h"
 
 namespace Physics{
@@ -45,7 +46,8 @@ namespace BasicTank{
 
 class GSSimView : public iGameScene{
 public:
-	GSSimView(CL_GraphicContext& gc, CL_ResourceManager& resources);
+	GSSimView(CL_GraphicContext& gc, CL_ResourceManager& resources,
+			  sim_data& sd);
 	virtual ~GSSimView();
 	
     virtual void onSceneDeactivate();
@@ -70,16 +72,21 @@ private:
 	tank_id m_playertank;
 	tank_id m_player2tank;
 	tank_id m_player3tank;
-	
+
+	/*
 	//cuda stuff
 	Physics::PhysRunner::RunnerCore* m_cuda_runner;
 	TankBullet::BulletCollection* m_cuda_bullets;
 	BasicTank::TankCollection* m_cuda_tanks;
 	AI::AI_Core* m_cuda_ai;
+	*/
 
 	// timer for debugging
 	boost::timer m_timer;
 	u32 m_frames_elapsed;
+
+	// reference to simulation data
+	sim_data& m_simd;
 };
 
 #endif // GSSIM_VIEW_H

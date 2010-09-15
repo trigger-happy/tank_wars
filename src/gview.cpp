@@ -141,7 +141,6 @@ int GameDisplay::main(){
 }
 
 int main(int argc, char* argv[]){
-	//TODO: replace this with boost::program_options
 	srand(std::time(NULL));
 	po::options_description desc("Gene viewer options");
 	desc.add_options()

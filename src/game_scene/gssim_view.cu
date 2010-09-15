@@ -38,8 +38,10 @@ void apply_transform(CL_GraphicContext* gc, Physics::vec2& c){
 	c.y += gc->get_height()/2;
 }
 
-GSSimView::GSSimView(CL_GraphicContext& gc, CL_ResourceManager& resources)
-: m_physrunner(new Physics::PhysRunner::RunnerCore()){
+GSSimView::GSSimView(CL_GraphicContext& gc, CL_ResourceManager& resources,
+					 sim_data& sd)
+: m_physrunner(new Physics::PhysRunner::RunnerCore()),
+m_simd(sd){
 	
 	// setup the debug text
 	CL_FontDescription desc;
@@ -64,35 +66,13 @@ GSSimView::GSSimView(CL_GraphicContext& gc, CL_ResourceManager& resources)
 	TankBullet::initialize(&m_bullets, m_physrunner.get());
 	BasicTank::initialize(&m_tanks, m_physrunner.get(), &m_bullets);
 	AI::initialize(&m_ai, &m_tanks, &m_bullets);
-	
-	// test code
-	Physics::vec2 params;
-	params.x = -25;
-	m_playertank = BasicTank::spawn_tank(&m_tanks, params, 90, 0);
-	params.x = 3;
-	params.y = 12;
-	m_player2tank = BasicTank::spawn_tank(&m_tanks, params, 180, 1);
-	params.x = 20;
-	params.y = -12;
-	m_player3tank = BasicTank::spawn_tank(&m_tanks, params, 180, 1);
-	AI::add_tank(&m_ai, m_playertank, AI_TYPE_EVADER);
-	AI::add_tank(&m_ai, m_player2tank, AI_TYPE_ATTACKER);
-	AI::add_tank(&m_ai, m_player3tank, AI_TYPE_ATTACKER);
 
-	// load a saved gene for viewing
-	if(GameDisplay::s_view_gene){
-		std::ifstream fin("report.dat");
-		AI::AI_Core::gene_type tempval;
-		for(int i = 0; i < MAX_GENE_DATA; ++i){
-			fin.read((char*)&tempval, sizeof(tempval));
-			m_ai.gene_accel[i][0] = tempval;
-		}
-		for(int i = 0; i < MAX_GENE_DATA; ++i){
-			fin.read((char*)&tempval, sizeof(tempval));
-			m_ai.gene_heading[i][0] = tempval;
-		}
-	}
-	
+	// get the simulation data
+	m_tanks = m_simd.tc;
+	m_bullets = m_simd.bc;
+	m_physrunner->bodies = m_simd.bodies[0];
+
+	/*
 	// stuff for cuda
 	if(GameDisplay::s_usecuda){
 		// allocate cuda memory
@@ -126,16 +106,19 @@ GSSimView::GSSimView(CL_GraphicContext& gc, CL_ResourceManager& resources)
 		cudaMemcpy(m_cuda_ai, &m_ai,
 				   sizeof(m_ai), cudaMemcpyHostToDevice);
 	}
+	*/
 	m_frames_elapsed = 0;
 }
 
 GSSimView::~GSSimView(){
 	BasicTank::destroy(&m_tanks);
 	TankBullet::destroy(&m_bullets);
+	/*
 	cudaFree(m_cuda_tanks);
 	cudaFree(m_cuda_bullets);
 	cudaFree(m_cuda_runner);
 	cudaFree(m_cuda_ai);
+	*/
 }
 
 void GSSimView::onSceneDeactivate(){
@@ -150,11 +133,14 @@ void GSSimView::onSceneActivate(){
 using namespace std;
 
 void GSSimView::onFrameRender(CL_GraphicContext* gc){
+	/*
 	if(GameDisplay::s_usecuda){
 		// re-assign the pointer to the CPU version
 		BasicTank::reset_pointers(&m_tanks, m_physrunner.get(), &m_bullets);
 		TankBullet::reset_phys_pointer(&m_bullets, m_physrunner.get());
 	}
+	*/
+	
 	// draw the background
 	Physics::vec2 pos;
 	apply_transform(gc, pos);
@@ -210,7 +196,7 @@ void GSSimView::onFrameRender(CL_GraphicContext* gc){
 	m_debugfont->draw_text(*gc, 1, 12, m_dbgmsg, CL_Colorf::red);
 }
 
-
+/*
 // #if __CUDA_ARCH__
 __global__ void gsgame_step(f32 dt,
 							tank_id player_tank,
@@ -236,11 +222,13 @@ __global__ void gsgame_step(f32 dt,
 	}
 }
 // #endif
+*/
 
 void GSSimView::onFrameUpdate(double dt,
 						   CL_InputDevice* keyboard,
 						   CL_InputDevice* mouse){
 	// update the game state
+	/*
 	if(GameDisplay::s_usecuda){
 		// copy over the player input
 // 		cudaMemcpy(m_cuda_player_input, &m_player_input,
@@ -266,13 +254,16 @@ void GSSimView::onFrameUpdate(double dt,
 		cudaMemcpy(&m_ai, m_cuda_ai,
 				   sizeof(AI::AI_Core),
 				   cudaMemcpyDeviceToHost);
-	}else{
+	}else{*/
 		// process the player input
 		if(m_tanks.state[m_playertank] != TANK_STATE_INACTIVE){
 
 			// perform all the update
-			AI::timestep(&m_ai, dt);
-			Physics::PhysRunner::timestep(m_physrunner.get(), dt);
+			//AI::timestep(&m_ai, dt);
+			//Physics::PhysRunner::timestep(m_physrunner.get(), dt);
+			// copy over the timestep data
+			m_physrunner->bodies = m_simd.bodies[m_frames_elapsed];
+			
 			TankBullet::update(&m_bullets, dt);
 			BasicTank::update(&m_tanks, dt);
 			
@@ -285,7 +276,7 @@ void GSSimView::onFrameUpdate(double dt,
 				Collision::tank_tank_check(&m_tanks, i);
 			}
 		}
-	}
+//	}
 	
 	// update the sprites
 	m_background->update();

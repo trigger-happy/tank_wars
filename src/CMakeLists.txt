@@ -13,6 +13,7 @@ list(APPEND GVIEW_SRC
 
 list(APPEND SIMVIEW_SRC
 			sview.cpp
+			data_store/data_store.cpp
 			game_scene/gssim_view.cu)
 			
 list(APPEND EVOLVER_SRC
