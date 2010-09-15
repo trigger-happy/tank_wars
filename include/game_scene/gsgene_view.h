@@ -54,6 +54,10 @@ public:
     virtual void onFrameUpdate(double dt,
 							   CL_InputDevice* keyboard,
 							   CL_InputDevice* mouse);
+
+	inline AI::AI_Core& get_ai(){
+		return m_ai;
+	}
 private:
 	boost::scoped_ptr<Physics::PhysRunner::RunnerCore> m_physrunner;
 	boost::scoped_ptr<CL_Sprite> m_background;

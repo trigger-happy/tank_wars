@@ -23,12 +23,15 @@
 #include <boost/lambda/lambda.hpp>
 #include <boost/timer.hpp>
 #include <boost/scoped_ptr.hpp>
+#include <boost/program_options.hpp>
 #include "game_display.h"
 #include "types.h"
 
 #include "game_scene/igamescene.h"
 
 #include "game_scene/gsgene_view.h"
+
+#include "data_store/data_store.h"
 
 // in milliseconds
 #define FRAME_TIME 1000.0/60.0
@@ -39,6 +42,12 @@ std::stack<iGameScene*>	GameDisplay::s_scene_stack;
 bool					GameDisplay::s_running = true;
 bool					GameDisplay::s_usecuda = false;
 bool					GameDisplay::s_view_gene = false;
+
+// This is a prototype, deal with the fact we're using global vars
+DataStore* g_db;
+ai_key g_aik;
+
+namespace po = boost::program_options;
 
 void GameDisplay::push_scene(iGameScene* scene){
 	if(!s_scene_stack.empty()){
@@ -71,7 +80,10 @@ int GameDisplay::main(){
 		CL_InputDevice& mouse = window.get_ic().get_mouse();
 		
 		CL_ResourceManager resources("resources/game_resource.xml");
-		s_scene_stack.push(new GSGeneView(gc, resources));
+		GSGeneView* gv = new GSGeneView(gc, resources);
+		s_scene_stack.push(gv);
+
+		g_db->get_gene_data(g_aik, gv->get_ai());
 		
 		while(!keyboard.get_keycode(CL_KEY_ESCAPE) && s_running){
 			// restart the frame timer
@@ -124,6 +136,47 @@ int GameDisplay::main(){
 
 int main(int argc, char* argv[]){
 	//TODO: replace this with boost::program_options
-	
+	srand(std::time(NULL));
+	po::options_description desc("Gene viewer options");
+	desc.add_options()
+		("help", "Show this help message")
+		("use-cuda", "Use CUDA")
+		("generation", po::value<u32>(), "The generation number")
+		("id", po::value<u32>(), "The id of the gene to view")
+		("db", po::value<std::string>(), "The gene database, default is genes.kch");
+
+	po::variables_map vm;
+	po::store(po::parse_command_line(argc, argv, desc), vm);
+	po::notify(vm);
+
+	if(vm.count("help")){
+		std::cout << desc << std::endl;
+		return 0;
+	}
+
+	if(vm.count("use-cuda")){
+		GameDisplay::s_usecuda = true;
+	}
+
+	// set the default values
+	g_aik.id = 0;
+	g_aik.generation = 1;
+	std::string aidb = "genes.kch";
+	std::string simdb = "simulation.kch";
+
+	if(vm.count("generation")){
+		g_aik.generation = vm["generation"].as<u32>();
+	}
+
+	if(vm.count("id")){
+		g_aik.id = vm["id"].as<u32>();
+	}
+
+	if(vm.count("db")){
+		aidb = vm["db"].as<std::string>();
+	}
+
+	g_db = new DataStore(aidb, simdb);
 	GameDisplay::main();
+	delete g_db;
 }

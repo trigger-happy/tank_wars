@@ -8,6 +8,7 @@ list(APPEND TANKGAME_SRC
 
 list(APPEND GVIEW_SRC
 			gview.cpp
+			data_store/data_store.cpp
 			game_scene/gsgene_view.cu)
 
 list(APPEND SIMVIEW_SRC
@@ -28,6 +29,7 @@ if(CUDA_FOUND)
 	cuda_add_executable(simview ${SIMVIEW_SRC})
 	cuda_add_executable(geneview ${GVIEW_SRC})
 	target_link_libraries(evolver ${LINK_LIBS})
+	target_link_libraries(geneview ${LINK_LIBS})
 	
 else(CUDA_FOUND)
 	message("CUDA not found, some apps won't be built")
