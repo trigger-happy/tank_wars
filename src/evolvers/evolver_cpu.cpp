@@ -99,39 +99,39 @@ void Evolver_cpu::retrieve_state_impl(){
 
 void Evolver_cpu::evolve_ga_impl(){
 	// copy over the data to the vector for easy sorting
-	vector<pair<u32, u32> > score_data(m_population_score.size());
-	for(u32 i = 0; i < score_data.size(); ++i){
-		score_data[i].first = i;
-		score_data[i].second = m_population_score[i];
+	m_scoredata.resize(m_population_score.size());
+	for(u32 i = 0; i < m_scoredata.size(); ++i){
+		m_scoredata[i].first = i;
+		m_scoredata[i].second = m_population_score[i];
 	}
 
 	// sort it from highest score to lowest score
-	sort(score_data.begin(), score_data.end(), score_sort<u32>);
+	sort(m_scoredata.begin(), m_scoredata.end(), score_sort<u32>);
 	if(m_last_score.size() == 0){
-		m_last_score = score_data;
+		m_last_score = m_scoredata;
 	}else{
-		bool result = equal(score_data.begin(), score_data.end(),
+		bool result = equal(m_scoredata.begin(), m_scoredata.end(),
 							m_last_score.begin());
 		if(result){
 			cout << "GENES DIDN'T EVOLVE" << endl;
 		}
-		m_last_score = score_data;
+		m_last_score = m_scoredata;
 	}
 
 	// perform the reproduction process
 	// score_data[n].first is the index to the individual
 	// second is the score
-	for(u32 i = 0; i < score_data.size(); ++i){
+	for(u32 i = 0; i < m_scoredata.size(); ++i){
 		if(i < ELITE_COUNT){
 			// copy over the elite genes
-			copy_genes(&m_ai_b[i], &m_ai[score_data[i].first]);
+			copy_genes(&m_ai_b[i], &m_ai[m_scoredata[i].first]);
 		}else{
 			// time to reproduce given whatever else there may be
 			// we'll force only the 1st half of the set of parents
-			u32 p1 = rand() % score_data.size()/2;
-			u32 p2 = rand() % score_data.size()/2;
-			reproduce(&m_ai_b[i], &m_ai[score_data[p1].first],
-					  &m_ai[score_data[p2].first]);
+			u32 p1 = rand() % m_scoredata.size()/2;
+			u32 p2 = rand() % m_scoredata.size()/2;
+			reproduce(&m_ai_b[i], &m_ai[m_scoredata[p1].first],
+					  &m_ai[m_scoredata[p2].first]);
 
 			// random chance to mutate
 			u32 m = rand() % 100;

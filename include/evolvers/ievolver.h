@@ -101,7 +101,7 @@ public:
 			aik.generation = m_gen_count;
 			aik.id = i;
 			
-			m_ds->save_gene_data(aik, m_ai[i]);
+			m_ds->save_gene_data(aik, m_ai[m_scoredata[i].first]);
 		}
 		
 		m_framecount = 0;
@@ -137,6 +137,9 @@ protected:
 	
 	// frame counter
 	u32 m_framecount;
+
+	// score data
+	std::vector<std::pair<u32, u32> > m_scoredata;
 
 private:
 	// for data storage
