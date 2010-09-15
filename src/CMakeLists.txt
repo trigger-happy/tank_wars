@@ -5,6 +5,14 @@ list(APPEND TANKGAME_SRC
 			game_scene/gsoptions.cpp
 			game_scene/gsgame.cu
 			tank_game.cpp)
+
+list(APPEND GVIEW_SRC
+			gview.cpp
+			game_scene/gsgene_view.cu)
+
+list(APPEND SIMVIEW_SRC
+			sview.cpp
+			game_scene/gssim_view.cu)
 			
 list(APPEND EVOLVER_SRC
 			data_store/data_store.cpp
@@ -17,6 +25,8 @@ if(CUDA_FOUND)
 	
 	cuda_add_executable(tank_game ${TANKGAME_SRC})
 	cuda_add_executable(evolver ${EVOLVER_SRC})
+	cuda_add_executable(simview ${SIMVIEW_SRC})
+	cuda_add_executable(geneview ${GVIEW_SRC})
 	target_link_libraries(evolver ${LINK_LIBS})
 	
 else(CUDA_FOUND)
@@ -24,6 +34,8 @@ else(CUDA_FOUND)
 	
 	add_executable(tank_game ${TANKGAME_SRC})
 	add_executable(evolver ${EVOLVER_SRC})
+	add_executable(simview ${SIMVIEW_SRC})
+	add_executable(geneview ${GVIEW_SRC})
 endif(CUDA_FOUND)
 
 # add_executable(event_replay event_replay.cpp)
