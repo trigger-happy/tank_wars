@@ -29,7 +29,6 @@
 using namespace std;
 
 void Evolver_gpu::initialize_impl(){
-	m_framecount = 0;
 	// resize the vectors
 	m_runner.resize(NUM_INSTANCES);
 	m_bullets.resize(NUM_INSTANCES);

@@ -16,6 +16,7 @@ Boston, MA 02110-1301, USA.
 
 #ifndef IEVOLVER_H
 #define IEVOLVER_H
+#include <iostream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -40,6 +41,13 @@ public:
 					const std::string& simdb){
 		static_cast<Derived*>(this)->initialize_impl();
 		m_ds = new DataStore(aidb, simdb);
+		
+		if(!m_ds->is_ok()){
+			std::cerr << "FAILED TO OPEN DB" << std::endl;
+		}
+		
+		m_framecount = 0;
+		m_gen_count = 0;
 	}
 	
 	/*!
@@ -87,6 +95,17 @@ public:
 	*/
 	void save_genes(const std::string& fname){
 		//static_cast<Derived*>(this)->save_best_gene_impl(fname);
+		
+		for(u32 i = 0; i < NUM_INSTANCES; ++i){
+			ai_key aik;
+			aik.generation = m_gen_count;
+			aik.id = i;
+			
+			m_ds->save_gene_data(aik, m_ai[i]);
+		}
+		
+		m_framecount = 0;
+		m_gen_count = 0;
 	}
 	
 	/*!
@@ -94,6 +113,7 @@ public:
 	*/
 	void prepare_game_state(){
 		static_cast<Derived*>(this)->prepare_game_state_impl();
+		++m_gen_count;
 	}
 	
 	/*!
@@ -122,6 +142,9 @@ protected:
 private:
 	// for data storage
 	DataStore* m_ds;
+	
+	// generation count
+	u32 m_gen_count;
 };
 
 template<typename T>

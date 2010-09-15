@@ -44,7 +44,6 @@ void frame_updater::operator()(){
 }
 
 void Evolver_cpu::initialize_impl(){
-	m_framecount = 0;
 	// resize the vectors
 	m_runner.resize(NUM_INSTANCES);
 	m_bullets.resize(NUM_INSTANCES);

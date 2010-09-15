@@ -32,7 +32,7 @@ using namespace std;
 
 template<typename T>
 void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
-	evl.initialize("genes.db", "simulation.db");
+	evl.initialize("genes.kch", "simulation.kch");
 
 	u32 num_generations = 0;
 	f32 highest_score = 0.0f;

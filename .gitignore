@@ -10,3 +10,4 @@ Doxyfile~
 .com.apple.*
 *.orig
 report.dat
+*.kch
