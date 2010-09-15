@@ -33,9 +33,11 @@ public:
 	}
 
 	bool save_gene_data(const ai_key& key,
+						u32 score,
 						const AI::AI_Core& aic);
 
 	bool get_gene_data(const ai_key& key,
+					   u32& score,
 					   AI::AI_Core& aic);
 
 	const char* get_ai_error() const;

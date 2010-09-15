@@ -73,7 +73,9 @@ int GameDisplay::main(){
 	CL_SetupGL setup_gl;
 	
 	try{
-		CL_DisplayWindow window("Simulation View", 800, 600);
+		u32 score;
+		CL_StringFormat fmt("GV ID: %1 GEN: %2 SCORE: %3");
+		CL_DisplayWindow window("GENE VIEWER", 800, 600);
 		
 		CL_GraphicContext& gc = window.get_gc();
 		CL_InputDevice& keyboard = window.get_ic().get_keyboard();
@@ -83,7 +85,11 @@ int GameDisplay::main(){
 		GSGeneView* gv = new GSGeneView(gc, resources);
 		s_scene_stack.push(gv);
 
-		g_db->get_gene_data(g_aik, gv->get_ai());
+		g_db->get_gene_data(g_aik, score, gv->get_ai());
+		fmt.set_arg(1, g_aik.id);
+		fmt.set_arg(2, g_aik.generation);
+		fmt.set_arg(3, score);
+		window.set_title(fmt.get_result());
 		
 		while(!keyboard.get_keycode(CL_KEY_ESCAPE) && s_running){
 			// restart the frame timer

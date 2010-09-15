@@ -34,9 +34,11 @@ DataStore::~DataStore(){
 }
 
 bool DataStore::save_gene_data(const ai_key& key,
+							   u32 score,
 							   const AI::AI_Core& aic){
 	bool result = true;
 	ai_data aid;
+	aid.score = score;
 
 	// copy the gene from aic to aid
 	for(u32 i = 0; i < MAX_GENE_DATA; ++i){
@@ -53,6 +55,7 @@ bool DataStore::save_gene_data(const ai_key& key,
 }
 
 bool DataStore::get_gene_data(const ai_key& key,
+							  u32& score,
 							  AI::AI_Core& aic){
 	bool result = true;
 	ai_data aid;
@@ -67,6 +70,7 @@ bool DataStore::get_gene_data(const ai_key& key,
 			aid.gene_heading[i][j] = aid.gene_heading[i][j];
 		}
 	}
+	score = aid.score;
 	
 	return result;
 }

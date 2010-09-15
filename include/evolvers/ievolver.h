@@ -31,6 +31,8 @@ Boston, MA 02110-1301, USA.
 // 15% mutation rate
 #define MUTATION_RATE	15
 
+//#define SAVE_SIM_DATA
+
 template<typename Derived>
 class iEvolver{
 public:
@@ -39,7 +41,10 @@ public:
 	*/
 	void initialize(const std::string& aidb,
 					const std::string& simdb){
+		#ifdef SAVE_SIM_DATA
 		m_simd_temp = new sim_data;
+		#endif
+		
 		static_cast<Derived*>(this)->initialize_impl();
 		m_ds = new DataStore(aidb, simdb);
 		
@@ -57,7 +62,10 @@ public:
 	void cleanup(){
 		static_cast<Derived*>(this)->cleanup_impl();
 		delete m_ds;
+		
+		#ifdef SAVE_SIM_DATA
 		delete m_simd_temp;
+		#endif
 		m_ds = NULL;
 	}
 	
@@ -69,6 +77,7 @@ public:
 	void frame_step(float dt){
 		static_cast<Derived*>(this)->frame_step_impl(dt);
 
+		#ifdef SAVE_SIM_DATA
 		// save the current frame data
 		for(u32 i = 0; i < NUM_INSTANCES; ++i){
 			sim_key sk;
@@ -79,6 +88,7 @@ public:
 			m_simd_temp->bodies[m_framecount] = m_runner[i].bodies;
 			m_ds->save_sim_data(sk, *m_simd_temp);
 		}
+		#endif
 		
 		++m_framecount;
 	}
@@ -115,7 +125,8 @@ public:
 			aik.generation = m_gen_count;
 			aik.id = i;
 			
-			m_ds->save_gene_data(aik, m_ai[m_scoredata[i].first]);
+			m_ds->save_gene_data(aik, m_scoredata[i].second,
+								 m_ai[m_scoredata[i].first]);
 		}
 		
 		m_framecount = 0;
@@ -128,6 +139,7 @@ public:
 		static_cast<Derived*>(this)->prepare_game_state_impl();
 		++m_gen_count;
 
+		#ifdef SAVE_SIM_DATA
 		// we're going to save the prepared game state's start
 		for(u32 i = 0; i < NUM_INSTANCES; ++i){
 			sim_key sk;
@@ -138,6 +150,7 @@ public:
 			m_simd_temp->tc = m_tanks[i];
 			m_ds->save_sim_data(sk, *m_simd_temp);
 		}
+		#endif
 	}
 	
 	/*!
