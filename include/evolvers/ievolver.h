@@ -105,7 +105,6 @@ public:
 		}
 		
 		m_framecount = 0;
-		m_gen_count = 0;
 	}
 	
 	/*!
