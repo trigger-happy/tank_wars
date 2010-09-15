@@ -40,6 +40,12 @@ public:
 
 	const char* get_ai_error() const;
 
+	bool save_sim_data(const sim_key& sk,
+					   const sim_data& sd);
+
+	bool get_sim_data(const sim_key& sk,
+					  sim_data& sd);
+
 	const char* get_sim_error() const;
 	
 private:

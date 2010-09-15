@@ -70,7 +70,7 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 		evl.evolve_ga();
 		
 		// save the data
-		evl.save_genes(fname);
+		evl.save_data(fname);
 	}
 	
 	// summary of the evolution process

@@ -24,7 +24,7 @@ Boston, MA 02110-1301, USA.
 #include "game_core/tank_ai.h"
 #include "data_store/data_store.h"
 
-#define NUM_INSTANCES 1024
+#define NUM_INSTANCES 128
 
 // top 5% will be elite
 #define ELITE_COUNT		(NUM_INSTANCES*0.05f)
@@ -39,6 +39,7 @@ public:
 	*/
 	void initialize(const std::string& aidb,
 					const std::string& simdb){
+		m_simd_temp = new sim_data;
 		static_cast<Derived*>(this)->initialize_impl();
 		m_ds = new DataStore(aidb, simdb);
 		
@@ -56,6 +57,7 @@ public:
 	void cleanup(){
 		static_cast<Derived*>(this)->cleanup_impl();
 		delete m_ds;
+		delete m_simd_temp;
 		m_ds = NULL;
 	}
 	
@@ -66,6 +68,18 @@ public:
 	*/
 	void frame_step(float dt){
 		static_cast<Derived*>(this)->frame_step_impl(dt);
+
+		// save the current frame data
+		for(u32 i = 0; i < NUM_INSTANCES; ++i){
+			sim_key sk;
+			sk.id = i;
+			sk.generation = m_gen_count;
+			m_ds->get_sim_data(sk, *m_simd_temp);
+
+			m_simd_temp->bodies[m_framecount] = m_runner[i].bodies;
+			m_ds->save_sim_data(sk, *m_simd_temp);
+		}
+		
 		++m_framecount;
 	}
 	
@@ -91,9 +105,9 @@ public:
 	}
 	
 	/*!
-	Save the genes of all individuals in the current generation
+	Save all the gathered data so far
 	*/
-	void save_genes(const std::string& fname){
+	void save_data(const std::string& fname){
 		//static_cast<Derived*>(this)->save_best_gene_impl(fname);
 		
 		for(u32 i = 0; i < NUM_INSTANCES; ++i){
@@ -113,6 +127,17 @@ public:
 	void prepare_game_state(){
 		static_cast<Derived*>(this)->prepare_game_state_impl();
 		++m_gen_count;
+
+		// we're going to save the prepared game state's start
+		for(u32 i = 0; i < NUM_INSTANCES; ++i){
+			sim_key sk;
+			sk.id = i;
+			sk.generation = m_gen_count;
+
+			m_simd_temp->bc = m_bullets[i];
+			m_simd_temp->tc = m_tanks[i];
+			m_ds->save_sim_data(sk, *m_simd_temp);
+		}
 	}
 	
 	/*!
@@ -147,6 +172,9 @@ private:
 	
 	// generation count
 	u32 m_gen_count;
+	
+	// for saving the replays
+	sim_data* m_simd_temp;
 };
 
 template<typename T>

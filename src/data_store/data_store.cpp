@@ -78,3 +78,19 @@ const char* DataStore::get_ai_error() const{
 const char* DataStore::get_sim_error() const{
 	return m_simdb->error().name();
 }
+
+bool DataStore::save_sim_data(const sim_key& sk,
+							  const sim_data& sd){
+	bool result = true;
+	result = m_simdb->set(reinterpret_cast<const char*>(&sk), sizeof(sim_key),
+						  reinterpret_cast<const char*>(&sd), sizeof(sim_data));
+	return result;
+}
+
+bool DataStore::get_sim_data(const sim_key& sk,
+							 sim_data& sd){
+	bool result = true;
+	result = m_simdb->get(reinterpret_cast<const char*>(&sk), sizeof(sim_key),
+						  reinterpret_cast<char*>(&sd), sizeof(sim_data));
+	return result;
+}
