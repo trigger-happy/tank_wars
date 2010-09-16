@@ -200,8 +200,8 @@ void Evolver_cpu::prepare_game_state_impl(){
 	fill(m_score.begin(), m_score.end(), 0);
 
 	// setup the stuff on the current buffer
-	Physics::vec2 params;
 	for(int i = 0; i < NUM_INSTANCES; ++i){
+		Physics::vec2 params;
 		params.x = -25;
 		tank_id evading_tank = BasicTank::spawn_tank(&m_tanks[i],
 													 params,
