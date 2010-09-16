@@ -29,13 +29,13 @@ Boston, MA 02110-1301, USA.
 #ifdef SAVE_SIM_DATA
 #define NUM_INSTANCES 16
 #else
-#define NUM_INSTANCES 1024
+#define NUM_INSTANCES 2048
 #endif
 
 // top 5% will be elite
 #define ELITE_COUNT		(NUM_INSTANCES*0.05f)
 // 15% mutation rate
-#define MUTATION_RATE	15
+#define MUTATION_RATE	50
 
 template<typename Derived>
 class iEvolver{
