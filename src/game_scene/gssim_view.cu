@@ -67,10 +67,18 @@ m_simd(sd){
 	BasicTank::initialize(&m_tanks, m_physrunner.get(), &m_bullets);
 	AI::initialize(&m_ai, &m_tanks, &m_bullets);
 
+	m_playertank = 0;
+	m_player2tank = 1;
+	m_player3tank = 2;
+
 	// get the simulation data
 	m_tanks = m_simd.tc;
 	m_bullets = m_simd.bc;
 	m_physrunner->bodies = m_simd.bodies[0];
+
+	// reset the pointers
+	BasicTank::reset_pointers(&m_tanks, m_physrunner.get(), &m_bullets);
+	TankBullet::reset_phys_pointer(&m_bullets, m_physrunner.get());
 
 	/*
 	// stuff for cuda
@@ -151,9 +159,9 @@ void GSSimView::onFrameRender(CL_GraphicContext* gc){
 	for(int i = 0; i < 3; ++i){
 		pos = TankBullet::get_bullet_pos(&m_bullets, i);
 		apply_transform(gc, pos);
-		if(m_bullets.state[i] != BULLET_STATE_INACTIVE){
+// 		if(m_bullets.state[i] != BULLET_STATE_INACTIVE){
 			m_testbullet->draw(*gc, pos.x, pos.y);
-		}
+// 		}
 	}
 	
 	// draw the tanks
@@ -282,7 +290,9 @@ void GSSimView::onFrameUpdate(double dt,
 	m_background->update();
 	m_testbullet->update();
 	m_testtank->update();
-	if(m_tanks.state[0] != TANK_STATE_INACTIVE){
+// 	if(m_tanks.state[0] != TANK_STATE_INACTIVE){
+	Physics::vec2 pos = BasicTank::get_tank_pos(&m_tanks, m_playertank);
+	if(pos.x != OFFSCREEN_X && pos.y != OFFSCREEN_Y){
 		++m_frames_elapsed;
 	}
 }
