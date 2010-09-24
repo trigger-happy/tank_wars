@@ -77,6 +77,13 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 		if(highest_score/MAX_FRAMESTEPS >= 0.999f){
 			// close to 1.0f
 			num_generations = i+1;
+			
+			// perform the genetic algorithm
+			evl.evolve_ga();
+			
+			// save the data
+			evl.save_data(fname);
+			
 			break;
 		}
 		
