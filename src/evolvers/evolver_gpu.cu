@@ -287,12 +287,16 @@ bool Evolver_gpu::is_game_over_impl(){
 		all_dead &= (m_tanks[i].state[0] == TANK_STATE_INACTIVE);
 	}
 	if(all_dead){
-		for(int i = 0; i < NUM_INSTANCES; ++i){
-			m_population_score[i] = m_score[i];
-			m_score[i] = 0;
-		}
+		finalize_impl();
 	}
 	return all_dead;
+}
+
+void Evolver_gpu::finalize_impl(){
+	for(int i = 0; i < NUM_INSTANCES; ++i){
+		m_population_score[i] = m_score[i];
+		m_score[i] = 0;
+	}
 }
 
 void Evolver_gpu::copy_to_device(){

@@ -235,12 +235,16 @@ bool Evolver_cpu::is_game_over_impl(){
 			all_dead &= (m_tanks[i].state[0] == TANK_STATE_INACTIVE);
 		}
 		if(all_dead){
-			for(int i = 0; i < NUM_INSTANCES; ++i){
-				m_population_score[i] = m_score[i];
-			}
+			finalize_impl();
 		}
 		return all_dead;
 	}else{
 		return false;
+	}
+}
+
+void Evolver_cpu::finalize_impl(){
+	for(int i = 0; i < NUM_INSTANCES; ++i){
+		m_population_score[i] = m_score[i];
 	}
 }

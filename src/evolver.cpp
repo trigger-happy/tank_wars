@@ -47,8 +47,11 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 		cout << "Running generation " << i << endl;
 		// setup the initial game state
 		evl.prepare_game_state();
+
+		// declare it outside so we can do a check later
+		int j = 0;
 		
-		for(int j = 0; j < MAX_FRAMESTEPS; ++j){
+		for(j = 0; j < MAX_FRAMESTEPS; ++j){
 			// perform a frame step
 			evl.frame_step(TIME_STEP);
 			
@@ -58,6 +61,11 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 			if(evl.is_game_over()){
 				break;
 			}
+		}
+
+		if(j >= MAX_FRAMESTEPS){
+			// we exceeded the max frames, perform a finalize
+			evl.finalize();
 		}
 		
 		// get the score of the best individual

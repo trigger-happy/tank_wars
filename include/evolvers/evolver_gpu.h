@@ -39,6 +39,7 @@ private:
 	void save_best_gene_impl(const std::string& fname);
 	void prepare_game_state_impl();
 	bool is_game_over_impl();
+	void finalize_impl();
 	
 private:
 	// internal functions
