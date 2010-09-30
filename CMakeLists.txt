@@ -9,12 +9,14 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 	set(BOOST_LIBRARYDIR /usr/local/lib)
 	set(BOOST_INCLUDEDIR /usr/local/include)
+	set(BUILD_EVOLVER TRUE)
 	FIND_PACKAGE(X11 REQUIRED)
 	list(APPEND LINK_LIBS ${LINK_LIBS} fontconfig)
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	set(CMAKE_LIBRARY_PATH "C:\\Boost\\lib")
 	set(CMAKE_INCLUDE_PATH "C:\\Boost\\include")
 	set(CMAKE_FIND_LIBRARY_PREFIXES "lib" "")
+	set(BUILD_EVOLVER FALSE)
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMakeModules)
@@ -60,7 +62,6 @@ link_directories(${Boost_LIBRARY_DIRS})
 
 #uncomment clanlib later
 list(APPEND LINK_LIBS ${LINK_LIBS}
-			kyotocabinet
 			${CMAKE_THREAD_LIBS_INIT}
 			${OPENGL_LIBRARIES}
 			${Boost_LIBRARIES}
@@ -70,6 +71,11 @@ list(APPEND LINK_LIBS ${LINK_LIBS}
 			${JPEG_LIBRARIES}
 			${FREETYPE_LIBRARIES}
 			${X11_LIBRARIES})
+
+if(${BUILD_EVOLVER} MATCHES TRUE)
+	list(APPEND LINK_LIBS ${LINK_LIBS}
+			kyotocabinet)
+endif(${BUILD_EVOLVER} MATCHES TRUE)
 
 link_libraries(${LINK_LIBS})
 
