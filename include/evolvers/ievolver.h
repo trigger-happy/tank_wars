@@ -165,6 +165,13 @@ public:
 		return static_cast<Derived*>(this)->is_game_over_impl();
 	}
 
+	/*!
+	Perform stuff that should be done after the fitness checking
+	*/
+	void finalize(){
+		static_cast<Derived*>(this)->finalize_impl();
+	}
+
 protected:
 	// CPU stuff
 	std::vector<Physics::PhysRunner::RunnerCore> m_runner;
