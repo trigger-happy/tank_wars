@@ -18,6 +18,7 @@
 */
 #include <fstream>
 #include <cuda.h>
+#include <ClanLib/Core/XML/dom_element.h>
 #include "game_display.h"
 #include "game_scene/gsgame.h"
 #include "../game_core/twgame.cu"
@@ -38,8 +39,33 @@ void apply_transform(CL_GraphicContext* gc, Physics::vec2& c){
 	c.y += gc->get_height()/2;
 }
 
+void GSGame::load_shaders(CL_GraphicContext& gc, CL_ResourceManager& res){
+	CL_String vfile = "resources/";
+	CL_String ffile = "resources/";
+	
+	CL_Resource shader_resource = res.get_resource("shaders/vertex");
+	vfile += shader_resource.get_element().get_attribute("file");
+	shader_resource = res.get_resource("shaders/fragment");
+	ffile += shader_resource.get_element().get_attribute("file");
+	
+	m_shader = CL_ProgramObject::load(gc, vfile, ffile);
+	m_shader.bind_attribute_location(0, "Position");
+	m_shader.bind_attribute_location(1, "Color0");
+	m_shader.bind_attribute_location(2, "TexCoord0");
+	if(!m_shader.link()){
+		throw CL_Exception("Shader Link Fail"+m_shader.get_info_log());
+	}
+}
+
 GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
-: m_physrunner(new Physics::PhysRunner::RunnerCore()){
+: m_physrunner(new Physics::PhysRunner::RunnerCore()), m_offscreen_buffer(gc),
+m_offscreen_texture(gc, gc.get_width(), gc.get_height()){
+	
+	m_offscreen_texture.set_min_filter(cl_filter_nearest);
+	m_offscreen_texture.set_mag_filter(cl_filter_nearest);
+	m_offscreen_buffer.attach_color_buffer(0, m_offscreen_texture);
+	
+	load_shaders(gc, resources);
 	
 	// setup the debug text
 	CL_FontDescription desc;
@@ -77,23 +103,9 @@ GSGame::GSGame(CL_GraphicContext& gc, CL_ResourceManager& resources)
 	m_player3tank = BasicTank::spawn_tank(&m_tanks, params, 180, 1);
 	m_player_input = 0;
 	m_player2_input = 0;
-	AI::add_tank(&m_ai, m_playertank, AI_TYPE_EVADER);
+	//AI::add_tank(&m_ai, m_playertank, AI_TYPE_EVADER);
 	AI::add_tank(&m_ai, m_player2tank, AI_TYPE_ATTACKER);
 	AI::add_tank(&m_ai, m_player3tank, AI_TYPE_ATTACKER);
-
-	// load a saved gene for viewing
-	if(GameDisplay::s_view_gene){
-		std::ifstream fin("report.dat");
-		AI::AI_Core::gene_type tempval;
-		for(int i = 0; i < MAX_GENE_DATA; ++i){
-			fin.read((char*)&tempval, sizeof(tempval));
-			m_ai.gene_accel[i][0] = tempval;
-		}
-		for(int i = 0; i < MAX_GENE_DATA; ++i){
-			fin.read((char*)&tempval, sizeof(tempval));
-			m_ai.gene_heading[i][0] = tempval;
-		}
-	}
 	
 	// stuff for cuda
 	if(GameDisplay::s_usecuda){
@@ -152,6 +164,8 @@ void GSGame::onSceneActivate(){
 using namespace std;
 
 void GSGame::onFrameRender(CL_GraphicContext* gc){
+	gc->set_frame_buffer(m_offscreen_buffer);
+	
 	if(GameDisplay::s_usecuda){
 		// re-assign the pointer to the CPU version
 		BasicTank::reset_pointers(&m_tanks, m_physrunner.get(), &m_bullets);
@@ -210,8 +224,49 @@ void GSGame::onFrameRender(CL_GraphicContext* gc){
 	fmt.set_arg(7, m_frames_elapsed);
 	m_dbgmsg = fmt.get_result();
 	m_debugfont->draw_text(*gc, 1, 12, m_dbgmsg, CL_Colorf::red);
+	
+	gc->reset_frame_buffer();
+	gc->set_texture(0, m_offscreen_texture);
+	gc->set_program_object(m_shader, cl_program_matrix_modelview_projection);
+	m_shader.set_uniform1i("SourceTexture", 1);
+	m_shader.set_uniform1f("Amount", 0.25f);
+	m_shader.set_uniform1f("Timer", m_timer.elapsed());
+	draw_texture(*gc, CL_Rect(0, 0, gc->get_width(), gc->get_height()));
+	gc->reset_program_object();
+	gc->reset_texture(0);
 }
 
+// This function was taken from the ClanLib post-processing example
+void GSGame::draw_texture(CL_GraphicContext &gc,
+						  const CL_Rectf &rect,
+						  const CL_Colorf &color,
+						  const CL_Rectf &texture_unit1_coords){
+	CL_Vec2f positions[6] =
+	{
+		CL_Vec2f(rect.left, rect.top),
+				 CL_Vec2f(rect.right, rect.top),
+				 CL_Vec2f(rect.left, rect.bottom),
+				 CL_Vec2f(rect.right, rect.top),
+				 CL_Vec2f(rect.left, rect.bottom),
+				 CL_Vec2f(rect.right, rect.bottom)
+	};
+	
+	CL_Vec2f tex1_coords[6] =
+	{
+		CL_Vec2f(texture_unit1_coords.left, texture_unit1_coords.top),
+				 CL_Vec2f(texture_unit1_coords.right, texture_unit1_coords.top),
+				 CL_Vec2f(texture_unit1_coords.left, texture_unit1_coords.bottom),
+				 CL_Vec2f(texture_unit1_coords.right, texture_unit1_coords.top),
+				 CL_Vec2f(texture_unit1_coords.left, texture_unit1_coords.bottom),
+				 CL_Vec2f(texture_unit1_coords.right, texture_unit1_coords.bottom)
+	};
+	
+	CL_PrimitivesArray prim_array(gc);
+	prim_array.set_attributes(0, positions);
+	prim_array.set_attribute(1, color);
+	prim_array.set_attributes(2, tex1_coords);
+	gc.draw_primitives(cl_triangles, 6, prim_array);
+}
 
 // #if __CUDA_ARCH__
 __global__ void gsgame_step(f32 dt,

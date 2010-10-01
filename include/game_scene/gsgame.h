@@ -62,6 +62,11 @@ public:
 							   CL_InputDevice* keyboard,
 							   CL_InputDevice* mouse);
 private:
+	void load_shaders(CL_GraphicContext& gc, CL_ResourceManager& res);
+	void draw_texture(CL_GraphicContext& gc, const CL_Rectf &rect,
+					  const CL_Colorf &color = CL_Colorf::white,
+					  const CL_Rectf &texture_unit1_coords = CL_Rectf(0.0f,0.0f,1.0f,1.0f));
+	
 	boost::scoped_ptr<Physics::PhysRunner::RunnerCore> m_physrunner;
 	boost::scoped_ptr<CL_Sprite> m_background;
 	boost::scoped_ptr<CL_Sprite> m_testbullet;
@@ -69,6 +74,9 @@ private:
 	boost::scoped_ptr<CL_Sprite> m_testtank2;
 	boost::scoped_ptr<CL_Font_System> m_debugfont;
 	CL_String m_dbgmsg;
+	CL_ProgramObject m_shader;
+	CL_FrameBuffer m_offscreen_buffer;
+	CL_Texture m_offscreen_texture;
 	
 	
 	TankBullet::BulletCollection m_bullets;

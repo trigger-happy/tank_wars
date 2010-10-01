@@ -65,4 +65,9 @@
 			<translation origin="center" />
 		</sprite>
 	</section>
+	
+	<section name="shaders">
+		<shader name="fragment" file="shaders/fragment.glsl" />
+		<shader name="vertex" file="shaders/vertex.glsl" />
+	</section>
 </resources>
