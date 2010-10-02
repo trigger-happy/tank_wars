@@ -69,5 +69,6 @@
 	<section name="shaders">
 		<shader name="fragment" file="shaders/fragment.glsl" />
 		<shader name="vertex" file="shaders/vertex.glsl" />
+		<shader name="bloom" file="shaders/bloom.glsl" />
 	</section>
 </resources>
