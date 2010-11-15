@@ -212,7 +212,7 @@ void GSGame::onFrameRender(CL_GraphicContext* gc){
 	}
 	
 	// Debug info
-	CL_StringFormat fmt("States: %1 %2 %3 %4 | Player pos: %5 %6 | Time elapsed: %7");
+	CL_StringFormat fmt("States: %1 %2 %3 %4 | Player: %5 %6 %7 | Time elapsed: %8");
 	fmt.set_arg(1, m_ai.bullet_vector[0]);
 	fmt.set_arg(2, m_ai.tank_vector[0]);
 	fmt.set_arg(3, m_ai.direction_state[0]);
@@ -221,7 +221,8 @@ void GSGame::onFrameRender(CL_GraphicContext* gc){
 														 m_tanks.phys_id[m_playertank]);
 	fmt.set_arg(5, pos.x);
 	fmt.set_arg(6, pos.y);
-	fmt.set_arg(7, m_frames_elapsed);
+	fmt.set_arg(7, BasicTank::get_tank_rot(&m_tanks, m_playertank));
+	fmt.set_arg(8, m_frames_elapsed);
 	m_dbgmsg = fmt.get_result();
 	m_debugfont->draw_text(*gc, 1, 12, m_dbgmsg, CL_Colorf::red);
 	
