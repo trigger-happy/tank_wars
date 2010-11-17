@@ -16,11 +16,18 @@
 #include <limits>
 #include <cstring>
 #include <ctime>
+#include <iostream>
 #include "exports.h"
 #include "game_core/tank_ai.h"
 
 #define SHORT_MAX 32767
 #define DISTANCE_DEFAULT SHORT_MAX
+
+#if !defined(__CUDA_ARCH__)
+static int g_frame_count = 0;
+#endif
+
+using namespace std;
 
 bullet_id AI::get_nearest_bullet(AI::AI_Core* aic,
 								 tank_id tid){
@@ -171,6 +178,10 @@ void AI::initialize(AI::AI_Core* aic,
 }
 
 void AI::timestep(AI::AI_Core* aic, f32 dt){
+	#if !defined(__CUDA_ARCH__)
+	++g_frame_count;
+	#endif
+	
 	int idx = 0;
 	#if __CUDA_ARCH__
 	idx = threadIdx.x;
@@ -204,7 +215,7 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 				// perform AI actions
 				if(aic->ai_type[idx] == AI_TYPE_EVADER){
 						// check how many frames has passed
-					if(aic->frame_count == FRAMES_PER_UPDATE){
+					if(aic->frame_count >= FRAMES_PER_UPDATE){
 						s32 index = aic->bullet_vector[idx] * aic->tank_vector[idx] *
 						aic->direction_state[idx] * aic->distance_state[idx];
 						if(index > 0){
@@ -230,6 +241,25 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 							}else if(aic->gene_heading[index][idx] > cur_rot){
 								BasicTank::turn_right(aic->tc, my_tank);
 							}
+
+							// dump the data for debugging
+							#if !defined(__CUDA_ARCH__)
+							bullet_id near_bul = AI::get_nearest_bullet(aic, my_tank);
+							Physics::vec2 mypos = BasicTank::get_tank_pos(aic->tc, my_tank);
+							Physics::vec2 bpos = TankBullet::get_bullet_pos(aic->bc, near_bul);
+							cout << g_frame_count << " "
+									<< aic->bullet_vector[idx] << " "
+									<< aic->tank_vector[idx] << " "
+									<< aic->direction_state[idx] << " "
+									<< aic->distance_state[idx] << " | "
+									<< mypos.x << " "
+									<< mypos.y << " "
+									<< BasicTank::get_tank_rot(aic->tc, my_tank) << " | "
+									<< bpos.x << " "
+									<< bpos.y << " "
+									<< Physics::PhysRunner::get_rotation(aic->bc->parent_runner, aic->bc->phys_id[near_bul])
+									<< endl;
+							#endif
 						}else{
 							BasicTank::stop(aic->tc, my_tank);
 						}
