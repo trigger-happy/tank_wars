@@ -218,29 +218,13 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 					if(aic->frame_count >= FRAMES_PER_UPDATE){
 						s32 index = aic->bullet_vector[idx] * aic->tank_vector[idx] *
 						aic->direction_state[idx] * aic->distance_state[idx];
+
+						// get the desired heading
+						aic->desired_heading[idx] = aic->gene_heading[index][idx];
+						aic->desired_thrust[idx] = aic->gene_accel[index][idx];
+						
 						if(index > 0){
 							// valid index, access the action from the array
-							switch(aic->gene_accel[index][idx]){
-								case 0:
-									BasicTank::stop(aic->tc, my_tank);
-									break;
-								case 1:
-									BasicTank::move_forward(aic->tc, my_tank);
-									break;
-								case 2:
-									BasicTank::move_backward(aic->tc, my_tank);
-									break;
-							}
-							// let's try to get to the right heading
-							f32 cur_rot = Physics::PhysRunner::get_rotation(aic->tc->parent_runner,
-																			aic->tc->phys_id[my_tank]);
-																			cur_rot = util::clamp_dir_360(cur_rot);
-																			cur_rot = AI::get_vector(cur_rot);
-							if(aic->gene_heading[index][idx] < cur_rot){
-								BasicTank::turn_left(aic->tc, my_tank);
-							}else if(aic->gene_heading[index][idx] > cur_rot){
-								BasicTank::turn_right(aic->tc, my_tank);
-							}
 
 							// dump the data for debugging
 							#ifdef AI_PRINT_DBG
@@ -266,6 +250,30 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 							BasicTank::stop(aic->tc, my_tank);
 						}
 						//TODO: state machine here in the future?
+					}
+					// perform the needed turn
+					
+					// let's try to get to the right heading
+					switch(aic->desired_thrust[idx]){
+						case 0:
+							BasicTank::stop(aic->tc, my_tank);
+							break;
+						case 1:
+							BasicTank::move_forward(aic->tc, my_tank);
+							break;
+						case 2:
+							BasicTank::move_backward(aic->tc, my_tank);
+							break;
+					}
+					
+					f32 cur_rot = Physics::PhysRunner::get_rotation(aic->tc->parent_runner,
+																	aic->tc->phys_id[my_tank]);
+					cur_rot = util::clamp_dir_360(cur_rot);
+					cur_rot = AI::get_vector(cur_rot);
+					if(aic->desired_heading[idx] < cur_rot){
+						BasicTank::turn_left(aic->tc, my_tank);
+					}else if(aic->desired_heading[idx] > cur_rot){
+						BasicTank::turn_right(aic->tc, my_tank);
 					}
 				}else if(aic->ai_type[idx] == AI_TYPE_ATTACKER){
 					// get the nearest target to shoot at
