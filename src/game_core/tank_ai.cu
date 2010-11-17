@@ -178,10 +178,6 @@ void AI::initialize(AI::AI_Core* aic,
 }
 
 void AI::timestep(AI::AI_Core* aic, f32 dt){
-	#if !defined(__CUDA_ARCH__)
-	++g_frame_count;
-	#endif
-	
 	int idx = 0;
 	#if __CUDA_ARCH__
 	idx = threadIdx.x;
@@ -292,7 +288,31 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 				}
 			}
 		}
+		#if !defined(__CUDA_ARCH__)
+		if(g_frame_count == 0){
+			// output the initial state
+			tank_id my_tank = aic->controlled_tanks[idx];
+			bullet_id near_bul = AI::get_nearest_bullet(aic, my_tank);
+			Physics::vec2 mypos = BasicTank::get_tank_pos(aic->tc, my_tank);
+			Physics::vec2 bpos = TankBullet::get_bullet_pos(aic->bc, near_bul);
+			cout << g_frame_count << " "
+					<< aic->bullet_vector[idx] << " "
+					<< aic->tank_vector[idx] << " "
+					<< aic->direction_state[idx] << " "
+					<< aic->distance_state[idx] << " | "
+					<< mypos.x << " "
+					<< mypos.y << " "
+					<< BasicTank::get_tank_rot(aic->tc, my_tank) << " | "
+					<< bpos.x << " "
+					<< bpos.y << " "
+					<< Physics::PhysRunner::get_rotation(aic->bc->parent_runner, aic->bc->phys_id[near_bul])
+					<< endl;
+		}
+		#endif
 	}
+	#if !defined(__CUDA_ARCH__)
+	++g_frame_count;
+	#endif
 }
 
 void AI::add_tank( AI::AI_Core* aic, tank_id tid, s32 ait){
