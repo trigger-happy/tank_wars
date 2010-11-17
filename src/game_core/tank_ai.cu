@@ -23,8 +23,12 @@
 #define SHORT_MAX 32767
 #define DISTANCE_DEFAULT SHORT_MAX
 
+// #define AI_PRINT_DBG
+
+#ifdef AI_PRINT_DBG
 #if !defined(__CUDA_ARCH__)
 static int g_frame_count = 0;
+#endif
 #endif
 
 using namespace std;
@@ -239,6 +243,7 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 							}
 
 							// dump the data for debugging
+							#ifdef AI_PRINT_DBG
 							#if !defined(__CUDA_ARCH__)
 							bullet_id near_bul = AI::get_nearest_bullet(aic, my_tank);
 							Physics::vec2 mypos = BasicTank::get_tank_pos(aic->tc, my_tank);
@@ -255,6 +260,7 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 									<< bpos.y << " "
 									<< Physics::PhysRunner::get_rotation(aic->bc->parent_runner, aic->bc->phys_id[near_bul])
 									<< endl;
+							#endif
 							#endif
 						}else{
 							BasicTank::stop(aic->tc, my_tank);
@@ -288,6 +294,7 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 				}
 			}
 		}
+		#ifdef AI_PRINT_DBG
 		#if !defined(__CUDA_ARCH__)
 		if(g_frame_count == 0){
 			// output the initial state
@@ -309,9 +316,12 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 					<< endl;
 		}
 		#endif
+		#endif
 	}
+	#ifdef AI_PRINT_DBG
 	#if !defined(__CUDA_ARCH__)
 	++g_frame_count;
+	#endif
 	#endif
 }
 
