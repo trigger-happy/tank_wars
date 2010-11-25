@@ -40,7 +40,7 @@ bool Collision::bullet_tank_check(TankBullet::BulletCollection* bc,
 			Physics::pBody tank_pid = tc->phys_id[tid];
 			//TODO: change this to quad based check in the future
 			f32 tank_radius = rc->bodies.dimension.x[tank_pid];
-			Physics::vec2 tankpos, bulletpos;
+			Physics::vec2<s32> tankpos, bulletpos;
 			tankpos = Physics::PhysRunner::get_cur_pos(rc, tank_pid);
 			bulletpos = Physics::PhysRunner::get_cur_pos(rc, bullet_pid);
 			f32 xdiff = fabsf(tankpos.x - bulletpos.x);
@@ -83,7 +83,7 @@ bool Collision::tank_tank_check(BasicTank::TankCollection* tc,
 		f32 t2_radius = rc->bodies.dimension.x[tank2_pid];
 		//TODO: change this to quad based check in the future
 		f32 tank_radius = rc->bodies.dimension.x[tank_pid];
-		Physics::vec2 tank1pos, tank2pos;
+		Physics::vec2<s32> tank1pos, tank2pos;
 		tank1pos = Physics::PhysRunner::get_cur_pos(rc, tank_pid);
 		tank2pos = Physics::PhysRunner::get_cur_pos(rc, tank2_pid);
 		f32 xdiff = fabsf(tank1pos.x - tank2pos.x);

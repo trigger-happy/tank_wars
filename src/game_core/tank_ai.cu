@@ -242,12 +242,12 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 					if(target != INVALID_ID){
 						
 						// get the positions
-						Physics::vec2 target_pos = BasicTank::get_tank_pos(aic->tc, target);
-						Physics::vec2 my_pos = BasicTank::get_tank_pos(aic->tc, tid);
+						Physics::vec2<s32> target_pos = BasicTank::get_tank_pos(aic->tc, target);
+						Physics::vec2<s32> my_pos = BasicTank::get_tank_pos(aic->tc, tid);
 						target_pos -= my_pos;
 
 						// get the necessary rotation
-						f32 dir = atan2(target_pos.x, target_pos.y);
+						f32 dir = atan2(static_cast<f32>(target_pos.x), static_cast<f32>(target_pos.y));
 						dir = util::rads_to_degs(dir);
 						dir = util::clamp_dir_360(dir);
 
@@ -310,9 +310,9 @@ void AI::update_perceptions(AI::AI_Core* aic,
 
 				// set the direction state
 				Physics::PhysRunner::RunnerCore* rc = aic->tc->parent_runner;
-				Physics::vec2 pos = Physics::PhysRunner::get_cur_pos(rc,
+				Physics::vec2<s32> pos = Physics::PhysRunner::get_cur_pos(rc,
 																	aic->tc->phys_id[tid]);
-				Physics::vec2 pos2 = Physics::PhysRunner::get_cur_pos(rc,
+				Physics::vec2<s32> pos2 = Physics::PhysRunner::get_cur_pos(rc,
 																	aic->bc->phys_id[bid]);
 				pos -= pos2;
 				// save the result for later use
@@ -338,8 +338,8 @@ void AI::update_perceptions(AI::AI_Core* aic,
 	}
 }
 
-s32 AI::get_sector(Physics::vec2 pos){
-	f32 dir = atan2(pos.x, pos.y);
+s32 AI::get_sector(Physics::vec2<s32> pos){
+	f32 dir = atan2(static_cast<float>(pos.x), static_cast<float>(pos.y));
 	dir = util::rads_to_degs(dir);
 	dir = util::clamp_dir_360(dir);
 	return ((s32)(dir/SECTOR_SIZE));

@@ -32,7 +32,7 @@
 #define CUDA_THREADS MAX_ARRAY_SIZE
 
 // helper function
-void apply_transform(CL_GraphicContext* gc, Physics::vec2& c){
+void apply_transform(CL_GraphicContext* gc, Physics::vec2<s32>& c){
 	c.x *= SCALE_FACTOR;
 	c.y *= -SCALE_FACTOR;
 	c.x += gc->get_width()/2;
@@ -92,7 +92,7 @@ m_offscreen_texture(gc, gc.get_width(), gc.get_height()){
 	AI::initialize(&m_ai, &m_tanks, &m_bullets);
 	
 	// test code
-	Physics::vec2 params;
+	Physics::vec2<s32> params;
 	params.x = -25;
 	m_playertank = BasicTank::spawn_tank(&m_tanks, params, 90, 0);
 	params.x = 3;
@@ -172,7 +172,7 @@ void GSGame::onFrameRender(CL_GraphicContext* gc){
 		TankBullet::reset_phys_pointer(&m_bullets, m_physrunner.get());
 	}
 	// draw the background
-	Physics::vec2 pos;
+	Physics::vec2<s32> pos;
 	apply_transform(gc, pos);
 	m_background->draw(*gc, pos.x, pos.y);
 	

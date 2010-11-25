@@ -24,10 +24,11 @@ void BasicTank::initialize(BasicTank::TankCollection* tank,
 	tank->parent_runner = p;
 	tank->bullet_collection = tb;
 	tank->next_tank = 0;
-	Physics::vec2 params;
+	Physics::vec2<s32> params;
+	Physics::vec2<f32> paramsf;
 	for(int i = 0; i < MAX_TANKS; ++i){
 		tank->phys_id[i] = Physics::PhysRunner::create_object(p);
-		Physics::PhysRunner::set_acceleration(p, tank->phys_id[i], params);
+		Physics::PhysRunner::set_acceleration(p, tank->phys_id[i], paramsf);
 		Physics::PhysRunner::set_max_velocity(p, tank->phys_id[i], MAX_TANK_VEL);
 		Physics::PhysRunner::set_rotation(p, tank->phys_id[i], 0);
 		//TODO: change this to shape_quad in the future
@@ -84,7 +85,7 @@ void BasicTank::update(BasicTank::TankCollection* tt, f32 dt){
 }
 
 void BasicTank::move_forward(BasicTank::TankCollection* tt, tank_id tid){
-	Physics::vec2 accel;
+	Physics::vec2<f32> accel;
 	f32 rot = util::degs_to_rads(Physics::PhysRunner::get_rotation(tt->parent_runner,
 																   tt->phys_id[tid]));
 	accel.x = TANK_ACCEL_RATE * cosf(rot);
@@ -95,7 +96,7 @@ void BasicTank::move_forward(BasicTank::TankCollection* tt, tank_id tid){
 }
 
 void BasicTank::move_backward(BasicTank::TankCollection* tt, tank_id tid){
-	Physics::vec2 accel;
+	Physics::vec2<f32> accel;
 	f32 rot = util::degs_to_rads(Physics::PhysRunner::get_rotation(tt->parent_runner,
 																   tt->phys_id[tid]));
 	accel.x = -(TANK_ACCEL_RATE * cosf(rot));
@@ -108,18 +109,18 @@ void BasicTank::move_backward(BasicTank::TankCollection* tt, tank_id tid){
 
 void BasicTank::stop(BasicTank::TankCollection* tt, tank_id tid){
 	tt->state[tid] = TANK_STATE_NEUTRAL;
-	Physics::vec2 accel;
+	Physics::vec2<f32> accel;
+	Physics::vec2<s32> pos;
 	accel.x = accel.y = 0;
 	Physics::PhysRunner::set_acceleration(tt->parent_runner,
 										  tt->phys_id[tid], accel);
 										  
-	// re-use the vec2 object
-	accel = Physics::PhysRunner::get_cur_pos(tt->parent_runner,
+	pos = Physics::PhysRunner::get_cur_pos(tt->parent_runner,
 											 tt->phys_id[tid]);
 	
 	Physics::PhysRunner::set_cur_pos(tt->parent_runner,
 									 tt->phys_id[tid],
-									 accel);
+									 pos);
 }
 
 void BasicTank::turn_left(BasicTank::TankCollection* tt, tank_id tid){
@@ -167,12 +168,12 @@ void BasicTank::fire(BasicTank::TankCollection* tt, tank_id tid){
 }
 
 tank_id BasicTank::spawn_tank(BasicTank::TankCollection* tt,
-							  const Physics::vec2& pos,
+							  const Physics::vec2<s32>& pos,
 							  f32 rot, u32 faction){
 	tank_id tid = tt->next_tank++;
 	Physics::PhysRunner::set_cur_pos(tt->parent_runner, tt->phys_id[tid], pos);
 	Physics::PhysRunner::set_rotation(tt->parent_runner, tt->phys_id[tid], rot);
-	Physics::vec2 accel;
+	Physics::vec2<f32> accel;
 	accel.x = accel.y = 0;
 	Physics::PhysRunner::set_acceleration(tt->parent_runner, tt->phys_id[tid], accel);
 	tt->state[tid] = TANK_STATE_NEUTRAL;
@@ -187,17 +188,16 @@ tank_id BasicTank::spawn_tank(BasicTank::TankCollection* tt,
 void BasicTank::kill_tank(BasicTank::TankCollection* tt, tank_id tid){
 	tt->state[tid] = TANK_STATE_INACTIVE;
 	Physics::PhysRunner::RunnerCore* rc = tt->parent_runner;
-	Physics::vec2 params;
+	Physics::vec2<s32> params;
+	Physics::vec2<f32> paramsf;
 	params.x = OFFSCREEN_X;
 	params.y = OFFSCREEN_Y;
 	Physics::PhysRunner::set_cur_pos(rc, tt->phys_id[tid], params);
 	
-	params.x = 0;
-	params.y = 0;
-	Physics::PhysRunner::set_acceleration(rc, tt->phys_id[tid], params);
+	Physics::PhysRunner::set_acceleration(rc, tt->phys_id[tid], paramsf);
 }
 
-Physics::vec2 BasicTank::get_tank_pos(BasicTank::TankCollection* tt, tank_id tid){
+Physics::vec2<s32> BasicTank::get_tank_pos(BasicTank::TankCollection* tt, tank_id tid){
 	return Physics::PhysRunner::get_cur_pos(tt->parent_runner, tt->phys_id[tid]);
 }
 
@@ -205,7 +205,7 @@ f32 BasicTank::get_tank_rot(BasicTank::TankCollection* tt, tank_id tid){
 	return Physics::PhysRunner::get_rotation(tt->parent_runner, tt->phys_id[tid]);
 }
 
-Physics::vec2 BasicTank::get_tank_accel(BasicTank::TankCollection* tt,
+Physics::vec2<f32> BasicTank::get_tank_accel(BasicTank::TankCollection* tt,
 										tank_id tid){
 	return Physics::PhysRunner::get_acceleration(tt->parent_runner, tt->phys_id[tid]);
 }

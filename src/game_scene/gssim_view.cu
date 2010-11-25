@@ -31,7 +31,7 @@
 #define CUDA_THREADS MAX_ARRAY_SIZE
 
 // helper function
-void apply_transform(CL_GraphicContext* gc, Physics::vec2& c){
+void apply_transform(CL_GraphicContext* gc, Physics::vec2<s32>& c){
 	c.x *= SCALE_FACTOR;
 	c.y *= -SCALE_FACTOR;
 	c.x += gc->get_width()/2;
@@ -150,7 +150,7 @@ void GSSimView::onFrameRender(CL_GraphicContext* gc){
 	*/
 	
 	// draw the background
-	Physics::vec2 pos;
+	Physics::vec2<s32> pos;
 	apply_transform(gc, pos);
 	m_background->draw(*gc, pos.x, pos.y);
 	
@@ -291,7 +291,7 @@ void GSSimView::onFrameUpdate(double dt,
 	m_testbullet->update();
 	m_testtank->update();
 // 	if(m_tanks.state[0] != TANK_STATE_INACTIVE){
-	Physics::vec2 pos = BasicTank::get_tank_pos(&m_tanks, m_playertank);
+	Physics::vec2<s32> pos = BasicTank::get_tank_pos(&m_tanks, m_playertank);
 	if(pos.x != OFFSCREEN_X && pos.y != OFFSCREEN_Y){
 		++m_frames_elapsed;
 	}

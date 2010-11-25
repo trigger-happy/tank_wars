@@ -102,7 +102,7 @@ namespace BasicTank{
 	/*!
 	*/
 	CUDA_EXPORT tank_id spawn_tank(TankCollection* tt,
-								   const Physics::vec2& pos,
+								   const Physics::vec2<s32>& pos,
 								   f32 rot,
 								   u32 faction = 0);
 	
@@ -112,7 +112,7 @@ namespace BasicTank{
 	
 	/*!
 	*/
-	CUDA_EXPORT Physics::vec2 get_tank_pos(TankCollection* tt, tank_id tid);
+	CUDA_EXPORT Physics::vec2<s32> get_tank_pos(TankCollection* tt, tank_id tid);
 	
 	/*!
 	*/
@@ -120,7 +120,7 @@ namespace BasicTank{
 	
 	/*!
 	*/
-	CUDA_EXPORT Physics::vec2 get_tank_accel(TankCollection* tt, tank_id tid);
+	CUDA_EXPORT Physics::vec2<f32> get_tank_accel(TankCollection* tt, tank_id tid);
 };
 
 #endif //BASICTANK_H

@@ -111,7 +111,7 @@ namespace AI{
 	\param pos The position of the object
 	\return The sector of the object
 	*/
-	CUDA_EXPORT s32 get_sector(Physics::vec2 pos);
+	CUDA_EXPORT s32 get_sector(Physics::vec2<s32> pos);
 							   
 	/*!
 	Function for discretizing the vector (for both tank and bullet)

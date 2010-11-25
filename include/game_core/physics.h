@@ -30,20 +30,21 @@ namespace Physics{
 /*!
 Simple vector class for floats
 */
+template<typename T>
 struct vec2{
-	vec2(){
+	CUDA_EXPORT vec2(){
 		x = 0;
 		y = 0;
 	}
 	
 	CUDA_EXPORT void normalize(){
-		f32 l = length();
+		T l = length();
 		x /= l;
 		y /= l;
 	}
 	
-	CUDA_EXPORT f32 length(){
-		return sqrt(x*x + y*y);
+	CUDA_EXPORT T length(){
+		return sqrt(static_cast<f32>(x*x) + static_cast<f32>(y*y));
 	}
 	
 	CUDA_EXPORT vec2 operator-=(const vec2& rhs){
@@ -55,8 +56,8 @@ struct vec2{
 		return temp;
 	}
 	
-	CUDA_EXPORT f32 operator*(const vec2& rhs){
-		f32 temp = (x * rhs.x) + (y * rhs.y);
+	CUDA_EXPORT T operator*(const vec2& rhs){
+		T temp = (x * rhs.x) + (y * rhs.y);
 		return temp;
 	}
 	
@@ -67,21 +68,45 @@ struct vec2{
 		return temp;
 	}
 	
-	f32 x;
-	f32 y;
+	T x;
+	T y;
 };
 
 /*!
 Structure of arrays for a vec2 class
 Purpose of this is to improve memory coallescing on the gpu
 */
+template<typename T>
 struct vec2_array{
-	CUDA_EXPORT vec2_array();
-	CUDA_EXPORT vec2 get_vec2(u32 id);
-	CUDA_EXPORT void normalize(u32 id);
+	CUDA_EXPORT vec2_array(){
+		#if __CUDA_ARCH__
+		// device code
+		for(int i = 0; i < MAX_ARRAY_SIZE; ++i){
+			x[i] = 0;
+			y[i] = 0;
+		}
+		#elif !defined(__CUDA_ARCH__)
+		// host code
+		std::fill(x, x + MAX_ARRAY_SIZE, 0);
+		std::fill(y, y + MAX_ARRAY_SIZE, 0);
+		#endif
+	}
 	
-	f32 x[MAX_ARRAY_SIZE];
-	f32 y[MAX_ARRAY_SIZE];
+	CUDA_EXPORT vec2<T> get_vec2(u32 id){
+		vec2<T> temp;
+		temp.x = x[id];
+		temp.y = y[id];
+		return temp;
+	}
+	
+	CUDA_EXPORT void normalize(u32 id){
+		f32 l = sqrt(x[id]*x[id] + y[id]*y[id]);
+		x[id] /= l;
+		y[id] /= l;
+	}
+	
+	T x[MAX_ARRAY_SIZE];
+	T y[MAX_ARRAY_SIZE];
 };
 
 #define SHAPE_INVALID	0
@@ -97,24 +122,24 @@ can be accessed grabbing the nth element in any of the array of parameters.
 pBody is used as the index for any given object.
 */
 struct physBody{
-	vec2_array	old_pos;
-	vec2_array	cur_pos;
-	vec2_array	acceleration;
-	f32 		rotation[MAX_ARRAY_SIZE];
-	f32			max_vel[MAX_ARRAY_SIZE];
+	vec2_array<s32>	old_pos;
+	vec2_array<s32>	cur_pos;
+	vec2_array<f32>	acceleration;
+	f32 			rotation[MAX_ARRAY_SIZE];
+	f32				max_vel[MAX_ARRAY_SIZE];
 	
-	bool		can_collide[MAX_ARRAY_SIZE];
+	bool			can_collide[MAX_ARRAY_SIZE];
 	
 	// for defining the shape of the object
-	pShape	 	shape_type[MAX_ARRAY_SIZE];
+	pShape	 		shape_type[MAX_ARRAY_SIZE];
 	
 	// for custom code (to mark the object as a tank, bullet, etc)
-	u32			user_data[MAX_ARRAY_SIZE];
+	u32				user_data[MAX_ARRAY_SIZE];
 	
 	// x is width and y is height for quad
 	// x is the radius and y is ignored for circle
 	// totally irrelevant if SHAPE_INVALID
-	vec2_array	dimension;
+	vec2_array<s32>		dimension;
 };
 
 	CUDA_EXPORT void init_physbody(Physics::physBody* pb);
@@ -174,7 +199,7 @@ namespace PhysRunner{
 	\param oid The index of the physicsbody
 	\return A vec2 object containing the current position
 	*/
-	CUDA_EXPORT vec2 get_cur_pos(RunnerCore* rc, pBody oid);
+	CUDA_EXPORT vec2<s32> get_cur_pos(RunnerCore* rc, pBody oid);
 	
 	/*!
 	Get the previous position of the physics object.
@@ -182,7 +207,7 @@ namespace PhysRunner{
 	\param oid The index of the physicsbody
 	\return A vec2 object containing the previous position
 	*/
-	CUDA_EXPORT vec2 get_prev_pos(RunnerCore* rc, pBody oid);
+	CUDA_EXPORT vec2<s32> get_prev_pos(RunnerCore* rc, pBody oid);
 	
 	/*!
 	Get the acceleration of the object
@@ -190,7 +215,7 @@ namespace PhysRunner{
 	\param oid The index of the physicsbody
 	\return A vec2 containing the acceleration of the object.
 	*/
-	CUDA_EXPORT vec2 get_acceleration(Physics::PhysRunner::RunnerCore* rc, pBody oid);
+	CUDA_EXPORT vec2<f32> get_acceleration(Physics::PhysRunner::RunnerCore* rc, pBody oid);
 	
 	/*!
 	Get the rotation of the physics object
@@ -238,7 +263,7 @@ namespace PhysRunner{
 	\param oid The index of the physicsbody.
 	\return A vec2 object containing the physical dimensions of the object.
 	*/
-	CUDA_EXPORT vec2 get_dimensions(RunnerCore* rc, pBody oid);
+	CUDA_EXPORT vec2<s32> get_dimensions(RunnerCore* rc, pBody oid);
 	
 	
 	/*!
@@ -247,7 +272,7 @@ namespace PhysRunner{
 	\param oid The index of the physicsbody.
 	\param pos The new object position.
 	*/
-	CUDA_EXPORT void set_cur_pos(RunnerCore* rc, pBody oid, const vec2& pos);
+	CUDA_EXPORT void set_cur_pos(RunnerCore* rc, pBody oid, const vec2<s32>& pos);
 	
 	/*!
 	Set the acceleration of the physics object.
@@ -256,7 +281,7 @@ namespace PhysRunner{
 	\param accel The acceleration of the physicsobject.
 	*/
 	CUDA_EXPORT void set_acceleration(RunnerCore* rc,
-									  pBody oid, const vec2& accel);
+									  pBody oid, const vec2<f32>& accel);
 									  
 	/*!
 	Set the rotation of the object.
@@ -296,7 +321,7 @@ namespace PhysRunner{
 	\param oid The index of the physicsbody.
 	\param dim The dimensions of the object.
 	*/
-	CUDA_EXPORT void set_dimensions(RunnerCore* rc, pBody oid, const vec2& dim);
+	CUDA_EXPORT void set_dimensions(RunnerCore* rc, pBody oid, const vec2<s32>& dim);
 	
 	/*!
 	Set the collidable property of an object.
@@ -342,7 +367,7 @@ namespace PhysRunner{
 	\param id The id of the phys object
 	\return The velocity vector of the object
 	*/
-	CUDA_EXPORT vec2 get_velocity_vector(RunnerCore* rc, pBody oid);
+	vec2<s32> get_velocity_vector(Physics::PhysRunner::RunnerCore* rc, Physics::pBody oid);
 }
 	
 }

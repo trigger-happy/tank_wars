@@ -33,7 +33,7 @@ namespace TankBullet{
 	
 	struct BulletCollection{
 		Physics::PhysRunner::RunnerCore* parent_runner;
-		Physics::vec2_array travel_dist;
+		Physics::vec2_array<f32> travel_dist;
 		u32 phys_id[MAX_BULLETS];
 		u32 state[MAX_BULLETS];
 		u32 faction[MAX_BULLETS];
@@ -71,7 +71,7 @@ namespace TankBullet{
 	*/
 	CUDA_EXPORT void fire_bullet(BulletCollection* bc,
 								 bullet_id bid, f32 rot_degress,
-								 Physics::vec2 pos);
+								 Physics::vec2<s32> pos);
 					 
 	/*!
 	deactivate a bullet
@@ -84,7 +84,7 @@ namespace TankBullet{
 	\param bid The bullet to query
 	\return A vector containing the bullet's position
 	*/
-	CUDA_EXPORT Physics::vec2 get_bullet_pos(BulletCollection* bc,
+	CUDA_EXPORT Physics::vec2<s32> get_bullet_pos(BulletCollection* bc,
 											 bullet_id bid);
 	
 	/*!
