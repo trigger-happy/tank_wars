@@ -45,7 +45,7 @@ GSGeneView::GSGeneView(CL_GraphicContext& gc, CL_ResourceManager& resources)
 : m_physrunner(new Physics::PhysRunner::RunnerCore()){
 
 	// quick output of the format of things
-	cout << "bullet_vector tank_vector direction_state distance_state | tank.x tank.y tank.rot | bullet.x bullet.y bullet.rot" << endl;
+// 	cout << "bullet_vector tank_vector direction_state distance_state | tank.x tank.y tank.rot | bullet.x bullet.y bullet.rot" << endl;
 	
 	// setup the debug text
 	CL_FontDescription desc;
