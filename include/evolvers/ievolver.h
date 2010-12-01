@@ -24,7 +24,7 @@ Boston, MA 02110-1301, USA.
 #include "game_core/tank_ai.h"
 #include "data_store/data_store.h"
 
-#define SAVE_SIM_DATA
+// #define SAVE_SIM_DATA
 
 #ifdef SAVE_SIM_DATA
 #define NUM_INSTANCES 4
