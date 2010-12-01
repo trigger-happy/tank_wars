@@ -27,8 +27,8 @@
 #define SECTOR_SIZE				(360/NUM_LOCATION_STATES)
 
 #define NUM_BULLET_VECTORS		8
-// #define NUM_TANK_VECTORS		8
-#define NUM_TANK_VECTORS		1
+#define NUM_TANK_VECTORS		8
+// #define NUM_TANK_VECTORS		1
 #define VECTOR_SIZE				(360/NUM_BULLET_VECTORS)
 
 #define MAX_GENE_DATA			NUM_DISTANCE_STATES * \
@@ -64,6 +64,8 @@ namespace AI{
 		tank_id controlled_tanks[MAX_AI_CONTROLLERS];
 		gene_type gene_accel[MAX_GENE_DATA][MAX_AI_EVADERS];
 		gene_type gene_heading[MAX_GENE_DATA][MAX_AI_EVADERS];
+		s32 desired_heading[MAX_AI_EVADERS];
+		s32 desired_thrust[MAX_AI_EVADERS];
 	};
 	
 	// sensor functions

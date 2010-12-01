@@ -16,11 +16,22 @@
 #include <limits>
 #include <cstring>
 #include <ctime>
+#include <iostream>
 #include "exports.h"
 #include "game_core/tank_ai.h"
 
 #define SHORT_MAX 32767
 #define DISTANCE_DEFAULT SHORT_MAX
+
+// #define AI_PRINT_DBG
+
+#ifdef AI_PRINT_DBG
+#if !defined(__CUDA_ARCH__)
+static int g_frame_count = 0;
+#endif
+#endif
+
+using namespace std;
 
 bullet_id AI::get_nearest_bullet(AI::AI_Core* aic,
 								 tank_id tid){
@@ -204,36 +215,65 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 				// perform AI actions
 				if(aic->ai_type[idx] == AI_TYPE_EVADER){
 						// check how many frames has passed
-					if(aic->frame_count == FRAMES_PER_UPDATE){
+					if(aic->frame_count >= FRAMES_PER_UPDATE){
 						s32 index = aic->bullet_vector[idx] * aic->tank_vector[idx] *
 						aic->direction_state[idx] * aic->distance_state[idx];
+
+						// get the desired heading
+						aic->desired_heading[idx] = aic->gene_heading[index][idx];
+						aic->desired_thrust[idx] = aic->gene_accel[index][idx];
+						
 						if(index > 0){
 							// valid index, access the action from the array
-							switch(aic->gene_accel[index][idx]){
-								case 0:
-									BasicTank::stop(aic->tc, my_tank);
-									break;
-								case 1:
-									BasicTank::move_forward(aic->tc, my_tank);
-									break;
-								case 2:
-									BasicTank::move_backward(aic->tc, my_tank);
-									break;
-							}
-							// let's try to get to the right heading
-							f32 cur_rot = Physics::PhysRunner::get_rotation(aic->tc->parent_runner,
-																			aic->tc->phys_id[my_tank]);
-																			cur_rot = util::clamp_dir_360(cur_rot);
-																			cur_rot = AI::get_vector(cur_rot);
-							if(aic->gene_heading[index][idx] < cur_rot){
-								BasicTank::turn_left(aic->tc, my_tank);
-							}else if(aic->gene_heading[index][idx] > cur_rot){
-								BasicTank::turn_right(aic->tc, my_tank);
-							}
+
+							// dump the data for debugging
+							#ifdef AI_PRINT_DBG
+							#if !defined(__CUDA_ARCH__)
+							bullet_id near_bul = AI::get_nearest_bullet(aic, my_tank);
+							Physics::vec2 mypos = BasicTank::get_tank_pos(aic->tc, my_tank);
+							Physics::vec2 bpos = TankBullet::get_bullet_pos(aic->bc, near_bul);
+							cout << g_frame_count << " "
+									<< aic->bullet_vector[idx] << " "
+									<< aic->tank_vector[idx] << " "
+									<< aic->direction_state[idx] << " "
+									<< aic->distance_state[idx] << " | "
+									<< mypos.x << " "
+									<< mypos.y << " "
+									<< BasicTank::get_tank_rot(aic->tc, my_tank) << " | "
+									<< bpos.x << " "
+									<< bpos.y << " "
+									<< Physics::PhysRunner::get_rotation(aic->bc->parent_runner, aic->bc->phys_id[near_bul])
+									<< endl;
+							#endif
+							#endif
 						}else{
 							BasicTank::stop(aic->tc, my_tank);
 						}
 						//TODO: state machine here in the future?
+					}
+					// perform the needed turn
+					
+					// let's try to get to the right heading
+					switch(aic->desired_thrust[idx]){
+						case 0:
+							BasicTank::stop(aic->tc, my_tank);
+							break;
+						case 1:
+							BasicTank::move_forward(aic->tc, my_tank);
+							break;
+						case 2:
+							BasicTank::move_backward(aic->tc, my_tank);
+							break;
+					}
+					
+					f32 cur_rot = Physics::PhysRunner::get_rotation(aic->tc->parent_runner,
+																	aic->tc->phys_id[my_tank]);
+					cur_rot = util::clamp_dir_360(cur_rot);
+					cur_rot = AI::get_vector(cur_rot);
+					if(aic->desired_heading[idx] < cur_rot){
+						BasicTank::turn_left(aic->tc, my_tank);
+					}else if(aic->desired_heading[idx] > cur_rot){
+						BasicTank::turn_right(aic->tc, my_tank);
 					}
 				}else if(aic->ai_type[idx] == AI_TYPE_ATTACKER){
 					// get the nearest target to shoot at
@@ -262,7 +302,35 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 				}
 			}
 		}
+		#ifdef AI_PRINT_DBG
+		#if !defined(__CUDA_ARCH__)
+		if(g_frame_count == 0){
+			// output the initial state
+			tank_id my_tank = aic->controlled_tanks[idx];
+			bullet_id near_bul = AI::get_nearest_bullet(aic, my_tank);
+			Physics::vec2 mypos = BasicTank::get_tank_pos(aic->tc, my_tank);
+			Physics::vec2 bpos = TankBullet::get_bullet_pos(aic->bc, near_bul);
+			cout << g_frame_count << " "
+					<< aic->bullet_vector[idx] << " "
+					<< aic->tank_vector[idx] << " "
+					<< aic->direction_state[idx] << " "
+					<< aic->distance_state[idx] << " | "
+					<< mypos.x << " "
+					<< mypos.y << " "
+					<< BasicTank::get_tank_rot(aic->tc, my_tank) << " | "
+					<< bpos.x << " "
+					<< bpos.y << " "
+					<< Physics::PhysRunner::get_rotation(aic->bc->parent_runner, aic->bc->phys_id[near_bul])
+					<< endl;
+		}
+		#endif
+		#endif
 	}
+	#ifdef AI_PRINT_DBG
+	#if !defined(__CUDA_ARCH__)
+	++g_frame_count;
+	#endif
+	#endif
 }
 
 void AI::add_tank( AI::AI_Core* aic, tank_id tid, s32 ait){
