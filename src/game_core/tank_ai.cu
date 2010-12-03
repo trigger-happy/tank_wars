@@ -223,7 +223,7 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 						aic->desired_heading[idx] = aic->gene_heading[index][idx];
 						aic->desired_thrust[idx] = aic->gene_accel[index][idx];
 						
-						if(index > 0){
+						if(index >= 0){
 							// valid index, access the action from the array
 
 							// dump the data for debugging
@@ -247,6 +247,9 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 							#endif
 							#endif
 						}else{
+							#if !defined(__CUDA_ARCH__)
+							assert("NEGATIVE INDEX" && false);
+							#endif
 							BasicTank::stop(aic->tc, my_tank);
 						}
 						//TODO: state machine here in the future?
