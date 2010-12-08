@@ -159,6 +159,22 @@ public:
 	}
 	
 	/*!
+	 * Prepare a particular game scenario
+	 */
+	void prepare_game_scenario(u32 dist,
+				   u32 bullet_loc,
+				   u32 bullet_vec){
+	  static_cast<Derived*>(this)->perpare_game_scenario_impl(dist, bullet_loc, bullet_vec);
+	}
+	
+	/*!
+	 * Call this to end a scenario and add up the score we have now
+	 */
+	void end_game_scenario(){
+		static_cast<Derived*>(this)->end_game_scenario_impl();
+	}
+	
+	/*!
 	Check if all the tanks in the current generation are dead
 	*/
 	bool is_game_over(){

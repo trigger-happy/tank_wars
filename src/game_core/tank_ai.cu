@@ -177,6 +177,8 @@ void AI::initialize(AI::AI_Core* aic,
 		   0, MAX_AI_EVADERS*sizeof(s32));
 	memset(static_cast<void*>(aic->ai_type),
 		   0, MAX_AI_CONTROLLERS*sizeof(s32));
+	memset(static_cast<void*>(aic->shot_count),
+		   0, MAX_AI_CONTROLLERS*sizeof(s32));
 	
 	AI::init_gene_data(aic);
 }
@@ -301,6 +303,19 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 
 						// fire away like a trigger-happy thing
 						BasicTank::fire(aic->tc, tid);
+					}
+				}else if(aic->ai_type[idx] == AI_TYPE_TRAINER){
+					// just fire blindly
+					if(aic->shot_count[idx] == 0){
+						tank_id tid = aic->controlled_tanks[idx];
+						BasicTank::fire(aic->tc, tid);
+						aic->shot_count[idx] += 1;
+					}else{
+						tank_id tid = aic->controlled_tanks[idx];
+						bullet_id bid = aic->tc->bullet[tid][0];
+						if(aic->bc->state[bid] == BULLET_STATE_INACTIVE){
+							BasicTank::kill_tank(aic->tc, tid);
+						}
 					}
 				}
 			}

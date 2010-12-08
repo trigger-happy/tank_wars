@@ -54,6 +54,8 @@ private:
 	u32 retrieve_score_impl();
 	void save_best_gene_impl(const std::string& fname);
 	void prepare_game_state_impl();
+	void perpare_game_scenario_impl(u32 dist, u32 bullet_loc, u32 bullet_vec);
+	void end_game_scenario_impl();
 	bool is_game_over_impl();
 	void finalize_impl();
 
