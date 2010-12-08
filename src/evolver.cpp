@@ -26,7 +26,7 @@
 #ifdef SAVE_SIM_DATA
 #define MAX_GENERATIONS 1
 #else
-#define MAX_GENERATIONS	1
+#define MAX_GENERATIONS 64
 #endif
 
 
@@ -67,11 +67,7 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 							break;
 						}
 					}
-
-					if(j >= MAX_FRAMESTEPS){
-						// end the game scenario
-						evl.end_game_scenario();
-					}
+					evl.end_game_scenario();
 				}
 			}
 		}
