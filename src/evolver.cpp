@@ -26,7 +26,7 @@
 #ifdef SAVE_SIM_DATA
 #define MAX_GENERATIONS 1
 #else
-#define MAX_GENERATIONS	32
+#define MAX_GENERATIONS	1
 #endif
 
 
@@ -46,27 +46,38 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 		boost::timer evol_timer;
 		cout << "Running generation " << i << endl;
 		// setup the initial game state
-		evl.prepare_game_state();
-
-		// declare it outside so we can do a check later
-		int j = 0;
+ 		evl.prepare_game_state();
 		
-		for(j = 0; j < MAX_FRAMESTEPS; ++j){
-			// perform a frame step
-			evl.frame_step(TIME_STEP);
-			
-			// retrieve the state for debugging purposes
-			evl.retrieve_state();
-			
-			if(evl.is_game_over()){
-				break;
+		for(int dist = 0; dist < NUM_DISTANCE_STATES; ++dist){
+			for(int locs = 0; locs < NUM_LOCATION_STATES; ++locs){
+				for(int vecs = 0; vecs < NUM_BULLET_VECTORS; ++vecs){
+					cout << "Scenario: " << dist << " " << locs << " " << vecs << endl;
+					evl.prepare_game_scenario(dist, locs, vecs);
+					
+					int j = 0;
+					
+					for(j = 0; j < MAX_FRAMESTEPS; ++j){
+						// perform a frame step
+						evl.frame_step(TIME_STEP);
+						
+						// retrieve the state for debugging purposes
+						evl.retrieve_state();
+						
+						if(evl.is_game_over()){
+							break;
+						}
+					}
+
+					if(j >= MAX_FRAMESTEPS){
+						// end the game scenario
+						evl.end_game_scenario();
+					}
+				}
 			}
 		}
-
-		if(j >= MAX_FRAMESTEPS){
-			// we exceeded the max frames, perform a finalize
-			evl.finalize();
-		}
+		
+		// end this generation
+		evl.finalize();
 		
 		// get the score of the best individual
 		highest_score = evl.retrieve_highest_score();

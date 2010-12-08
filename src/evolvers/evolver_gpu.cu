@@ -280,6 +280,13 @@ void Evolver_gpu::prepare_game_state_impl(){
 	copy_to_device();
 }
 
+
+void Evolver_gpu::perpare_game_scenario_impl(u32 dist, u32 bullet_loc, u32 bullet_vec){
+}
+
+void Evolver_gpu::end_game_scenario_impl(){
+}
+
 bool Evolver_gpu::is_game_over_impl(){
 	bool all_dead = true;
 	for(int i = 0; i < NUM_INSTANCES; ++i){

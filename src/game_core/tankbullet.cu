@@ -113,7 +113,7 @@ void TankBullet::deactivate(TankBullet::BulletCollection* bc, bullet_id bid){
 	params.y = 0;
 	Physics::PhysRunner::set_acceleration(rc, bid, params);
 	
-	bc->state[bid] = TANK_STATE_INACTIVE;
+	bc->state[bid] = BULLET_STATE_INACTIVE;
 }
 
 Physics::vec2 TankBullet::get_bullet_pos(TankBullet::BulletCollection* bc,

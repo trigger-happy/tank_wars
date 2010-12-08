@@ -44,6 +44,7 @@
 #define AI_TYPE_INVALID			0
 #define AI_TYPE_EVADER			1
 #define AI_TYPE_ATTACKER		2
+#define AI_TYPE_TRAINER			3
 
 #define FRAMES_PER_UPDATE		29
 
@@ -66,6 +67,7 @@ namespace AI{
 		gene_type gene_heading[MAX_GENE_DATA][MAX_AI_EVADERS];
 		s32 desired_heading[MAX_AI_EVADERS];
 		s32 desired_thrust[MAX_AI_EVADERS];
+		s32 shot_count[MAX_AI_CONTROLLERS];
 	};
 	
 	// sensor functions
