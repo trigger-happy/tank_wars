@@ -38,7 +38,7 @@ void frame_updater::operator()(){
 			Collision::tank_tank_check(&tanks[i], j);
 		}
 		if(tanks[i].state[0] != TANK_STATE_INACTIVE){
-			scores[i] += 1;
+			//scores[i] += 1;
 		}
 	}
 }
@@ -263,6 +263,9 @@ void Evolver_cpu::end_game_scenario_impl(){
 	for(int i = 0; i < NUM_INSTANCES; ++i){
 		if(m_tanks[i].state[0] != TANK_STATE_INACTIVE){
 			// tank is alive, add up to the score
+			if(m_population_score.find(i) == m_population_score.end()){
+				m_population_score[i] = 0;
+			}
 			++(m_population_score[i]);
 		}
 	}
