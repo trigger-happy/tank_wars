@@ -302,7 +302,17 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 														90-dir);
 
 						// fire away like a trigger-happy thing
-						BasicTank::fire(aic->tc, tid);
+// 						BasicTank::fire(aic->tc, tid);
+						// copy over the trainer code:
+						if(aic->shot_count[idx] == 0){
+							BasicTank::fire(aic->tc, tid);
+							aic->shot_count[idx] += 1;
+						}else{
+							bullet_id bid = aic->tc->bullet[tid][0];
+							if(aic->bc->state[bid] == BULLET_STATE_INACTIVE){
+								BasicTank::kill_tank(aic->tc, tid);
+							}
+						}
 					}
 				}else if(aic->ai_type[idx] == AI_TYPE_TRAINER){
 					// just fire blindly

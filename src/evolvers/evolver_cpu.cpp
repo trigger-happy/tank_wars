@@ -255,7 +255,7 @@ void Evolver_cpu::perpare_game_scenario_impl(u32 dist, u32 bullet_loc, u32 bulle
 													   atk_params,
 													   tank_rot,
 													   1);
-		AI::add_tank(&m_ai[i], attacking_tank, AI_TYPE_TRAINER);
+		AI::add_tank(&m_ai[i], attacking_tank, AI_TYPE_ATTACKER);
 	}
 }
 

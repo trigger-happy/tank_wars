@@ -26,7 +26,7 @@
 #ifdef SAVE_SIM_DATA
 #define MAX_GENERATIONS 1
 #else
-#define MAX_GENERATIONS 128
+#define MAX_GENERATIONS 64
 #endif
 
 
@@ -51,7 +51,7 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 		for(int dist = 0; dist < NUM_DISTANCE_STATES; ++dist){
 			for(int locs = 0; locs < NUM_LOCATION_STATES; ++locs){
 				for(int vecs = 0; vecs < NUM_BULLET_VECTORS; ++vecs){
-// 					cout << "Scenario: " << dist << " " << locs << " " << vecs << endl;
+					cout << "Scenario: " << dist << " " << locs << " " << vecs << endl;
 					evl.prepare_game_scenario(dist, locs, vecs);
 					
 					int j = 0;
