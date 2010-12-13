@@ -207,7 +207,7 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 					if(aic->frame_count == FRAMES_PER_UPDATE){
 						s32 index = aic->bullet_vector[idx] * aic->tank_vector[idx] *
 						aic->direction_state[idx] * aic->distance_state[idx];
-						if(index > 0){
+						if(index >= 0){
 							// valid index, access the action from the array
 							switch(aic->gene_accel[index][idx]){
 								case 0:
@@ -231,6 +231,9 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 								BasicTank::turn_right(aic->tc, my_tank);
 							}
 						}else{
+							#if !defined(__CUDA_ARCH__)
+							assert("NEGATIVE INDEX" && false);
+							#endif
 							BasicTank::stop(aic->tc, my_tank);
 						}
 						//TODO: state machine here in the future?
