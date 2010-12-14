@@ -51,7 +51,7 @@ Physics::vec2 Physics::vec2_array::get_vec2(u32 id){
 }
 
 void Physics::vec2_array::normalize(u32 id){
-	f32 l = sqrt(x[id]*x[id] + y[id]*y[id]);
+	f64 l = sqrt(x[id]*x[id] + y[id]*y[id]);
 	x[id] /= l;
 	y[id] /= l;
 }
@@ -67,7 +67,7 @@ void Physics::PhysRunner::cleanup(Physics::PhysRunner::RunnerCore* rc){
 	//TODO: cleanup stuff here
 }
 
-CUDA_EXPORT void update_verlet(f32 dt,
+CUDA_EXPORT void update_verlet(f64 dt,
 							   Physics::physBody* bodies){
 	int idx = 0;
 	#if __CUDA_ARCH__
@@ -142,7 +142,7 @@ CUDA_EXPORT void update_verlet(f32 dt,
 	#endif
 }
 
-void Physics::PhysRunner::timestep(Physics::PhysRunner::RunnerCore* rc, f32 dt){
+void Physics::PhysRunner::timestep(Physics::PhysRunner::RunnerCore* rc, f64 dt){
 	// convert from millisecond to seconds
 	dt /= 1000.0f;
 	
@@ -236,16 +236,16 @@ Physics::vec2 Physics::PhysRunner::get_acceleration(Physics::PhysRunner::RunnerC
 	return temp;
 }
 
-f32 Physics::PhysRunner::get_rotation(Physics::PhysRunner::RunnerCore* rc,
+f64 Physics::PhysRunner::get_rotation(Physics::PhysRunner::RunnerCore* rc,
 									  Physics::pBody oid){
-	f32 rot = 0;
+	f64 rot = 0;
 	rot = rc->bodies.rotation[oid];
 	return rot;
 }
 
-f32 Physics::PhysRunner::get_max_velocity(Physics::PhysRunner::RunnerCore* rc,
+f64 Physics::PhysRunner::get_max_velocity(Physics::PhysRunner::RunnerCore* rc,
 										  Physics::pBody oid){
-	f32 mv = 0;
+	f64 mv = 0;
 	mv = rc->bodies.rotation[oid];
 	return mv;
 }
@@ -295,12 +295,12 @@ void Physics::PhysRunner::set_acceleration(Physics::PhysRunner::RunnerCore* rc,
 }
 
 void Physics::PhysRunner::set_rotation(Physics::PhysRunner::RunnerCore* rc,
-									   Physics::pBody oid, f32 r){
+									   Physics::pBody oid, f64 r){
 	rc->bodies.rotation[oid] = r;
 }
 
 void Physics::PhysRunner::set_max_velocity(Physics::PhysRunner::RunnerCore* rc,
-										   Physics::pBody oid, f32 mv){
+										   Physics::pBody oid, f64 mv){
 	rc->bodies.max_vel[oid] = mv;
 }
 
@@ -326,7 +326,7 @@ void Physics::PhysRunner::set_dimensions(Physics::PhysRunner::RunnerCore* rc,
 	rc->bodies.dimension.y[oid] = dim.y;
 }
 
-f32 Physics::PhysRunner::get_cur_velocity(Physics::PhysRunner::RunnerCore* rc,
+f64 Physics::PhysRunner::get_cur_velocity(Physics::PhysRunner::RunnerCore* rc,
 										  Physics::pBody oid){
 	Physics::vec2 vel = Physics::PhysRunner::get_cur_pos(rc, oid);
 	vel -= Physics::PhysRunner::get_prev_pos(rc, oid);

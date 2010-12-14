@@ -37,12 +37,12 @@ struct vec2{
 	}
 	
 	CUDA_EXPORT void normalize(){
-		f32 l = length();
+		f64 l = length();
 		x /= l;
 		y /= l;
 	}
 	
-	CUDA_EXPORT f32 length(){
+	CUDA_EXPORT f64 length(){
 		return sqrt(x*x + y*y);
 	}
 	
@@ -55,8 +55,8 @@ struct vec2{
 		return temp;
 	}
 	
-	CUDA_EXPORT f32 operator*(const vec2& rhs){
-		f32 temp = (x * rhs.x) + (y * rhs.y);
+	CUDA_EXPORT f64 operator*(const vec2& rhs){
+		f64 temp = (x * rhs.x) + (y * rhs.y);
 		return temp;
 	}
 	
@@ -67,8 +67,8 @@ struct vec2{
 		return temp;
 	}
 	
-	f32 x;
-	f32 y;
+	f64 x;
+	f64 y;
 };
 
 /*!
@@ -80,8 +80,8 @@ struct vec2_array{
 	CUDA_EXPORT vec2 get_vec2(u32 id);
 	CUDA_EXPORT void normalize(u32 id);
 	
-	f32 x[MAX_ARRAY_SIZE];
-	f32 y[MAX_ARRAY_SIZE];
+	f64 x[MAX_ARRAY_SIZE];
+	f64 y[MAX_ARRAY_SIZE];
 };
 
 #define SHAPE_INVALID	0
@@ -100,8 +100,8 @@ struct physBody{
 	vec2_array	old_pos;
 	vec2_array	cur_pos;
 	vec2_array	acceleration;
-	f32 		rotation[MAX_ARRAY_SIZE];
-	f32			max_vel[MAX_ARRAY_SIZE];
+	f64 		rotation[MAX_ARRAY_SIZE];
+	f64			max_vel[MAX_ARRAY_SIZE];
 	
 	bool		can_collide[MAX_ARRAY_SIZE];
 	
@@ -151,7 +151,7 @@ namespace PhysRunner{
 	\param rc The RunnerCore object.
 	\param dt The frame time in seconds.
 	*/
-	CUDA_EXPORT void timestep(RunnerCore* rc, f32 dt);
+	CUDA_EXPORT void timestep(RunnerCore* rc, f64 dt);
 
 	
 	/*!
@@ -198,7 +198,7 @@ namespace PhysRunner{
 	\param oid The index of the physicsbody
 	\return The rotation of the object.
 	*/
-	CUDA_EXPORT f32 get_rotation(Physics::PhysRunner::RunnerCore* rc, pBody oid);
+	CUDA_EXPORT f64 get_rotation(Physics::PhysRunner::RunnerCore* rc, pBody oid);
 	
 	/*!
 	Get the maximum velocity of the object.
@@ -206,7 +206,7 @@ namespace PhysRunner{
 	\param oid The index of the physicsbody.
 	\return The maximum velocity of the object.
 	*/
-	CUDA_EXPORT f32 get_max_velocity(RunnerCore* rc, pBody oid);
+	CUDA_EXPORT f64 get_max_velocity(RunnerCore* rc, pBody oid);
 	
 	/*!
 	Returns true if the object may collides, false otherwise
@@ -264,7 +264,7 @@ namespace PhysRunner{
 	\param oid The index of the physicsbody.
 	\param r The rotation of the object.
 	*/
-	CUDA_EXPORT void set_rotation(RunnerCore* rc, pBody oid, f32 r);
+	CUDA_EXPORT void set_rotation(RunnerCore* rc, pBody oid, f64 r);
 	
 	/*!
 	Set the maximum velocity of the object.
@@ -272,7 +272,7 @@ namespace PhysRunner{
 	\param oid The index of the physicsbody.
 	\param mv The maximum velocity.
 	*/
-	CUDA_EXPORT void set_max_velocity(RunnerCore* rc, pBody oid, f32 mv);
+	CUDA_EXPORT void set_max_velocity(RunnerCore* rc, pBody oid, f64 mv);
 	
 	/*!
 	Set the shape type of the object.
@@ -334,7 +334,7 @@ namespace PhysRunner{
 	\param id The id of the phys object
 	\return The velocity of the object
 	*/
-	CUDA_EXPORT f32 get_cur_velocity(RunnerCore* rc, pBody oid);
+	CUDA_EXPORT f64 get_cur_velocity(RunnerCore* rc, pBody oid);
 	
 	/*!
 	Get the velocity vector of the object

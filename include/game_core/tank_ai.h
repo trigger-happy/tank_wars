@@ -101,7 +101,7 @@ namespace AI{
 	\param target_id The id of the target tank whose distance to check
 	\return The distance between the 2 tanks
 	*/
-	CUDA_EXPORT f32 get_tank_dist(AI_Core* aic,
+	CUDA_EXPORT f64 get_tank_dist(AI_Core* aic,
 								  tank_id my_id,
 								  tank_id target_id);
 								 
@@ -118,7 +118,7 @@ namespace AI{
 	\param rot The rotation of the object
 	\return The vector of the object
 	*/
-	CUDA_EXPORT s32 get_vector(f32 rot);
+	CUDA_EXPORT s32 get_vector(f64 rot);
 								  
 	/*!
 	Update the perception data. Algorithm taken from the AI Game Engine
@@ -129,7 +129,7 @@ namespace AI{
 	*/
 	CUDA_EXPORT void update_perceptions(AI_Core* aic,
 										ai_id id,
-										f32 dt);
+										f64 dt);
 	
 	/*!
 	Get the distance of a bullet to the current tank
@@ -138,7 +138,7 @@ namespace AI{
 	\param The id of the bullet to query
 	\return The distance between the bullet and the tank
 	*/
-	CUDA_EXPORT f32 get_bullet_dist(AI::AI_Core* aic,
+	CUDA_EXPORT f64 get_bullet_dist(AI::AI_Core* aic,
 									tank_id tid,
 									bullet_id bid);
 	
@@ -154,7 +154,7 @@ namespace AI{
 	\param aic The AI core
 	\param dt The frame time in milliseconds
 	*/
-	CUDA_EXPORT void timestep(AI_Core* aic, f32 dt);
+	CUDA_EXPORT void timestep(AI_Core* aic, f64 dt);
 	
 	/*!
 	Add a new tank for the AI to control

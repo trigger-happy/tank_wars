@@ -35,16 +35,16 @@ CUDA_EXPORT T clamp_dir_360(T dir){
 	T out_dir_abs = fabs(dir);
 	T out_dir = 0;
 	
-	if(out_dir_abs > 360.0f){
-		if(out_dir_abs > 720.0f){
-			out_dir = fmod(dir, 360.0f);
+	if(out_dir_abs > 360.0){
+		if(out_dir_abs > 720.0){
+			out_dir = fmod(dir, 360.0);
 		}else{
-			out_dir = ( dir > 0.0f ) ? dir - 360.0f : dir + 360.0f;
+			out_dir = ( dir > 0.0 ) ? dir - 360.0 : dir + 360.0;
 		}
 		out_dir_abs = fabs(out_dir);
 	}else{
-		if(dir < 0.0f){
-			out_dir = dir + 360.0f;
+		if(dir < 0.0){
+			out_dir = dir + 360.0;
 		}else{
 			out_dir = dir;
 		}

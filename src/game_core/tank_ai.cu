@@ -26,7 +26,7 @@ bullet_id AI::get_nearest_bullet(AI::AI_Core* aic,
 								 tank_id tid){
 	Physics::PhysRunner::RunnerCore* rc = aic->tc->parent_runner;
 	u32 tank_faction = aic->tc->faction[tid];
-	f32 sqdist = SHORT_MAX;
+	f64 sqdist = SHORT_MAX;
 	unsigned int bid = INVALID_ID;
 	for(int i = 0; i < MAX_BULLETS; ++i){
 		// check if the current bullet is an enemy bullet
@@ -41,10 +41,10 @@ bullet_id AI::get_nearest_bullet(AI::AI_Core* aic,
 		}
 		
 		// get the distance
-		f32 xdist = rc->bodies.cur_pos.x[aic->tc->phys_id[tid]]
+		f64 xdist = rc->bodies.cur_pos.x[aic->tc->phys_id[tid]]
 		- rc->bodies.cur_pos.x[aic->bc->phys_id[i]];
 		xdist *= xdist;
-		f32 ydist = rc->bodies.cur_pos.y[aic->tc->phys_id[tid]]
+		f64 ydist = rc->bodies.cur_pos.y[aic->tc->phys_id[tid]]
 		- rc->bodies.cur_pos.y[aic->bc->phys_id[i]];
 		ydist *= ydist;
 		
@@ -61,7 +61,7 @@ tank_id AI::get_nearest_enemy(AI::AI_Core* aic,
 							  tank_id tid){
 	Physics::PhysRunner::RunnerCore* rc = aic->tc->parent_runner;
 	u32 tank_faction = aic->tc->faction[tid];
-	f32 sqdist = SHORT_MAX;
+	f64 sqdist = SHORT_MAX;
 	unsigned int eid = INVALID_ID;
 	for(int i = 0; i < MAX_TANKS; ++i){
 		// check if the tank is an enemy tank
@@ -75,10 +75,10 @@ tank_id AI::get_nearest_enemy(AI::AI_Core* aic,
 			continue;
 		}
 		// get the distance
-		f32 xdist = rc->bodies.cur_pos.x[aic->tc->phys_id[tid]]
+		f64 xdist = rc->bodies.cur_pos.x[aic->tc->phys_id[tid]]
 		- rc->bodies.cur_pos.x[aic->tc->phys_id[i]];
 		xdist *= xdist;
-		f32 ydist = rc->bodies.cur_pos.y[aic->tc->phys_id[tid]]
+		f64 ydist = rc->bodies.cur_pos.y[aic->tc->phys_id[tid]]
 		- rc->bodies.cur_pos.y[aic->tc->phys_id[i]];
 		ydist *= ydist;
 		// if the distance is smaller, save it
@@ -94,7 +94,7 @@ tank_id AI::get_nearest_ally(AI::AI_Core* aic,
 							 tank_id tid){
 	Physics::PhysRunner::RunnerCore* rc = aic->tc->parent_runner;
 	u32 tank_faction = aic->tc->faction[tid];
-	f32 sqdist = SHORT_MAX;
+	f64 sqdist = SHORT_MAX;
 	unsigned int aid = INVALID_ID;
 	for(int i = 0; i < MAX_TANKS; ++i){
 		// check if the tank is an allied tank
@@ -103,10 +103,10 @@ tank_id AI::get_nearest_ally(AI::AI_Core* aic,
 			continue;
 		}
 		// get the distance
-		f32 xdist = rc->bodies.cur_pos.x[aic->tc->phys_id[tid]]
+		f64 xdist = rc->bodies.cur_pos.x[aic->tc->phys_id[tid]]
 		- rc->bodies.cur_pos.x[aic->tc->phys_id[i]];
 		xdist *= xdist;
-		f32 ydist = rc->bodies.cur_pos.y[aic->tc->phys_id[tid]]
+		f64 ydist = rc->bodies.cur_pos.y[aic->tc->phys_id[tid]]
 		- rc->bodies.cur_pos.y[aic->tc->phys_id[i]];
 		ydist *= ydist;
 		// if the distance is smaller, save it
@@ -120,24 +120,24 @@ tank_id AI::get_nearest_ally(AI::AI_Core* aic,
 
 
 
-f32 AI::get_tank_dist(AI::AI_Core* aic,
+f64 AI::get_tank_dist(AI::AI_Core* aic,
 					  tank_id my_id,
 					  tank_id target_id){
 	Physics::PhysRunner::RunnerCore* rc = aic->tc->parent_runner;
-	f32 xdist = rc->bodies.cur_pos.x[aic->tc->phys_id[my_id]]
+	f64 xdist = rc->bodies.cur_pos.x[aic->tc->phys_id[my_id]]
 	- rc->bodies.cur_pos.x[aic->tc->phys_id[target_id]];
-	f32 ydist = rc->bodies.cur_pos.y[aic->tc->phys_id[my_id]]
+	f64 ydist = rc->bodies.cur_pos.y[aic->tc->phys_id[my_id]]
 	- rc->bodies.cur_pos.y[aic->tc->phys_id[target_id]];
 	return sqrt((xdist*xdist) + (ydist*ydist));
 }
 								   
-f32 AI::get_bullet_dist(AI::AI_Core* aic,
+f64 AI::get_bullet_dist(AI::AI_Core* aic,
 						tank_id tid,
 						bullet_id bid){
 	Physics::PhysRunner::RunnerCore* rc = aic->tc->parent_runner;
-	f32 xdist = rc->bodies.cur_pos.x[aic->tc->phys_id[tid]]
+	f64 xdist = rc->bodies.cur_pos.x[aic->tc->phys_id[tid]]
 	- rc->bodies.cur_pos.x[aic->bc->phys_id[bid]];
-	f32 ydist = rc->bodies.cur_pos.y[aic->tc->phys_id[tid]]
+	f64 ydist = rc->bodies.cur_pos.y[aic->tc->phys_id[tid]]
 	- rc->bodies.cur_pos.y[aic->bc->phys_id[bid]];
 	return sqrt((xdist * xdist) + (ydist*ydist));
 }
@@ -170,7 +170,7 @@ void AI::initialize(AI::AI_Core* aic,
 	AI::init_gene_data(aic);
 }
 
-void AI::timestep(AI::AI_Core* aic, f32 dt){
+void AI::timestep(AI::AI_Core* aic, f64 dt){
 	int idx = 0;
 	#if __CUDA_ARCH__
 	idx = threadIdx.x;
@@ -221,7 +221,7 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 									break;
 							}
 							// let's try to get to the right heading
-							f32 cur_rot = Physics::PhysRunner::get_rotation(aic->tc->parent_runner,
+							f64 cur_rot = Physics::PhysRunner::get_rotation(aic->tc->parent_runner,
 																			aic->tc->phys_id[my_tank]);
 																			cur_rot = util::clamp_dir_360(cur_rot);
 																			cur_rot = AI::get_vector(cur_rot);
@@ -247,7 +247,7 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 						target_pos -= my_pos;
 
 						// get the necessary rotation
-						f32 dir = atan2(target_pos.x, target_pos.y);
+						f64 dir = atan2(target_pos.x, target_pos.y);
 						dir = util::rads_to_degs(dir);
 						dir = util::clamp_dir_360(dir);
 
@@ -284,7 +284,7 @@ void AI::init_gene_data(AI::AI_Core* aic){
 
 void AI::update_perceptions(AI::AI_Core* aic,
 							ai_id id,
-							f32 dt){
+							f64 dt){
 	//TODO: break this up into smaller functions
 	if(aic->controlled_tanks[id] != INVALID_ID){
 		tank_id tid = aic->controlled_tanks[id];
@@ -339,13 +339,13 @@ void AI::update_perceptions(AI::AI_Core* aic,
 }
 
 s32 AI::get_sector(Physics::vec2 pos){
-	f32 dir = atan2(pos.x, pos.y);
+	f64 dir = atan2(pos.x, pos.y);
 	dir = util::rads_to_degs(dir);
 	dir = util::clamp_dir_360(dir);
 	return ((s32)(dir/SECTOR_SIZE));
 }
 
-s32 AI::get_vector(f32 rot){
+s32 AI::get_vector(f64 rot){
 	rot = util::clamp_dir_360(rot);
 	return ((s32)(rot/VECTOR_SIZE));
 }
