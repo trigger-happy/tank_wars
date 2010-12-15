@@ -110,7 +110,7 @@ __global__ void internal_frame_step(f32 dt,
 	__syncthreads();
 	if(tanks[blockIdx.x].state[0] != TANK_STATE_INACTIVE
 		&& threadIdx.x == 0){
-		scores[blockIdx.x] += 1;
+		//scores[blockIdx.x] += 1;
 	}
 }
 
@@ -244,66 +244,114 @@ void Evolver_gpu::prepare_game_state_impl(){
 	m_framecount = 0;
 	
 	// get the backup buffer and put it into current one
+// 	m_ai = m_ai_b;
+// 	m_runner = m_runner_b;
+// 	m_tanks = m_tanks_b;
+// 	m_bullets = m_bullets_b;
+	
+	// setup stuff on the current buffer
+// 	for(int i = 0; i < NUM_INSTANCES; ++i){
+// 		Physics::vec2 params;
+// 		params.x = -25;
+// 		tank_id evading_tank = BasicTank::spawn_tank(&m_tanks[i],
+// 													 params,
+// 													 90,
+// 													 0);
+// 		AI::add_tank(&m_ai[i], evading_tank, AI_TYPE_EVADER);
+// 		
+// 		params.x = 3;
+// 		params.y = 12;
+// 		tank_id attacking_tank = BasicTank::spawn_tank(&m_tanks[i],
+// 													   params,
+// 													   180,
+// 													   1);
+// 		AI::add_tank(&m_ai[i], attacking_tank, AI_TYPE_ATTACKER);
+// 		
+// 		params.x = 20;
+// 		params.y = -12;
+// 		attacking_tank = BasicTank::spawn_tank(&m_tanks[i],
+// 											   params,
+// 											   180,
+// 											   1);
+// 		AI::add_tank(&m_ai[i], attacking_tank, AI_TYPE_ATTACKER);
+// 	}
+// 	
+// 	// send it over to the device
+// 	copy_to_device();
+}
+
+
+void Evolver_gpu::perpare_game_scenario_impl(u32 dist, u32 bullet_loc, u32 bullet_vec){
+	m_framecount = 0;
 	m_ai = m_ai_b;
 	m_runner = m_runner_b;
 	m_tanks = m_tanks_b;
 	m_bullets = m_bullets_b;
-	
-	// setup stuff on the current buffer
+
+	Physics::vec2 atk_params;
+
+	// change the position based on the stuff above
+	f32 theta = SECTOR_SIZE*bullet_loc + SECTOR_SIZE/2;
+	f32 hypot = DISTANCE_FACTOR*dist + DISTANCE_FACTOR/2;
+	atk_params.y = hypot * sin(util::degs_to_rads(theta));
+	atk_params.x = hypot * cos(util::degs_to_rads(theta));
+	f32 tank_rot = VECTOR_SIZE*bullet_vec + VECTOR_SIZE/2;
+
 	for(int i = 0; i < NUM_INSTANCES; ++i){
 		Physics::vec2 params;
-		params.x = -25;
+		params.x = 0;
 		tank_id evading_tank = BasicTank::spawn_tank(&m_tanks[i],
 													 params,
 													 90,
 													 0);
 		AI::add_tank(&m_ai[i], evading_tank, AI_TYPE_EVADER);
-		
-		params.x = 3;
-		params.y = 12;
+
 		tank_id attacking_tank = BasicTank::spawn_tank(&m_tanks[i],
-													   params,
-													   180,
+													   atk_params,
+													   tank_rot,
 													   1);
 		AI::add_tank(&m_ai[i], attacking_tank, AI_TYPE_ATTACKER);
-		
-		params.x = 20;
-		params.y = -12;
-		attacking_tank = BasicTank::spawn_tank(&m_tanks[i],
-											   params,
-											   180,
-											   1);
-		AI::add_tank(&m_ai[i], attacking_tank, AI_TYPE_ATTACKER);
 	}
-	
-	// send it over to the device
+
+	// send it to the gpu
 	copy_to_device();
 }
 
-
-void Evolver_gpu::perpare_game_scenario_impl(u32 dist, u32 bullet_loc, u32 bullet_vec){
-}
-
 void Evolver_gpu::end_game_scenario_impl(){
+	copy_to_device();
+	for(int i = 0; i < NUM_INSTANCES; ++i){
+		if(m_tanks[i].state[0] != TANK_STATE_INACTIVE){
+			if(m_population_score.find(i) == m_population_score.end()){
+				m_population_score[i] = 0;
+			}
+			++(m_population_score[i]);
+		}
+	}
 }
 
 bool Evolver_gpu::is_game_over_impl(){
-	bool all_dead = true;
-	for(int i = 0; i < NUM_INSTANCES; ++i){
-		// tank 0 is the one dodging, check its status
-		all_dead &= (m_tanks[i].state[0] == TANK_STATE_INACTIVE);
+	if(m_framecount % RETRIEVE_INTERVAL == 0){
+		bool all_done = true;
+		bool really_done = true;
+		for(int i = 0; i < NUM_INSTANCES; ++i){
+			// tank 0 is the one dodging, check its status
+			all_done &= (m_tanks[i].state[0] == TANK_STATE_INACTIVE);
+			really_done &= (m_tanks[i].state[1] == TANK_STATE_INACTIVE);
+		}
+		if(all_done || really_done){
+			// 			finalize_impl();
+		}
+		return all_done | really_done;
+	}else{
+		return false;
 	}
-	if(all_dead){
-		finalize_impl();
-	}
-	return all_dead;
 }
 
 void Evolver_gpu::finalize_impl(){
-	for(int i = 0; i < NUM_INSTANCES; ++i){
-		m_population_score[i] = m_score[i];
-		m_score[i] = 0;
-	}
+// 	for(int i = 0; i < NUM_INSTANCES; ++i){
+// 		m_population_score[i] = m_score[i];
+// 		m_score[i] = 0;
+// 	}
 }
 
 void Evolver_gpu::copy_to_device(){
