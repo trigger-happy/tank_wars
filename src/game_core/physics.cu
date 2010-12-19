@@ -121,21 +121,21 @@ CUDA_EXPORT void update_verlet(f32 dt,
 	
 	// restrict within the screen coordinates
 	// check x
-	if(bodies->cur_pos.x[idx] < SCREEN_LEFT){
-		bodies->cur_pos.x[idx] += SCREEN_RIGHT*2;
-		bodies->old_pos.x[idx] += SCREEN_RIGHT*2;
-	}else if(bodies->cur_pos.x[idx] > SCREEN_RIGHT){
-		bodies->cur_pos.x[idx] += SCREEN_LEFT*2;
-		bodies->old_pos.x[idx] += SCREEN_LEFT*2;
-	}
-	// check y
-	if(bodies->cur_pos.y[idx] > SCREEN_TOP){
-		bodies->cur_pos.y[idx] += SCREEN_BOTTOM*2;
-		bodies->old_pos.y[idx] += SCREEN_BOTTOM*2;
-	}else if(bodies->cur_pos.y[idx] < SCREEN_BOTTOM){
-		bodies->cur_pos.y[idx] += SCREEN_TOP*2;
-		bodies->old_pos.y[idx] += SCREEN_TOP*2;
-	}
+// 	if(bodies->cur_pos.x[idx] < SCREEN_LEFT){
+// 		bodies->cur_pos.x[idx] += SCREEN_RIGHT*2;
+// 		bodies->old_pos.x[idx] += SCREEN_RIGHT*2;
+// 	}else if(bodies->cur_pos.x[idx] > SCREEN_RIGHT){
+// 		bodies->cur_pos.x[idx] += SCREEN_LEFT*2;
+// 		bodies->old_pos.x[idx] += SCREEN_LEFT*2;
+// 	}
+// 	// check y
+// 	if(bodies->cur_pos.y[idx] > SCREEN_TOP){
+// 		bodies->cur_pos.y[idx] += SCREEN_BOTTOM*2;
+// 		bodies->old_pos.y[idx] += SCREEN_BOTTOM*2;
+// 	}else if(bodies->cur_pos.y[idx] < SCREEN_BOTTOM){
+// 		bodies->cur_pos.y[idx] += SCREEN_TOP*2;
+// 		bodies->old_pos.y[idx] += SCREEN_TOP*2;
+// 	}
 	
 	#if !defined(__CUDA_ARCH__)
 	}
