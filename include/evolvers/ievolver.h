@@ -29,7 +29,7 @@ Boston, MA 02110-1301, USA.
 #ifdef SAVE_SIM_DATA
 #define NUM_INSTANCES 4
 #else
-#define NUM_INSTANCES 2048
+#define NUM_INSTANCES 1024
 #endif
 
 // top 5% will be elite
