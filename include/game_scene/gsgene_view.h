@@ -58,6 +58,14 @@ public:
 	inline AI::AI_Core& get_ai(){
 		return m_ai;
 	}
+
+	inline u32 get_running_score() const{
+		return m_runningscore;
+	}
+
+private:
+	void prepare_game_scenario(u32 dist, u32 bullet_loc, u32 bullet_vec);
+	
 private:
 	boost::scoped_ptr<Physics::PhysRunner::RunnerCore> m_physrunner;
 	boost::scoped_ptr<CL_Sprite> m_background;
@@ -85,6 +93,11 @@ private:
 	// timer for debugging
 	boost::timer m_timer;
 	u32 m_frames_elapsed;
+
+	u32 m_test_dist;
+	u32 m_test_sect;
+	u32 m_test_vect;
+	u32 m_runningscore;
 };
 
 #endif // GSGENE_VIEW_H

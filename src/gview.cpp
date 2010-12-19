@@ -14,6 +14,7 @@
 	Boston, MA 02110-1301, USA.
 */
 
+#include <iostream>
 #include <vector>
 #include <stack>
 #include <ClanLib/core.h>
@@ -44,10 +45,11 @@ bool					GameDisplay::s_usecuda = false;
 bool					GameDisplay::s_view_gene = false;
 
 // This is a prototype, deal with the fact we're using global vars
-DataStore* g_db;
+DataStore* g_db = NULL;
 ai_key g_aik;
 
 namespace po = boost::program_options;
+using namespace std;
 
 void GameDisplay::push_scene(iGameScene* scene){
 	if(!s_scene_stack.empty()){

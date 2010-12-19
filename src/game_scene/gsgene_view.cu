@@ -20,6 +20,8 @@
 #include <iostream>
 #include <cuda.h>
 #include "game_display.h"
+#include "data_store/data_store.h"
+#include "data_store/ds_types.h"
 #include "game_scene/gsgene_view.h"
 #include "../game_core/twgame.cu"
 // #include "game_core/physics.h"
@@ -32,6 +34,9 @@
 #define CUDA_THREADS MAX_ARRAY_SIZE
 
 using namespace std;
+
+extern DataStore* g_db;
+extern ai_key g_aik;
 
 // helper function
 void apply_transform(CL_GraphicContext* gc, Physics::vec2& c){
@@ -72,18 +77,20 @@ GSGeneView::GSGeneView(CL_GraphicContext& gc, CL_ResourceManager& resources)
 	AI::initialize(&m_ai, &m_tanks, &m_bullets);
 	
 	// test code
-	Physics::vec2 params;
-	params.x = -25;
-	m_playertank = BasicTank::spawn_tank(&m_tanks, params, 90, 0);
-	params.x = 3;
-	params.y = 12;
-	m_player2tank = BasicTank::spawn_tank(&m_tanks, params, 180, 1);
-	params.x = 20;
-	params.y = -12;
-	m_player3tank = BasicTank::spawn_tank(&m_tanks, params, 180, 1);
-	AI::add_tank(&m_ai, m_playertank, AI_TYPE_EVADER);
-	AI::add_tank(&m_ai, m_player2tank, AI_TYPE_ATTACKER);
-	AI::add_tank(&m_ai, m_player3tank, AI_TYPE_ATTACKER);
+// 	Physics::vec2 params;
+// 	params.x = 0;
+// 	m_playertank = BasicTank::spawn_tank(&m_tanks, params, 90, 0);
+// 	params.x = 0;
+// 	params.y = 12;
+// 	m_player2tank = BasicTank::spawn_tank(&m_tanks, params, 180, 1);
+// 	AI::add_tank(&m_ai, m_playertank, AI_TYPE_EVADER);
+// 	AI::add_tank(&m_ai, m_player2tank, AI_TYPE_ATTACKER);
+
+	// prepare the initial scenario
+	m_test_dist = 1;
+	m_test_sect = 0;
+	m_test_vect = 0;
+	prepare_game_scenario(m_test_dist, m_test_sect, m_test_vect);
 
 	// load a saved gene for viewing
 	if(GameDisplay::s_view_gene){
@@ -133,6 +140,39 @@ GSGeneView::GSGeneView(CL_GraphicContext& gc, CL_ResourceManager& resources)
 				   sizeof(m_ai), cudaMemcpyHostToDevice);
 	}
 	m_frames_elapsed = 0;
+	m_runningscore = 0;
+}
+
+void GSGeneView::prepare_game_scenario(u32 dist, u32 bullet_loc, u32 bullet_vec){
+	Physics::PhysRunner::initialize(m_physrunner.get());
+	TankBullet::initialize(&m_bullets, m_physrunner.get());
+	BasicTank::initialize(&m_tanks, m_physrunner.get(), &m_bullets);
+	AI::initialize(&m_ai, &m_tanks, &m_bullets);
+	u32 score = 0;
+	// set the gene data
+	g_db->get_gene_data(g_aik, score, this->get_ai());
+
+	Physics::vec2 atk_params;
+	
+	f32 theta = SECTOR_SIZE*bullet_loc + SECTOR_SIZE/2;
+	f32 hypot = DISTANCE_FACTOR*dist + DISTANCE_FACTOR/2;
+	atk_params.y = hypot * sin(util::degs_to_rads(theta));
+	atk_params.x = hypot * cos(util::degs_to_rads(theta));
+	f32 tank_rot = VECTOR_SIZE*bullet_vec + VECTOR_SIZE/2;
+	
+	Physics::vec2 params;
+	params.x = 0;
+	m_playertank = BasicTank::spawn_tank(&m_tanks,
+													params,
+													90,
+													0);
+	AI::add_tank(&m_ai, m_playertank, AI_TYPE_EVADER);
+
+	m_player2tank = BasicTank::spawn_tank(&m_tanks,
+													atk_params,
+													tank_rot,
+													1);
+	AI::add_tank(&m_ai, m_player2tank, AI_TYPE_ATTACKER);
 }
 
 GSGeneView::~GSGeneView(){
@@ -193,16 +233,16 @@ void GSGeneView::onFrameRender(CL_GraphicContext* gc){
 		m_testtank2->draw(*gc, pos.x, pos.y);
 	}
 	
-	if(m_tanks.state[m_player3tank] != TANK_STATE_INACTIVE){
-		pos = BasicTank::get_tank_pos(&m_tanks, m_player3tank);
-		apply_transform(gc, pos);
-		f32 rot = BasicTank::get_tank_rot(&m_tanks, m_player3tank);
-		m_testtank2->set_angle(CL_Angle(-rot, cl_degrees));
-		m_testtank2->draw(*gc, pos.x, pos.y);
-	}
+// 	if(m_tanks.state[m_player3tank] != TANK_STATE_INACTIVE){
+// 		pos = BasicTank::get_tank_pos(&m_tanks, m_player3tank);
+// 		apply_transform(gc, pos);
+// 		f32 rot = BasicTank::get_tank_rot(&m_tanks, m_player3tank);
+// 		m_testtank2->set_angle(CL_Angle(-rot, cl_degrees));
+// 		m_testtank2->draw(*gc, pos.x, pos.y);
+// 	}
 	
 	// Debug info
-	CL_StringFormat fmt("States: %1 %2 %3 %4 | Player pos: %5 %6 | Time elapsed: %7");
+	CL_StringFormat fmt("States: %1 %2 %3 %4 | Player pos: %5 %6 | Running Score: %7");
 	fmt.set_arg(1, m_ai.bullet_vector[0]);
 	fmt.set_arg(2, m_ai.tank_vector[0]);
 	fmt.set_arg(3, m_ai.direction_state[0]);
@@ -211,7 +251,7 @@ void GSGeneView::onFrameRender(CL_GraphicContext* gc){
 														 m_tanks.phys_id[m_playertank]);
 	fmt.set_arg(5, pos.x);
 	fmt.set_arg(6, pos.y);
-	fmt.set_arg(7, m_frames_elapsed);
+	fmt.set_arg(7, m_runningscore);
 	m_dbgmsg = fmt.get_result();
 	m_debugfont->draw_text(*gc, 1, 12, m_dbgmsg, CL_Colorf::red);
 }
@@ -277,7 +317,8 @@ void GSGeneView::onFrameUpdate(double dt,
 				   cudaMemcpyDeviceToHost);
 	}else{
 		// process the player input
-		if(m_tanks.state[m_playertank] != TANK_STATE_INACTIVE){
+		if(m_tanks.state[m_playertank] != TANK_STATE_INACTIVE
+			&& m_tanks.state[m_player2tank] != TANK_STATE_INACTIVE){
 			// perform all the update
 			AI::timestep(&m_ai, dt);
 			Physics::PhysRunner::timestep(m_physrunner.get(), dt);
@@ -292,6 +333,38 @@ void GSGeneView::onFrameUpdate(double dt,
 			for(int i = 0; i < MAX_TANKS; ++i){
 				Collision::tank_tank_check(&m_tanks, i);
 			}
+		}else if(m_tanks.state[m_playertank] == TANK_STATE_INACTIVE){
+			// player tank died, let's reset
+			++m_test_vect;
+			if(m_test_vect >= NUM_BULLET_VECTORS){
+				m_test_vect = 0;
+				++m_test_sect;
+				if(m_test_sect >= NUM_LOCATION_STATES){
+					m_test_sect = 0;
+					++m_test_dist;
+					if(m_test_dist >= NUM_DISTANCE_STATES){
+						cout << m_runningscore << endl;
+						GameDisplay::s_running = false;
+					}
+				}
+			}
+			prepare_game_scenario(m_test_dist, m_test_sect, m_test_vect);
+		}else if(m_tanks.state[m_player2tank] == TANK_STATE_INACTIVE){
+			++m_runningscore;
+			++m_test_vect;
+			if(m_test_vect >= NUM_BULLET_VECTORS){
+				m_test_vect = 0;
+				++m_test_sect;
+				if(m_test_sect >= NUM_LOCATION_STATES){
+					m_test_sect = 0;
+					++m_test_dist;
+					if(m_test_dist >= NUM_DISTANCE_STATES){
+						cout << m_runningscore << endl;
+						GameDisplay::s_running = false;
+					}
+				}
+			}
+			prepare_game_scenario(m_test_dist, m_test_sect, m_test_vect);
 		}
 	}
 	
