@@ -91,9 +91,10 @@ bool Collision::tank_tank_check(BasicTank::TankCollection* tc,
 		f32 sq_dist = (xdiff * xdiff) + (ydiff * ydiff);
 		if(sq_dist <= (t2_radius + tank_radius) * (t2_radius + tank_radius)){
 			// A collision!
-			BasicTank::kill_tank(tc, tid);
-			BasicTank::kill_tank(tc, tid2);
-			return true;
+// 			BasicTank::kill_tank(tc, tid);
+// 			BasicTank::kill_tank(tc, tid2);
+// 			return true;
+			return false;
 		}
 	}
 	return false;
