@@ -26,7 +26,7 @@
 #ifdef SAVE_SIM_DATA
 #define MAX_GENERATIONS 1
 #else
-#define MAX_GENERATIONS 48
+#define MAX_GENERATIONS 64
 #endif
 
 
