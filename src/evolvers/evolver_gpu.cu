@@ -240,6 +240,9 @@ void Evolver_gpu::save_best_gene_impl(const string& fname){
 
 void Evolver_gpu::prepare_game_state_impl(){
 	m_population_score.clear();
+	for(int i = 0; i < NUM_INSTANCES; ++i){
+		m_population_score[i] = 0;
+	}
 	fill(m_score.begin(), m_score.end(), 0);
 	m_framecount = 0;
 	
@@ -318,7 +321,7 @@ void Evolver_gpu::perpare_game_scenario_impl(u32 dist, u32 bullet_loc, u32 bulle
 }
 
 void Evolver_gpu::end_game_scenario_impl(){
-	copy_to_device();
+	copy_from_device();
 	for(int i = 0; i < NUM_INSTANCES; ++i){
 		if(m_tanks[i].state[0] != TANK_STATE_INACTIVE){
 			if(m_population_score.find(i) == m_population_score.end()){

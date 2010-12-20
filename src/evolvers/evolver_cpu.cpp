@@ -190,6 +190,9 @@ void Evolver_cpu::save_best_gene_impl(const std::string& fname){
 
 void Evolver_cpu::prepare_game_state_impl(){
 	m_population_score.clear();
+	for(int i = 0; i < NUM_INSTANCES; ++i){
+		m_population_score[i] = 0;
+	}
 	m_framecount = 0;
 
 	// restore from the backup buffer
