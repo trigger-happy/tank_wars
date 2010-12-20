@@ -23,7 +23,7 @@
 #define SHORT_MAX 32767
 #define DISTANCE_DEFAULT SHORT_MAX
 
-#define AI_PRINT_DBG
+// #define AI_PRINT_DBG
 
 #ifdef AI_PRINT_DBG
 #if !defined(__CUDA_ARCH__)
