@@ -46,7 +46,7 @@
 #define AI_TYPE_ATTACKER		2
 #define AI_TYPE_TRAINER			3
 
-#define FRAMES_PER_UPDATE		29
+#define FRAMES_PER_UPDATE		4000
 
 namespace AI{
 	typedef u32 ai_id;
