@@ -75,6 +75,11 @@ GSGeneView::GSGeneView(CL_GraphicContext& gc, CL_ResourceManager& resources)
 	TankBullet::initialize(&m_bullets, m_physrunner.get());
 	BasicTank::initialize(&m_tanks, m_physrunner.get(), &m_bullets);
 	AI::initialize(&m_ai, &m_tanks, &m_bullets);
+	u32 score = 0;
+	// set the gene data
+	g_db->get_gene_data(g_aik, score, this->get_ai());
+
+	m_ai_b = m_ai;
 	
 	// test code
 // 	Physics::vec2 params;
@@ -148,9 +153,8 @@ void GSGeneView::prepare_game_scenario(u32 dist, u32 bullet_loc, u32 bullet_vec)
 	TankBullet::initialize(&m_bullets, m_physrunner.get());
 	BasicTank::initialize(&m_tanks, m_physrunner.get(), &m_bullets);
 	AI::initialize(&m_ai, &m_tanks, &m_bullets);
-	u32 score = 0;
-	// set the gene data
-	g_db->get_gene_data(g_aik, score, this->get_ai());
+
+	m_ai = m_ai_b;
 
 	Physics::vec2 atk_params;
 	

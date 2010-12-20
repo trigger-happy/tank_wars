@@ -79,6 +79,7 @@ private:
 	TankBullet::BulletCollection m_bullets;
 	BasicTank::TankCollection m_tanks;
 	AI::AI_Core m_ai;
+	AI::AI_Core m_ai_b;
 	tank_id m_playertank;
 	tank_id m_player2tank;
 	tank_id m_player3tank;

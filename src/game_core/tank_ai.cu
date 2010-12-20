@@ -161,7 +161,7 @@ void AI::initialize(AI::AI_Core* aic,
 	g_frame_count = 0;
 #endif
 #endif
-	aic->frame_count = FRAMES_PER_UPDATE-1;
+	aic->frame_count = FRAMES_PER_UPDATE-5;
 	aic->tc = tc;
 	aic->bc = bc;
 	aic->next_slot = 0;
@@ -184,6 +184,11 @@ void AI::initialize(AI::AI_Core* aic,
 		   0, MAX_AI_CONTROLLERS*sizeof(s32));
 	memset(static_cast<void*>(aic->shot_count),
 		   0, MAX_AI_CONTROLLERS*sizeof(s32));
+
+	for(int i = 0; i < MAX_AI_EVADERS; ++i){
+		aic->desired_heading[i] = -1;
+		aic->desired_thrust[i] = -1;
+	}
 	
 	AI::init_gene_data(aic);
 }
@@ -289,7 +294,7 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 																	aic->tc->phys_id[my_tank]);
 					cur_rot = util::clamp_dir_360(cur_rot);
 					cur_rot = AI::get_vector(cur_rot);
-					if(index != -1){
+					if(aic->desired_heading[idx] != -1 && index != -1){
 						if(aic->desired_heading[idx] < cur_rot){
 							BasicTank::turn_left(aic->tc, my_tank);
 						}else if(aic->desired_heading[idx] > cur_rot){
