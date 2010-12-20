@@ -38,7 +38,7 @@
 
 #define MAX_THRUST_VALUES		3
 #define MAX_HEADING_VALUES		8
-#define MAX_AI_CONTROLLERS		3
+#define MAX_AI_CONTROLLERS		2
 #define MAX_AI_EVADERS			1
 
 #define AI_TYPE_INVALID			0

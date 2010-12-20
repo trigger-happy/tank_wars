@@ -23,7 +23,7 @@
 #define SHORT_MAX 32767
 #define DISTANCE_DEFAULT SHORT_MAX
 
-// #define AI_PRINT_DBG
+#define AI_PRINT_DBG
 
 #ifdef AI_PRINT_DBG
 #if !defined(__CUDA_ARCH__)
@@ -156,7 +156,12 @@ f32 AI::get_bullet_dist(AI::AI_Core* aic,
 void AI::initialize(AI::AI_Core* aic,
 					BasicTank::TankCollection* tc,
 					TankBullet::BulletCollection* bc){
-	aic->frame_count = FRAMES_PER_UPDATE;
+#ifdef AI_PRINT_DBG
+#if !defined(__CUDA_ARCH__)
+	g_frame_count = 0;
+#endif
+#endif
+	aic->frame_count = FRAMES_PER_UPDATE-1;
 	aic->tc = tc;
 	aic->bc = bc;
 	aic->next_slot = 0;
@@ -217,16 +222,20 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 				// perform AI actions
 				if(aic->ai_type[idx] == AI_TYPE_EVADER){
 						// check how many frames has passed
+						s32 index = 0;
 					if(aic->frame_count >= FRAMES_PER_UPDATE){
-						s32 index = aic->bullet_vector[idx] * aic->tank_vector[idx] *
+						index = aic->bullet_vector[idx] *
 						aic->direction_state[idx] * aic->distance_state[idx];
-
-						// get the desired heading
-						aic->desired_heading[idx] = aic->gene_heading[index][idx];
-						aic->desired_thrust[idx] = aic->gene_accel[index][idx];
 						
-						if(index >= 0){
+						if(index >= 0
+							&& aic->bullet_vector[idx] >= 0
+							&& aic->direction_state[idx] >= 0
+							&& aic->distance_state[idx] >= 0){
 							// valid index, access the action from the array
+							
+							// get the desired heading
+							aic->desired_heading[idx] = aic->gene_heading[index][idx];
+							aic->desired_thrust[idx] = aic->gene_accel[index][idx];
 
 							// dump the data for debugging
 							#ifdef AI_PRINT_DBG
@@ -250,9 +259,13 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 							#endif
 						}else{
 							#if !defined(__CUDA_ARCH__)
-							assert("NEGATIVE INDEX" && false);
+// 							assert("NEGATIVE INDEX" && false);
 							#endif
 							BasicTank::stop(aic->tc, my_tank);
+							aic->desired_heading[idx] = -1;
+							aic->desired_thrust[idx] = -1;
+							// this is for the desired_heading
+							index = -1;
 						}
 						//TODO: state machine here in the future?
 					}
@@ -261,6 +274,7 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 					// let's try to get to the right heading
 					switch(aic->desired_thrust[idx]){
 						case 0:
+						case -1:
 							BasicTank::stop(aic->tc, my_tank);
 							break;
 						case 1:
@@ -275,10 +289,12 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 																	aic->tc->phys_id[my_tank]);
 					cur_rot = util::clamp_dir_360(cur_rot);
 					cur_rot = AI::get_vector(cur_rot);
-					if(aic->desired_heading[idx] < cur_rot){
-						BasicTank::turn_left(aic->tc, my_tank);
-					}else if(aic->desired_heading[idx] > cur_rot){
-						BasicTank::turn_right(aic->tc, my_tank);
+					if(index != -1){
+						if(aic->desired_heading[idx] < cur_rot){
+							BasicTank::turn_left(aic->tc, my_tank);
+						}else if(aic->desired_heading[idx] > cur_rot){
+							BasicTank::turn_right(aic->tc, my_tank);
+						}
 					}
 				}else if(aic->ai_type[idx] == AI_TYPE_ATTACKER){
 					// get the nearest target to shoot at
@@ -330,29 +346,29 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 				}
 			}
 		}
-		#ifdef AI_PRINT_DBG
-		#if !defined(__CUDA_ARCH__)
-		if(g_frame_count == 0){
-			// output the initial state
-			tank_id my_tank = aic->controlled_tanks[idx];
-			bullet_id near_bul = AI::get_nearest_bullet(aic, my_tank);
-			Physics::vec2 mypos = BasicTank::get_tank_pos(aic->tc, my_tank);
-			Physics::vec2 bpos = TankBullet::get_bullet_pos(aic->bc, near_bul);
-			cout << g_frame_count << " "
-					<< aic->bullet_vector[idx] << " "
-					<< aic->tank_vector[idx] << " "
-					<< aic->direction_state[idx] << " "
-					<< aic->distance_state[idx] << " | "
-					<< mypos.x << " "
-					<< mypos.y << " "
-					<< BasicTank::get_tank_rot(aic->tc, my_tank) << " | "
-					<< bpos.x << " "
-					<< bpos.y << " "
-					<< Physics::PhysRunner::get_rotation(aic->bc->parent_runner, aic->bc->phys_id[near_bul])
-					<< endl;
-		}
-		#endif
-		#endif
+// 		#ifdef AI_PRINT_DBG
+// 		#if !defined(__CUDA_ARCH__)
+// 		if(g_frame_count == 0){
+// 			// output the initial state
+// 			tank_id my_tank = aic->controlled_tanks[idx];
+// 			bullet_id near_bul = AI::get_nearest_bullet(aic, my_tank);
+// 			Physics::vec2 mypos = BasicTank::get_tank_pos(aic->tc, my_tank);
+// 			Physics::vec2 bpos = TankBullet::get_bullet_pos(aic->bc, near_bul);
+// 			cout << g_frame_count << " "
+// 					<< aic->bullet_vector[idx] << " "
+// 					<< aic->tank_vector[idx] << " "
+// 					<< aic->direction_state[idx] << " "
+// 					<< aic->distance_state[idx] << " | "
+// 					<< mypos.x << " "
+// 					<< mypos.y << " "
+// 					<< BasicTank::get_tank_rot(aic->tc, my_tank) << " | "
+// 					<< bpos.x << " "
+// 					<< bpos.y << " "
+// 					<< Physics::PhysRunner::get_rotation(aic->bc->parent_runner, aic->bc->phys_id[near_bul])
+// 					<< endl;
+// 		}
+// 		#endif
+// 		#endif
 	}
 	#ifdef AI_PRINT_DBG
 	#if !defined(__CUDA_ARCH__)
