@@ -1,0 +1,264 @@
+Performing CPU evolution
+Running generation 0
+Generation: 0 survived scenarios: 29 score: 0.805556 time: 506.27
+Running generation 1
+Generation: 1 survived scenarios: 31 score: 0.861111 time: 547.71
+Running generation 2
+Generation: 2 survived scenarios: 31 score: 0.861111 time: 548.08
+Running generation 3
+Generation: 3 survived scenarios: 31 score: 0.861111 time: 548.78
+Running generation 4
+Generation: 4 survived scenarios: 31 score: 0.861111 time: 548.27
+Running generation 5
+Generation: 5 survived scenarios: 32 score: 0.888889 time: 547.58
+Running generation 6
+Generation: 6 survived scenarios: 33 score: 0.916667 time: 548.68
+Running generation 7
+Generation: 7 survived scenarios: 33 score: 0.916667 time: 533.42
+Running generation 8
+Generation: 8 survived scenarios: 33 score: 0.916667 time: 503.29
+Running generation 9
+Generation: 9 survived scenarios: 33 score: 0.916667 time: 503.86
+Running generation 10
+Generation: 10 survived scenarios: 33 score: 0.916667 time: 502.56
+Running generation 11
+Generation: 11 survived scenarios: 33 score: 0.916667 time: 471.8
+Running generation 12
+Generation: 12 survived scenarios: 33 score: 0.916667 time: 427.15
+Running generation 13
+Generation: 13 survived scenarios: 33 score: 0.916667 time: 427.5
+Running generation 14
+Generation: 14 survived scenarios: 33 score: 0.916667 time: 425.85
+Running generation 15
+Generation: 15 survived scenarios: 33 score: 0.916667 time: 425.14
+Running generation 16
+Generation: 16 survived scenarios: 33 score: 0.916667 time: 395.57
+Running generation 17
+Generation: 17 survived scenarios: 33 score: 0.916667 time: 379.88
+Running generation 18
+Generation: 18 survived scenarios: 33 score: 0.916667 time: 349.3
+Running generation 19
+Generation: 19 survived scenarios: 33 score: 0.916667 time: 333.18
+Running generation 20
+Generation: 20 survived scenarios: 33 score: 0.916667 time: 215.08
+Running generation 21
+Generation: 21 survived scenarios: 33 score: 0.916667 time: 214.7
+Running generation 22
+Generation: 22 survived scenarios: 33 score: 0.916667 time: 214.28
+Running generation 23
+Generation: 23 survived scenarios: 33 score: 0.916667 time: 214.49
+Running generation 24
+Generation: 24 survived scenarios: 33 score: 0.916667 time: 214.66
+Running generation 25
+Generation: 25 survived scenarios: 33 score: 0.916667 time: 214.5
+Running generation 26
+Generation: 26 survived scenarios: 33 score: 0.916667 time: 215
+Running generation 27
+Generation: 27 survived scenarios: 33 score: 0.916667 time: 215.49
+Running generation 28
+Generation: 28 survived scenarios: 33 score: 0.916667 time: 215.42
+Running generation 29
+Generation: 29 survived scenarios: 33 score: 0.916667 time: 215.01
+Running generation 30
+Generation: 30 survived scenarios: 33 score: 0.916667 time: 214.44
+Running generation 31
+Generation: 31 survived scenarios: 33 score: 0.916667 time: 214.37
+Running generation 32
+Generation: 32 survived scenarios: 33 score: 0.916667 time: 215.11
+Running generation 33
+Generation: 33 survived scenarios: 33 score: 0.916667 time: 212.79
+Running generation 34
+Generation: 34 survived scenarios: 33 score: 0.916667 time: 211.29
+Running generation 35
+Generation: 35 survived scenarios: 33 score: 0.916667 time: 215.16
+Running generation 36
+Generation: 36 survived scenarios: 33 score: 0.916667 time: 215.55
+Running generation 37
+Generation: 37 survived scenarios: 33 score: 0.916667 time: 214.82
+Running generation 38
+Generation: 38 survived scenarios: 33 score: 0.916667 time: 215.13
+Running generation 39
+Generation: 39 survived scenarios: 33 score: 0.916667 time: 215.31
+Running generation 40
+Generation: 40 survived scenarios: 33 score: 0.916667 time: 215.02
+Running generation 41
+Generation: 41 survived scenarios: 33 score: 0.916667 time: 214.98
+Running generation 42
+Generation: 42 survived scenarios: 33 score: 0.916667 time: 214.65
+Running generation 43
+Generation: 43 survived scenarios: 33 score: 0.916667 time: 214.81
+Running generation 44
+Generation: 44 survived scenarios: 33 score: 0.916667 time: 214.82
+Running generation 45
+Generation: 45 survived scenarios: 33 score: 0.916667 time: 214.86
+Running generation 46
+Generation: 46 survived scenarios: 33 score: 0.916667 time: 214.72
+Running generation 47
+Generation: 47 survived scenarios: 33 score: 0.916667 time: 215.02
+Running generation 48
+Generation: 48 survived scenarios: 33 score: 0.916667 time: 214.44
+Running generation 49
+Generation: 49 survived scenarios: 33 score: 0.916667 time: 214.45
+Running generation 50
+Generation: 50 survived scenarios: 33 score: 0.916667 time: 214.81
+Running generation 51
+Generation: 51 survived scenarios: 33 score: 0.916667 time: 214.87
+Running generation 52
+Generation: 52 survived scenarios: 33 score: 0.916667 time: 215.38
+Running generation 53
+Generation: 53 survived scenarios: 33 score: 0.916667 time: 215.31
+Running generation 54
+Generation: 54 survived scenarios: 33 score: 0.916667 time: 214.97
+Running generation 55
+Generation: 55 survived scenarios: 33 score: 0.916667 time: 214.41
+Running generation 56
+Generation: 56 survived scenarios: 33 score: 0.916667 time: 214.28
+Running generation 57
+Generation: 57 survived scenarios: 33 score: 0.916667 time: 214.89
+Running generation 58
+Generation: 58 survived scenarios: 33 score: 0.916667 time: 215.35
+Running generation 59
+Generation: 59 survived scenarios: 33 score: 0.916667 time: 214.45
+Running generation 60
+Generation: 60 survived scenarios: 33 score: 0.916667 time: 214.51
+Running generation 61
+Generation: 61 survived scenarios: 33 score: 0.916667 time: 214.42
+Running generation 62
+Generation: 62 survived scenarios: 33 score: 0.916667 time: 214.86
+Running generation 63
+Generation: 63 survived scenarios: 33 score: 0.916667 time: 215.42
+Number of generations: 0
+Best score: 33
+Total evolution time: 18923.1
+Performing GPU evolution
+Running generation 0
+Generation: 0 survived scenarios: 29 score: 0.805556 time: 88.87
+Running generation 1
+Generation: 1 survived scenarios: 30 score: 0.833333 time: 91.23
+Running generation 2
+Generation: 2 survived scenarios: 31 score: 0.861111 time: 92.79
+Running generation 3
+Generation: 3 survived scenarios: 31 score: 0.861111 time: 93.96
+Running generation 4
+Generation: 4 survived scenarios: 33 score: 0.916667 time: 95.01
+Running generation 5
+Generation: 5 survived scenarios: 33 score: 0.916667 time: 95.92
+Running generation 6
+Generation: 6 survived scenarios: 33 score: 0.916667 time: 96.59
+Running generation 7
+Generation: 7 survived scenarios: 33 score: 0.916667 time: 91.78
+Running generation 8
+Generation: 8 survived scenarios: 33 score: 0.916667 time: 86.48
+Running generation 9
+Generation: 9 survived scenarios: 33 score: 0.916667 time: 87.22
+Running generation 10
+Generation: 10 survived scenarios: 33 score: 0.916667 time: 82.05
+Running generation 11
+Generation: 11 survived scenarios: 33 score: 0.916667 time: 73.61
+Running generation 12
+Generation: 12 survived scenarios: 33 score: 0.916667 time: 68.23
+Running generation 13
+Generation: 13 survived scenarios: 33 score: 0.916667 time: 68.44
+Running generation 14
+Generation: 14 survived scenarios: 33 score: 0.916667 time: 65.45
+Running generation 15
+Generation: 15 survived scenarios: 33 score: 0.916667 time: 62.68
+Running generation 16
+Generation: 16 survived scenarios: 33 score: 0.916667 time: 62.88
+Running generation 17
+Generation: 17 survived scenarios: 33 score: 0.916667 time: 51.54
+Running generation 18
+Generation: 18 survived scenarios: 33 score: 0.916667 time: 51.59
+Running generation 19
+Generation: 19 survived scenarios: 33 score: 0.916667 time: 51.59
+Running generation 20
+Generation: 20 survived scenarios: 33 score: 0.916667 time: 51.61
+Running generation 21
+Generation: 21 survived scenarios: 33 score: 0.916667 time: 51.62
+Running generation 22
+Generation: 22 survived scenarios: 33 score: 0.916667 time: 51.65
+Running generation 23
+Generation: 23 survived scenarios: 33 score: 0.916667 time: 51.49
+Running generation 24
+Generation: 24 survived scenarios: 33 score: 0.916667 time: 51.54
+Running generation 25
+Generation: 25 survived scenarios: 33 score: 0.916667 time: 51.63
+Running generation 26
+Generation: 26 survived scenarios: 33 score: 0.916667 time: 51.56
+Running generation 27
+Generation: 27 survived scenarios: 33 score: 0.916667 time: 51.58
+Running generation 28
+Generation: 28 survived scenarios: 33 score: 0.916667 time: 51.57
+Running generation 29
+Generation: 29 survived scenarios: 33 score: 0.916667 time: 51.44
+Running generation 30
+Generation: 30 survived scenarios: 33 score: 0.916667 time: 51.77
+Running generation 31
+Generation: 31 survived scenarios: 33 score: 0.916667 time: 51.62
+Running generation 32
+Generation: 32 survived scenarios: 33 score: 0.916667 time: 51.63
+Running generation 33
+Generation: 33 survived scenarios: 33 score: 0.916667 time: 51.69
+Running generation 34
+Generation: 34 survived scenarios: 33 score: 0.916667 time: 51.6
+Running generation 35
+Generation: 35 survived scenarios: 33 score: 0.916667 time: 51.51
+Running generation 36
+Generation: 36 survived scenarios: 33 score: 0.916667 time: 51.86
+Running generation 37
+Generation: 37 survived scenarios: 33 score: 0.916667 time: 51.55
+Running generation 38
+Generation: 38 survived scenarios: 33 score: 0.916667 time: 51.69
+Running generation 39
+Generation: 39 survived scenarios: 33 score: 0.916667 time: 51.82
+Running generation 40
+Generation: 40 survived scenarios: 33 score: 0.916667 time: 51.64
+Running generation 41
+Generation: 41 survived scenarios: 33 score: 0.916667 time: 51.61
+Running generation 42
+Generation: 42 survived scenarios: 33 score: 0.916667 time: 51.68
+Running generation 43
+Generation: 43 survived scenarios: 33 score: 0.916667 time: 51.76
+Running generation 44
+Generation: 44 survived scenarios: 33 score: 0.916667 time: 51.79
+Running generation 45
+Generation: 45 survived scenarios: 33 score: 0.916667 time: 51.59
+Running generation 46
+Generation: 46 survived scenarios: 33 score: 0.916667 time: 51.7
+Running generation 47
+Generation: 47 survived scenarios: 33 score: 0.916667 time: 51.66
+Running generation 48
+Generation: 48 survived scenarios: 33 score: 0.916667 time: 51.72
+Running generation 49
+Generation: 49 survived scenarios: 33 score: 0.916667 time: 51.56
+Running generation 50
+Generation: 50 survived scenarios: 33 score: 0.916667 time: 51.62
+Running generation 51
+Generation: 51 survived scenarios: 33 score: 0.916667 time: 51.58
+Running generation 52
+Generation: 52 survived scenarios: 33 score: 0.916667 time: 51.64
+Running generation 53
+Generation: 53 survived scenarios: 33 score: 0.916667 time: 51.59
+Running generation 54
+Generation: 54 survived scenarios: 33 score: 0.916667 time: 51.58
+Running generation 55
+Generation: 55 survived scenarios: 33 score: 0.916667 time: 51.71
+Running generation 56
+Generation: 56 survived scenarios: 33 score: 0.916667 time: 51.72
+Running generation 57
+Generation: 57 survived scenarios: 33 score: 0.916667 time: 51.71
+Running generation 58
+Generation: 58 survived scenarios: 33 score: 0.916667 time: 51.59
+Running generation 59
+Generation: 59 survived scenarios: 33 score: 0.916667 time: 51.49
+Running generation 60
+Generation: 60 survived scenarios: 33 score: 0.916667 time: 51.63
+Running generation 61
+Generation: 61 survived scenarios: 33 score: 0.916667 time: 51.73
+Running generation 62
+Generation: 62 survived scenarios: 33 score: 0.916667 time: 51.73
+Running generation 63
+Generation: 63 survived scenarios: 33 score: 0.916667 time: 51.55
+Number of generations: 0
+Best score: 33
+Total evolution time: 3830.46
