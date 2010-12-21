@@ -340,7 +340,7 @@ void GSGeneView::onFrameUpdate(double dt,
 		}else if(m_tanks.state[m_playertank] == TANK_STATE_INACTIVE){
 			// player tank died, let's reset
 			++m_test_vect;
-			if(m_test_vect >= NUM_BULLET_VECTORS){
+			if(m_test_vect >= 1){
 				m_test_vect = 0;
 				++m_test_sect;
 				if(m_test_sect >= NUM_LOCATION_STATES){
@@ -356,7 +356,7 @@ void GSGeneView::onFrameUpdate(double dt,
 		}else if(m_tanks.state[m_player2tank] == TANK_STATE_INACTIVE){
 			++m_runningscore;
 			++m_test_vect;
-			if(m_test_vect >= NUM_BULLET_VECTORS){
+			if(m_test_vect >= 1){
 				m_test_vect = 0;
 				++m_test_sect;
 				if(m_test_sect >= NUM_LOCATION_STATES){
