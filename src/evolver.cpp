@@ -38,6 +38,8 @@ using namespace std;
 
 template<typename T>
 void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
+	// consistent random seed
+	srand(0);
 	evl.initialize("genes.kch", "simulation.kch");
 
 	u32 num_generations = 0;
@@ -78,11 +80,11 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 		// get the score of the best individual
 		highest_score = evl.retrieve_highest_score();
 		//highest_score /= MAX_FRAMESTEPS;
-		cout << "Generation: " << i << " frames: "
+		cout << "Generation: " << i << " survived scenarios: "
 			<< highest_score  << " score: "
-			<< highest_score/((NUM_DISTANCE_STATES-2)*NUM_LOCATION_STATES*NUM_BULLET_VECTORS)
+			<< highest_score/((NUM_DISTANCE_STATES-2)*NUM_LOCATION_STATES*1)
 			<< " time: " << evol_timer.elapsed() << endl;
-		if(highest_score/((NUM_DISTANCE_STATES-2)*NUM_LOCATION_STATES*NUM_BULLET_VECTORS) >= 0.999f){
+		if(highest_score/((NUM_DISTANCE_STATES-2)*NUM_LOCATION_STATES*1) >= 0.999f){
 			// close to 1.0f
 			num_generations = i+1;
 			
@@ -111,7 +113,6 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 
 int main(int argc, char* argv[]){
 	// seed the random values
-	srand(std::time(NULL));
 	po::options_description desc("Available options");
 	desc.add_options()
 		("help", "display this help message")

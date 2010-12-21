@@ -347,7 +347,7 @@ void GSGeneView::onFrameUpdate(double dt,
 					m_test_sect = 0;
 					++m_test_dist;
 					if(m_test_dist >= NUM_DISTANCE_STATES){
-						cout << m_runningscore << endl;
+						cout << m_runningscore+1 << endl;
 						GameDisplay::s_running = false;
 					}
 				}
@@ -363,7 +363,7 @@ void GSGeneView::onFrameUpdate(double dt,
 					m_test_sect = 0;
 					++m_test_dist;
 					if(m_test_dist >= NUM_DISTANCE_STATES){
-						cout << m_runningscore << endl;
+						cout << m_runningscore+1 << endl;
 						GameDisplay::s_running = false;
 					}
 				}
