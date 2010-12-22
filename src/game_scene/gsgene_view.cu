@@ -92,7 +92,7 @@ GSGeneView::GSGeneView(CL_GraphicContext& gc, CL_ResourceManager& resources)
 // 	AI::add_tank(&m_ai, m_player2tank, AI_TYPE_ATTACKER);
 
 	// prepare the initial scenario
-	m_test_dist = 2;
+	m_test_dist = 0;
 	m_test_sect = 0;
 	m_test_vect = 0;
 	prepare_game_scenario(m_test_dist, m_test_sect, m_test_vect);

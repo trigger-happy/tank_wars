@@ -50,7 +50,7 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 		// setup the initial game state
  		evl.prepare_game_state();
 		
-		for(int dist = 2; dist < NUM_DISTANCE_STATES; ++dist){
+		for(int dist = 0; dist < NUM_DISTANCE_STATES; ++dist){
 			for(int locs = 0; locs < NUM_LOCATION_STATES; ++locs){
 				for(int vecs = 0; vecs < 1; ++vecs){
 // 					cout << "Scenario: " << dist << " " << locs << " " << vecs << endl;
@@ -82,9 +82,9 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 		//highest_score /= MAX_FRAMESTEPS;
 		cout << "Generation: " << i << " survived scenarios: "
 			<< highest_score  << " score: "
-			<< highest_score/((NUM_DISTANCE_STATES-2)*NUM_LOCATION_STATES*1)
+			<< highest_score/((NUM_DISTANCE_STATES)*NUM_LOCATION_STATES*1)
 			<< " time: " << evol_timer.elapsed() << endl;
-		if(highest_score/((NUM_DISTANCE_STATES-2)*NUM_LOCATION_STATES*1) >= 0.999f){
+		if(highest_score/((NUM_DISTANCE_STATES)*NUM_LOCATION_STATES*1) >= 0.999f){
 			// close to 1.0f
 			num_generations = i+1;
 			
