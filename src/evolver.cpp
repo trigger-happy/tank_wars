@@ -40,7 +40,6 @@ template<typename T>
 void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 	// consistent random seed
 	srand(0);
-	evl.initialize("genes.kch", "simulation.kch");
 
 	u32 num_generations = 0;
 	f32 highest_score = 0.0f;
@@ -131,11 +130,13 @@ int main(int argc, char* argv[]){
 	if(vm.count("cpu")){
 		boost::timer t;
 		Evolver_cpu evc;
+		evc.initialize("genes_cpu.kch", "simulation_cpu.kch");
 		perform_evolution(evc);
 		cout << "Total evolution time: " << t.elapsed() << endl;
 	}else if(vm.count("gpu")){
 		boost::timer t;
 		Evolver_gpu evg;
+		evg.initialize("genes_gpu.kch", "simulation_gpu.kch");
 		perform_evolution(evg);
 		cout << "Total evolution time: " << t.elapsed() << endl;
 	}else{
@@ -144,6 +145,7 @@ int main(int argc, char* argv[]){
 		{
 			boost::timer t;
 			Evolver_cpu evc;
+			evc.initialize("genes_cpu.kch", "simulation_cpu.kch");
 			perform_evolution(evc);
 			cout << "Total evolution time: " << t.elapsed() << endl;
 		}
@@ -151,6 +153,7 @@ int main(int argc, char* argv[]){
 		{
 			boost::timer t;
 			Evolver_gpu evg;
+			evg.initialize("genes_gpu.kch", "simulation_gpu.kch");
 			perform_evolution(evg);
 			cout << "Total evolution time: " << t.elapsed() << endl;
 		}
