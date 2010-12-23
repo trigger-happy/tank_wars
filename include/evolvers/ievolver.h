@@ -35,7 +35,7 @@ Boston, MA 02110-1301, USA.
 #ifdef SAVE_SIM_DATA
 #define MAX_GENERATIONS 1
 #else
-#define MAX_GENERATIONS 64
+#define MAX_GENERATIONS 16
 #endif
 
 // top 5% will be elite

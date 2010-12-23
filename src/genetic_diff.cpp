@@ -36,27 +36,27 @@ int main(int argc, char** argv){
 	if(result){
 		ai_key aik;
 		ai_data aid1, aid2;
-		for(int i = 0; i < NUM_INSTANCES; ++i){
-			for(int j = 1; j <= MAX_GENERATIONS; ++j){
+		for(int j = 1; j <= MAX_GENERATIONS; ++j){
+			for(int i = 0; i < NUM_INSTANCES; ++i){
 				aik.id = i;
 				aik.generation = j;
 
 				result = ds1->get(reinterpret_cast<const char*>(&aik), sizeof(ai_key),
 								  reinterpret_cast<char*>(&aid1), sizeof(ai_data));
 				if(!result){
-					cerr << "Failed to load: ds1 " << i << " " << j << endl;
+					cerr << "Failed to load: ds1 " << j << " " << i << endl;
 				}
 
 				result = ds2->get(reinterpret_cast<const char*>(&aik), sizeof(ai_key),
 								  reinterpret_cast<char*>(&aid2), sizeof(ai_data));
 
 				if(!result){
-					cerr << "Failed to load: ds2 " << i << " " << j << endl;
+					cerr << "Failed to load: ds2 " << j << " " << i << endl;
 				}
 
 				result = compare_genes(aid1, aid2);
 				if(!result){
-					cout << "Genes differ at: " << i << " " << j << endl;
+					cout << "Genes differ at: " << j << " " << i << endl;
 				}
 			}
 		}
