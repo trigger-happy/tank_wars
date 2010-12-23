@@ -22,6 +22,10 @@ list(APPEND EVOLVER_SRC
 			evolvers/evolver_cpu.cpp
 			evolver.cpp)
 
+add_executable(genetic_diff genetic_diff.cpp
+							data_store/data_store.cpp)
+target_link_libraries(genetic_diff ${LINK_LIBS})
+
 if(CUDA_FOUND)
 	cuda_add_executable(quick_check qcheck.cu)
 	

@@ -23,13 +23,6 @@
 #include "evolvers/evolver_cpu.h"
 #include "evolvers/evolver_gpu.h"
 
-#ifdef SAVE_SIM_DATA
-#define MAX_GENERATIONS 1
-#else
-#define MAX_GENERATIONS 64
-#endif
-
-
 #define MAX_FRAMESTEPS	18000 // 5 minutes
 #define TIME_STEP		1000.0f/60.0f // 60 fps
 

@@ -32,6 +32,12 @@ Boston, MA 02110-1301, USA.
 #define NUM_INSTANCES 1024
 #endif
 
+#ifdef SAVE_SIM_DATA
+#define MAX_GENERATIONS 1
+#else
+#define MAX_GENERATIONS 64
+#endif
+
 // top 5% will be elite
 #define ELITE_COUNT		(NUM_INSTANCES*0.05f)
 // 15% mutation rate
