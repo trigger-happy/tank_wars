@@ -50,7 +50,7 @@ void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 		// setup the initial game state
  		evl.prepare_game_state();
 		
-		for(int dist = 0; dist < NUM_DISTANCE_STATES; ++dist){
+		for(int dist = 1; dist < NUM_DISTANCE_STATES; ++dist){
 			for(int locs = 0; locs < NUM_LOCATION_STATES; ++locs){
 				for(int vecs = 0; vecs < 1; ++vecs){
 // 					cout << "Scenario: " << dist << " " << locs << " " << vecs << endl;
