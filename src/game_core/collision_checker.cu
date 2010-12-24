@@ -22,7 +22,7 @@ bool Collision::bullet_tank_check(TankBullet::BulletCollection* bc,
 	if(bc->parent_runner != tc->parent_runner){
 		return false;
 	}
-	if(bc->state[bid] == TANK_STATE_INACTIVE){
+	if(bc->state[bid] == BULLET_STATE_INACTIVE){
 		return false;
 	}
 	Physics::PhysRunner::RunnerCore* rc = bc->parent_runner;
