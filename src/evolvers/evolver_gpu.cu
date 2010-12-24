@@ -85,6 +85,7 @@ __global__ void internal_frame_step(f32 dt,
 	AI::timestep(&aic[blockIdx.x], dt);
 	
 	// perform the physics operations
+	__syncthreads();
 	Physics::PhysRunner::timestep(&runners[blockIdx.x], dt);
 	
 	// update the bullets
@@ -321,7 +322,7 @@ void Evolver_gpu::perpare_game_scenario_impl(u32 dist, u32 bullet_loc, u32 bulle
 }
 
 void Evolver_gpu::end_game_scenario_impl(){
-	copy_from_device();
+// 	copy_from_device();
 	for(int i = 0; i < NUM_INSTANCES; ++i){
 		if(m_tanks[i].state[0] != TANK_STATE_INACTIVE){
 			if(m_population_score.find(i) == m_population_score.end()){
@@ -334,17 +335,17 @@ void Evolver_gpu::end_game_scenario_impl(){
 
 bool Evolver_gpu::is_game_over_impl(){
 	if(m_framecount % RETRIEVE_INTERVAL == 0){
-		bool all_done = true;
+// 		bool all_done = true;
 		bool really_done = true;
 		for(int i = 0; i < NUM_INSTANCES; ++i){
 			// tank 0 is the one dodging, check its status
-			all_done &= (m_tanks[i].state[0] == TANK_STATE_INACTIVE);
+// 			all_done &= (m_tanks[i].state[0] == TANK_STATE_INACTIVE);
 			really_done &= (m_tanks[i].state[1] == TANK_STATE_INACTIVE);
 		}
-		if(all_done || really_done){
+		if(/*all_done || */really_done){
 			// 			finalize_impl();
 		}
-		return all_done | really_done;
+		return /*all_done | */really_done;
 	}else{
 		return false;
 	}

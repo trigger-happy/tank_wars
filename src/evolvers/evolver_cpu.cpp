@@ -276,17 +276,17 @@ void Evolver_cpu::end_game_scenario_impl(){
 
 bool Evolver_cpu::is_game_over_impl(){
 	if(m_framecount % RETRIEVE_INTERVAL == 0){
-		bool all_done = true;
+// 		bool all_done = true;
 		bool really_done = true;
 		for(int i = 0; i < NUM_INSTANCES; ++i){
 			// tank 0 is the one dodging, check its status
-			all_done &= (m_tanks[i].state[0] == TANK_STATE_INACTIVE);
+// 			all_done &= (m_tanks[i].state[0] == TANK_STATE_INACTIVE);
 			really_done &= (m_tanks[i].state[1] == TANK_STATE_INACTIVE);
 		}
-		if(all_done || really_done){
+		if(/*all_done ||*/ really_done){
 // 			finalize_impl();
 		}
-		return all_done | really_done;
+		return /*all_done |*/ really_done;
 	}else{
 		return false;
 	}
