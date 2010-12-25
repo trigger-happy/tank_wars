@@ -177,15 +177,38 @@ void GSGeneView::prepare_game_scenario(u32 dist, u32 bullet_loc, u32 bullet_vec)
 													tank_rot,
 													1);
 	AI::add_tank(&m_ai, m_player2tank, AI_TYPE_ATTACKER);
+
+	if(GameDisplay::s_usecuda){
+		// reset the pointers
+		BasicTank::reset_pointers(&m_tanks, m_cuda_runner, m_cuda_bullets);
+		TankBullet::reset_phys_pointer(&m_bullets, m_cuda_runner);
+		
+		// copy over the stuff to GPU mem
+		cudaMemcpy(m_cuda_runner, m_physrunner.get(),
+				   sizeof(Physics::PhysRunner::RunnerCore), cudaMemcpyHostToDevice);
+		
+		cudaMemcpy(m_cuda_bullets, &m_bullets,
+				   sizeof(m_bullets), cudaMemcpyHostToDevice);
+		
+		cudaMemcpy(m_cuda_tanks, &m_tanks,
+				   sizeof(m_tanks), cudaMemcpyHostToDevice);
+		
+		m_ai.bc = m_cuda_bullets;
+		m_ai.tc = m_cuda_tanks;
+		cudaMemcpy(m_cuda_ai, &m_ai,
+				   sizeof(m_ai), cudaMemcpyHostToDevice);
+	}
 }
 
 GSGeneView::~GSGeneView(){
 	BasicTank::destroy(&m_tanks);
 	TankBullet::destroy(&m_bullets);
-	cudaFree(m_cuda_tanks);
-	cudaFree(m_cuda_bullets);
-	cudaFree(m_cuda_runner);
-	cudaFree(m_cuda_ai);
+	if(GameDisplay::s_usecuda){
+		cudaFree(m_cuda_tanks);
+		cudaFree(m_cuda_bullets);
+		cudaFree(m_cuda_runner);
+		cudaFree(m_cuda_ai);
+	}
 }
 
 void GSGeneView::onSceneDeactivate(){
@@ -271,16 +294,22 @@ __global__ void gsgame_step(f32 dt,
 	int idx = threadIdx.x;
 	
 	// AI operations
+	__syncthreads();
 	AI::timestep(aic, dt);
-
+	
+	__syncthreads();
 	Physics::PhysRunner::timestep(runner, dt);
+	__syncthreads();
 	TankBullet::update(bullets, dt);
+	__syncthreads();
 	BasicTank::update(tanks, dt);
 	
 	// collision check
+	__syncthreads();
 	if(idx < MAX_BULLETS){
 		Collision::bullet_tank_check(bullets, tanks, idx);
 	}
+	__syncthreads();
 	if(idx < MAX_TANKS){
 		Collision::tank_tank_check(tanks, idx);
 	}
@@ -319,6 +348,40 @@ void GSGeneView::onFrameUpdate(double dt,
 		cudaMemcpy(&m_ai, m_cuda_ai,
 				   sizeof(AI::AI_Core),
 				   cudaMemcpyDeviceToHost);
+
+		if(m_tanks.state[m_playertank] == TANK_STATE_INACTIVE){
+			// player tank died, let's reset
+			++m_test_vect;
+			if(m_test_vect >= 1){
+				m_test_vect = 0;
+				++m_test_sect;
+				if(m_test_sect >= NUM_LOCATION_STATES){
+					m_test_sect = 0;
+					++m_test_dist;
+					if(m_test_dist >= NUM_DISTANCE_STATES){
+						cout << m_runningscore << endl;
+						GameDisplay::s_running = false;
+					}
+				}
+			}
+			prepare_game_scenario(m_test_dist, m_test_sect, m_test_vect);
+		}else if(m_tanks.state[m_player2tank] == TANK_STATE_INACTIVE){
+			++m_runningscore;
+			++m_test_vect;
+			if(m_test_vect >= 1){
+				m_test_vect = 0;
+				++m_test_sect;
+				if(m_test_sect >= NUM_LOCATION_STATES){
+					m_test_sect = 0;
+					++m_test_dist;
+					if(m_test_dist >= NUM_DISTANCE_STATES){
+						cout << m_runningscore << endl;
+						GameDisplay::s_running = false;
+					}
+				}
+			}
+			prepare_game_scenario(m_test_dist, m_test_sect, m_test_vect);
+		}
 	}else{
 		// process the player input
 		if(m_tanks.state[m_playertank] != TANK_STATE_INACTIVE
@@ -347,7 +410,7 @@ void GSGeneView::onFrameUpdate(double dt,
 					m_test_sect = 0;
 					++m_test_dist;
 					if(m_test_dist >= NUM_DISTANCE_STATES){
-						cout << m_runningscore+1 << endl;
+						cout << m_runningscore << endl;
 						GameDisplay::s_running = false;
 					}
 				}
@@ -363,7 +426,7 @@ void GSGeneView::onFrameUpdate(double dt,
 					m_test_sect = 0;
 					++m_test_dist;
 					if(m_test_dist >= NUM_DISTANCE_STATES){
-						cout << m_runningscore+1 << endl;
+						cout << m_runningscore << endl;
 						GameDisplay::s_running = false;
 					}
 				}
