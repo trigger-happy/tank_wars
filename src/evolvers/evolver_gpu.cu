@@ -109,10 +109,10 @@ __global__ void internal_frame_step(f32 dt,
 								   threadIdx.x);
 	}
 	__syncthreads();
-	if(tanks[blockIdx.x].state[0] != TANK_STATE_INACTIVE
-		&& threadIdx.x == 0){
-		//scores[blockIdx.x] += 1;
-	}
+// 	if(tanks[blockIdx.x].state[0] != TANK_STATE_INACTIVE
+// 		&& threadIdx.x == 0){
+// 		//scores[blockIdx.x] += 1;
+// 	}
 }
 
 void Evolver_gpu::frame_step_impl(f32 dt){
