@@ -223,6 +223,9 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 
 				// update the sensors
 				update_perceptions(aic, idx, dt);
+#if __CUDA_ARCH__
+				__syncthreads();
+#endif
 
 				// perform AI actions
 				if(aic->ai_type[idx] == AI_TYPE_EVADER){
@@ -276,6 +279,9 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 					}
 					// perform the needed turn
 					
+					#if __CUDA_ARCH__
+					__syncthreads();
+					#endif
 					// let's try to get to the right heading
 					switch(aic->desired_thrust[idx]){
 						case 0:
@@ -303,6 +309,9 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 					}
 				}else if(aic->ai_type[idx] == AI_TYPE_ATTACKER){
 					// get the nearest target to shoot at
+					#if __CUDA_ARCH__
+					__syncthreads();
+					#endif
 					tank_id tid = aic->controlled_tanks[idx];
 					tank_id target = AI::get_nearest_enemy(aic, tid);
 					if(target != INVALID_ID){

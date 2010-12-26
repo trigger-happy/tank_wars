@@ -139,6 +139,8 @@ CUDA_EXPORT void update_verlet(f32 dt,
 	
 	#if !defined(__CUDA_ARCH__)
 	}
+	#else
+	__syncthreads();
 	#endif
 }
 
