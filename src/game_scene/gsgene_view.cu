@@ -38,6 +38,10 @@ using namespace std;
 extern DataStore* g_db;
 extern ai_key g_aik;
 
+extern u32 g_dist;
+extern u32 g_vect;
+extern u32 g_sect;
+
 // helper function
 void apply_transform(CL_GraphicContext* gc, Physics::vec2& c){
 	c.x *= SCALE_FACTOR;
@@ -92,9 +96,9 @@ GSGeneView::GSGeneView(CL_GraphicContext& gc, CL_ResourceManager& resources)
 // 	AI::add_tank(&m_ai, m_player2tank, AI_TYPE_ATTACKER);
 
 	// prepare the initial scenario
-	m_test_dist = 1;
-	m_test_sect = 0;
-	m_test_vect = 0;
+	m_test_dist = g_dist;
+	m_test_sect = g_sect;
+	m_test_vect = g_vect;
 	prepare_game_scenario(m_test_dist, m_test_sect, m_test_vect);
 
 	// load a saved gene for viewing

@@ -43,6 +43,9 @@ std::stack<iGameScene*>	GameDisplay::s_scene_stack;
 bool					GameDisplay::s_running = true;
 bool					GameDisplay::s_usecuda = false;
 bool					GameDisplay::s_view_gene = false;
+u32						g_dist = 1;
+u32						g_vect = 0;
+u32						g_sect = 0;
 
 // This is a prototype, deal with the fact we're using global vars
 DataStore* g_db = NULL;
@@ -150,7 +153,10 @@ int main(int argc, char* argv[]){
 		("use-cuda", "Use CUDA")
 		("generation", po::value<u32>(), "The generation number")
 		("id", po::value<u32>(), "The id of the gene to view")
-		("db", po::value<std::string>(), "The gene database, default is genes.kch");
+		("db", po::value<std::string>(), "The gene database, default is genes.kch")
+		("dist", po::value<u32>(), "The distance state to check")
+		("sect", po::value<u32>(), "The sector state to check")
+		("vect", po::value<u32>(), "The vector state to check");
 
 	po::variables_map vm;
 	po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -159,6 +165,18 @@ int main(int argc, char* argv[]){
 	if(vm.count("help")){
 		std::cout << desc << std::endl;
 		return 0;
+	}
+
+	if(vm.count("dist")){
+		g_dist = vm["dist"].as<u32>();
+	}
+
+	if(vm.count("sect")){
+		g_sect = vm["sect"].as<u32>();
+	}
+
+	if(vm.count("vect")){
+		g_vect = vm["vect"].as<u32>();
 	}
 
 	if(vm.count("use-cuda")){
