@@ -26,6 +26,9 @@ add_executable(genetic_diff genetic_diff.cpp
 							data_store/data_store.cpp)
 target_link_libraries(genetic_diff ${LINK_LIBS})
 
+add_executable(query_gene query_gene.cpp)
+target_link_libraries(query_gene ${LINK_LIBS})
+
 if(CUDA_FOUND)
 	cuda_add_executable(quick_check qcheck.cu)
 	
