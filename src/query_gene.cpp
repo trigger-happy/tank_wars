@@ -37,8 +37,8 @@ void perform_query(const string& db, u32 id, u32 gen,
 		return;
 	}
 
-	//TODO: FIX THIS CRITICALLY FLAWED EQUATION
-	u32 index = dist * sect * vect;
+	u32 index = (dist * NUM_LOCATION_STATES * NUM_BULLET_VECTORS)
+				+ (sect * NUM_BULLET_VECTORS) + vect;
 
 	cout << "thrust: " << (u32)aid.gene_accel[index][0] << endl;
 	cout << "vector: " << (u32)aid.gene_heading[index][0] << endl;

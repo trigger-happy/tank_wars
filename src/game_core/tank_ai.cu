@@ -232,9 +232,9 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 						// check how many frames has passed
 						s32 index = 0;
 					if(aic->frame_count >= FRAMES_PER_UPDATE){
-						//TODO: FIX THIS CRITICALLY FLAWED EQUATION
-						index = aic->bullet_vector[idx] *
-						aic->direction_state[idx] * aic->distance_state[idx];
+						index = (aic->distance_state[idx] * NUM_LOCATION_STATES * NUM_BULLET_VECTORS)
+								+ (aic->direction_state[idx] * NUM_BULLET_VECTORS)
+								+ aic->bullet_vector[idx];
 						
 						if(index >= 0
 							&& aic->bullet_vector[idx] >= 0
