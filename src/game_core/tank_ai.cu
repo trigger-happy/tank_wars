@@ -232,6 +232,7 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 						// check how many frames has passed
 						s32 index = 0;
 					if(aic->frame_count >= FRAMES_PER_UPDATE){
+						//TODO: FIX THIS CRITICALLY FLAWED EQUATION
 						index = aic->bullet_vector[idx] *
 						aic->direction_state[idx] * aic->distance_state[idx];
 						
@@ -440,11 +441,9 @@ void AI::update_perceptions(AI::AI_Core* aic,
 																	aic->tc->phys_id[tid]);
 				Physics::vec2 pos2 = Physics::PhysRunner::get_cur_pos(rc,
 																	aic->bc->phys_id[bid]);
-				pos -= pos2;
-				// save the result for later use
-				pos2 = pos;
-				pos.normalize();
-				temp = AI::get_sector(pos);
+				pos2 -= pos;
+				pos2.normalize();
+				temp = AI::get_sector(pos2);
 				aic->direction_state[id] = temp;
 
 				// get the tank vector
@@ -467,7 +466,7 @@ void AI::update_perceptions(AI::AI_Core* aic,
 s32 AI::get_sector(Physics::vec2 pos){
 	f32 dir = atan2(pos.x, pos.y);
 	dir = util::rads_to_degs(dir);
-	dir = util::clamp_dir_360(dir);
+	dir = util::clamp_dir_360(90-dir);
 	return ((s32)(dir/SECTOR_SIZE));
 }
 
