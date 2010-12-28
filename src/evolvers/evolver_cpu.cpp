@@ -106,7 +106,13 @@ void Evolver_cpu::evolve_ga_impl(){
 	}
 
 	// sort it from highest score to lowest score
-	sort(m_scoredata.begin(), m_scoredata.end(), score_sort<u32>);
+	stable_sort(m_scoredata.begin(), m_scoredata.end(), score_sort<u32>);
+
+	// debugging
+	for(int i = 0; i < m_scoredata.size(); ++i){
+		cout << m_scoredata[i].first << " " << m_scoredata[i].second << endl;
+	}
+	
 	if(m_last_score.size() == 0){
 		m_last_score = m_scoredata;
 	}else{
