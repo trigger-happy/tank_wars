@@ -14,6 +14,8 @@
 	Boston, MA 02110-1301, USA.
 */
 #include <kcpolydb.h>
+#include <algorithm>
+#include <assert.h>
 #include "data_store/data_store.h"
 
 using namespace std;
@@ -35,7 +37,8 @@ DataStore::~DataStore(){
 
 bool DataStore::save_gene_data(const ai_key& key,
 							   u32 score,
-							   const AI::AI_Core& aic){
+							   const AI::AI_Core& aic,
+							   const std::vector<u32>& scenario_results){
 	bool result = true;
 	ai_data aid;
 	aid.score = score;
@@ -48,6 +51,16 @@ bool DataStore::save_gene_data(const ai_key& key,
 		}
 	}
 
+// 	copy(scenario_results.begin(), scenario_results.end(), aid.scenario_result);
+
+	s32 accum_score = 0;
+	for(int i = 0; i < NUM_SCENARIOS; ++i){
+		aid.scenario_result[i] = scenario_results[i];
+		accum_score += scenario_results[i];
+	}
+
+	assert(accum_score == aid.score);
+
 	// save the data
 	result = m_aidb->set(reinterpret_cast<const char*>(&key), sizeof(ai_key),
 					  reinterpret_cast<const char*>(&aid), sizeof(ai_data));
@@ -56,7 +69,8 @@ bool DataStore::save_gene_data(const ai_key& key,
 
 bool DataStore::get_gene_data(const ai_key& key,
 							  u32& score,
-							  AI::AI_Core& aic){
+							  AI::AI_Core& aic,
+							  std::vector<u32>& scenario_results){
 	bool result = true;
 	ai_data aid;
 
@@ -71,6 +85,18 @@ bool DataStore::get_gene_data(const ai_key& key,
 		}
 	}
 	score = aid.score;
+
+	scenario_results.clear();
+	scenario_results.resize(NUM_SCENARIOS, 0);
+// 	copy(aid.scenario_result, aid.scenario_result+NUM_SCENARIOS,
+// 		 scenario_results.begin());
+	s32 accum_score = 0;
+	for(int i = 0; i < NUM_SCENARIOS; ++i){
+		scenario_results[i] = aid.scenario_result[i];
+		accum_score += aid.scenario_result[i];
+	}
+
+	assert(accum_score == aid.score);
 	
 	return result;
 }

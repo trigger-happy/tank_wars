@@ -22,6 +22,7 @@
 #include "types.h"
 
 #define MAX_BODY_RECORD 18000
+#define NUM_SCENARIOS	(NUM_DISTANCE_STATES * NUM_LOCATION_STATES * NUM_BULLET_VECTORS)
 
 // for the AI records
 struct ai_key{
@@ -31,6 +32,8 @@ struct ai_key{
 
 struct ai_data{
 	u32 score;
+	// 1 if the AI lived in this scenario, 0 otherwise
+	u32 scenario_result[NUM_SCENARIOS];
 	AI::AI_Core::gene_type gene_accel[MAX_GENE_DATA][MAX_AI_EVADERS];
 	AI::AI_Core::gene_type gene_heading[MAX_GENE_DATA][MAX_AI_EVADERS];
 };

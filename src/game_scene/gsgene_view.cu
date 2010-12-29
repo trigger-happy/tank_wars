@@ -81,7 +81,7 @@ GSGeneView::GSGeneView(CL_GraphicContext& gc, CL_ResourceManager& resources)
 	AI::initialize(&m_ai, &m_tanks, &m_bullets);
 	u32 score = 0;
 	// set the gene data
-	g_db->get_gene_data(g_aik, score, this->get_ai());
+	g_db->get_gene_data(g_aik, score, this->get_ai(), m_scenario_results);
 
 	m_ai_b = m_ai;
 	
@@ -157,6 +157,10 @@ void GSGeneView::prepare_game_scenario(u32 dist, u32 bullet_loc, u32 bullet_vec)
 	TankBullet::initialize(&m_bullets, m_physrunner.get());
 	BasicTank::initialize(&m_tanks, m_physrunner.get(), &m_bullets);
 	AI::initialize(&m_ai, &m_tanks, &m_bullets);
+
+	m_index = (dist * NUM_LOCATION_STATES * NUM_BULLET_VECTORS)
+				+ (bullet_loc * NUM_BULLET_VECTORS)
+				+ bullet_vec;
 
 	m_ai = m_ai_b;
 
@@ -273,7 +277,7 @@ void GSGeneView::onFrameRender(CL_GraphicContext* gc){
 // 	}
 	
 	// Debug info
-	CL_StringFormat fmt("States: %1 %2 %3 %4 | Player pos: %5 %6 | Running Score: %7");
+	CL_StringFormat fmt("States: %1 %2 %3 %4 | Player pos: %5 %6 | Final Score: %7 | Recorded s_result: %8");
 	fmt.set_arg(1, m_ai.bullet_vector[0]);
 	fmt.set_arg(2, m_ai.tank_vector[0]);
 	fmt.set_arg(3, m_ai.direction_state[0]);
@@ -283,6 +287,7 @@ void GSGeneView::onFrameRender(CL_GraphicContext* gc){
 	fmt.set_arg(5, pos.x);
 	fmt.set_arg(6, pos.y);
 	fmt.set_arg(7, m_runningscore);
+	fmt.set_arg(8, m_scenario_results[m_index]);
 	m_dbgmsg = fmt.get_result();
 	m_debugfont->draw_text(*gc, 1, 12, m_dbgmsg, CL_Colorf::red);
 }
@@ -356,7 +361,7 @@ void GSGeneView::onFrameUpdate(double dt,
 		if(m_tanks.state[m_playertank] == TANK_STATE_INACTIVE){
 			// player tank died, let's reset
 			cout << m_test_dist << " " << m_test_sect << " " << m_test_vect
-			<< " dead" << endl;
+			<< " " << m_scenario_results[m_index] << " dead" << endl;
 			++m_test_vect;
 			if(m_test_vect >= 1){
 				m_test_vect = 0;
@@ -373,7 +378,7 @@ void GSGeneView::onFrameUpdate(double dt,
 			prepare_game_scenario(m_test_dist, m_test_sect, m_test_vect);
 		}else if(m_tanks.state[m_player2tank] == TANK_STATE_INACTIVE){
 			cout << m_test_dist << " " << m_test_sect << " " << m_test_vect
-			<< " alive" << endl;
+			<< " " << m_scenario_results[m_index] << " alive" << endl;
 			++m_runningscore;
 			++m_test_vect;
 			if(m_test_vect >= 1){
@@ -411,7 +416,7 @@ void GSGeneView::onFrameUpdate(double dt,
 		}else if(m_tanks.state[m_playertank] == TANK_STATE_INACTIVE){
 			// player tank died, let's reset
 			cout << m_test_dist << " " << m_test_sect << " " << m_test_vect
-			<< " dead" << endl;
+			<< " " << m_scenario_results[m_index] << " dead" << endl;
 			++m_test_vect;
 			if(m_test_vect >= 1){
 				m_test_vect = 0;
@@ -428,7 +433,7 @@ void GSGeneView::onFrameUpdate(double dt,
 			prepare_game_scenario(m_test_dist, m_test_sect, m_test_vect);
 		}else if(m_tanks.state[m_player2tank] == TANK_STATE_INACTIVE){
 			cout << m_test_dist << " " << m_test_sect << " " << m_test_vect
-			<< " alive" << endl;
+			<< " " << m_scenario_results[m_index] << " alive" << endl;
 			++m_runningscore;
 			++m_test_vect;
 			if(m_test_vect >= 1){

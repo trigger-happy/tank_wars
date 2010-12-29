@@ -403,8 +403,8 @@ void AI::add_tank( AI::AI_Core* aic, tank_id tid, s32 ait){
 void AI::init_gene_data(AI::AI_Core* aic){
 	for(int i = 0; i < MAX_AI_EVADERS; ++i){
 		for(int j = 0; j < MAX_GENE_DATA; ++j){
-			aic->gene_accel[j][i] = rand()%MAX_THRUST_VALUES;
-			aic->gene_heading[j][i] = rand()%MAX_HEADING_VALUES;
+			aic->gene_accel[j][i] = static_cast<u8>(rand()%MAX_THRUST_VALUES);
+			aic->gene_heading[j][i] = static_cast<u8>(rand()%MAX_HEADING_VALUES);
 		}
 	}
 }

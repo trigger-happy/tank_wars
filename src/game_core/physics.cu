@@ -185,8 +185,8 @@ void Physics::PhysRunner::free_slot(Physics::PhysRunner::RunnerCore* rc, u32 id)
 
 
 void Physics::init_physbody(Physics::physBody* pb){
-	int idx = 0;
 	#if __CUDA_ARCH__
+	int idx = 0;
 	idx = threadIdx.x;
 	if(idx < MAX_ARRAY_SIZE){
 		pb->rotation[idx] = 0;

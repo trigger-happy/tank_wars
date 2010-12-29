@@ -18,6 +18,7 @@
 */
 #ifndef GSGENE_VIEW_H
 #define GSGENE_VIEW_H
+#include <vector>
 #include <ClanLib/core.h>
 #include <ClanLib/display.h>
 #include <boost/scoped_ptr.hpp>
@@ -99,6 +100,9 @@ private:
 	u32 m_test_sect;
 	u32 m_test_vect;
 	u32 m_runningscore;
+	u32 m_index;
+
+	std::vector<u32> m_scenario_results;
 };
 
 #endif // GSGENE_VIEW_H

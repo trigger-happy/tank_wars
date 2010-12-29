@@ -107,6 +107,7 @@ void Evolver_cpu::evolve_ga_impl(){
 
 	// sort it from highest score to lowest score
 	stable_sort(m_scoredata.begin(), m_scoredata.end(), score_sort<u32>);
+	stable_sort(m_scenario_results.begin(), m_scenario_results.end(), scenario_score_sort<u32>);
 
 	// debugging
 	for(int i = 0; i < m_scoredata.size(); ++i){
@@ -269,15 +270,6 @@ void Evolver_cpu::perpare_game_scenario_impl(u32 dist, u32 bullet_loc, u32 bulle
 }
 
 void Evolver_cpu::end_game_scenario_impl(){
-	for(int i = 0; i < NUM_INSTANCES; ++i){
-		if(m_tanks[i].state[0] != TANK_STATE_INACTIVE){
-			// tank is alive, add up to the score
-			if(m_population_score.find(i) == m_population_score.end()){
-				m_population_score[i] = 0;
-			}
-			++(m_population_score[i]);
-		}
-	}
 }
 
 bool Evolver_cpu::is_game_over_impl(){

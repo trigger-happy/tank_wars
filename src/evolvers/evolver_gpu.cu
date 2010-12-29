@@ -150,6 +150,7 @@ void Evolver_gpu::evolve_ga_impl(){
 	
 	// sort it from highest score to lowest score
 	stable_sort(m_scoredata.begin(), m_scoredata.end(), score_sort<u32>);
+	stable_sort(m_scenario_results.begin(), m_scenario_results.end(), scenario_score_sort<u32>);
 	
 	// debugging
 	for(int i = 0; i < m_scoredata.size(); ++i){
@@ -198,10 +199,8 @@ void Evolver_gpu::evolve_ga_impl(){
 
 u32 Evolver_gpu::retrieve_score_impl(){
 	u32 score = 0;
-	u32 pos_found = 0;
 	for(int i = 0; i < m_population_score.size(); ++i){
 		if(m_population_score[i] > score){
-			pos_found = i;
 			score = m_population_score[i];
 		}
 	}
@@ -329,14 +328,6 @@ void Evolver_gpu::perpare_game_scenario_impl(u32 dist, u32 bullet_loc, u32 bulle
 
 void Evolver_gpu::end_game_scenario_impl(){
 // 	copy_from_device();
-	for(int i = 0; i < NUM_INSTANCES; ++i){
-		if(m_tanks[i].state[0] != TANK_STATE_INACTIVE){
-			if(m_population_score.find(i) == m_population_score.end()){
-				m_population_score[i] = 0;
-			}
-			++(m_population_score[i]);
-		}
-	}
 }
 
 bool Evolver_gpu::is_game_over_impl(){

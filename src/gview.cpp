@@ -90,7 +90,9 @@ int GameDisplay::main(){
 		GSGeneView* gv = new GSGeneView(gc, resources);
 		s_scene_stack.push(gv);
 
-		g_db->get_gene_data(g_aik, score, gv->get_ai());
+		std::vector<u32> scenario_results;
+
+		g_db->get_gene_data(g_aik, score, gv->get_ai(), scenario_results);
 		fmt.set_arg(1, g_aik.id);
 		fmt.set_arg(2, g_aik.generation);
 		fmt.set_arg(3, score);

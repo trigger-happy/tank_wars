@@ -20,6 +20,8 @@ Boston, MA 02110-1301, USA.
 #include <string>
 #include <utility>
 #include <vector>
+#include <numeric>
+#include <memory.h>
 #include "types.h"
 #include "game_core/tank_ai.h"
 #include "data_store/data_store.h"
@@ -64,6 +66,7 @@ public:
 		
 		m_framecount = 0;
 		m_gen_count = 0;
+		m_scenario_results.resize(NUM_INSTANCES, std::vector<u32>(NUM_SCENARIOS, 0));
 	}
 	
 	/*!
@@ -137,7 +140,8 @@ public:
 			aik.id = i;
 			
 			m_ds->save_gene_data(aik, m_scoredata[i].second,
-								 m_ai[m_scoredata[i].first]);
+								 m_ai[m_scoredata[i].first],
+								 m_scenario_results[i]);
 		}
 		
 		m_framecount = 0;
@@ -149,6 +153,9 @@ public:
 	void prepare_game_state(){
 		static_cast<Derived*>(this)->prepare_game_state_impl();
 		++m_gen_count;
+		for(int i = 0; i < NUM_INSTANCES; ++i){
+			memset(&m_scenario_results[i][0], 0, NUM_SCENARIOS*sizeof(s32));
+		}
 
 		#ifdef SAVE_SIM_DATA
 		// we're going to save the prepared game state's start
@@ -170,7 +177,10 @@ public:
 	void prepare_game_scenario(u32 dist,
 				   u32 bullet_loc,
 				   u32 bullet_vec){
-	  static_cast<Derived*>(this)->perpare_game_scenario_impl(dist, bullet_loc, bullet_vec);
+		m_dist_state = dist;
+		m_bullet_loc = bullet_loc;
+		m_bullet_vec = bullet_vec;
+		static_cast<Derived*>(this)->perpare_game_scenario_impl(dist, bullet_loc, bullet_vec);
 	}
 	
 	/*!
@@ -178,6 +188,23 @@ public:
 	 */
 	void end_game_scenario(){
 		static_cast<Derived*>(this)->end_game_scenario_impl();
+
+		s32 index = (m_dist_state * NUM_LOCATION_STATES * NUM_BULLET_VECTORS)
+					+ (m_bullet_loc * NUM_BULLET_VECTORS)
+					+ m_bullet_vec;
+		
+		for(int i = 0; i < NUM_INSTANCES; ++i){
+			if(m_tanks[i].state[0] != TANK_STATE_INACTIVE){
+				// tank is alive, add up to the score
+// 				if(m_population_score.find(i) == m_population_score.end()){
+// 					m_population_score[i] = 0;
+// 				}
+				++(m_population_score[i]);
+				m_scenario_results[i][index] = 1;
+			}else{
+				m_scenario_results[i][index] = 0;
+			}
+		}
 	}
 	
 	/*!
@@ -195,6 +222,10 @@ public:
 	}
 
 protected:
+	typedef std::map<u32, u32> score_map;
+	// genetic stuff
+	score_map m_population_score;
+	
 	// CPU stuff
 	std::vector<Physics::PhysRunner::RunnerCore> m_runner;
 	std::vector<TankBullet::BulletCollection> m_bullets;
@@ -213,6 +244,14 @@ protected:
 	// score data
 	std::vector<std::pair<u32, u32> > m_scoredata;
 
+	// scenario results
+	std::vector<std::vector<u32> > m_scenario_results;
+
+	// scenario tracking
+	u32 m_dist_state;
+	u32 m_bullet_loc;
+	u32 m_bullet_vec;
+
 private:
 	// for data storage
 	DataStore* m_ds;
@@ -230,6 +269,16 @@ bool score_sort(const std::pair<T, T>& lhs, const std::pair<T, T>& rhs){
 		return true;
 	}if(lhs.second == rhs.second){
 		return lhs.first < rhs.first;
+	}
+	return false;
+}
+
+template<typename T>
+bool scenario_score_sort(const std::vector<T>& lhs, const std::vector<T>& rhs){
+	u32 lhs_score = std::accumulate(lhs.begin(), lhs.end(), 0);
+	u32 rhs_score = std::accumulate(rhs.begin(), rhs.end(), 0);
+	if(lhs_score > rhs_score){
+		return true;
 	}
 	return false;
 }
@@ -267,12 +316,12 @@ void mutate(T* mutant){
 	for(int i = 0; i < MAX_GENE_DATA*0.1f; ++i){
 		// mutate the thrust value
 		u32 pos = rand() % MAX_GENE_DATA;
-		AI::AI_Core::gene_type mval = rand() % MAX_THRUST_VALUES;
+		AI::AI_Core::gene_type mval = static_cast<u8>(rand() % MAX_THRUST_VALUES);
 		mutant->gene_accel[pos][0] = mval;
 		
 		// mutate the heading value
 		pos = rand() % MAX_GENE_DATA;
-		mval = rand() % MAX_HEADING_VALUES;
+		mval = static_cast<u8>(rand() % MAX_HEADING_VALUES);
 		mutant->gene_heading[pos][0] = mval;
 	}
 }

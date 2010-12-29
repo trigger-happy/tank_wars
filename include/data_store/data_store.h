@@ -16,6 +16,7 @@
 #ifndef DATA_STORE_H
 #define DATA_STORE_H
 #include <string>
+#include <vector>
 #include "data_store/ds_types.h"
 
 namespace kyotocabinet{
@@ -34,11 +35,14 @@ public:
 
 	bool save_gene_data(const ai_key& key,
 						u32 score,
-						const AI::AI_Core& aic);
+						const AI::AI_Core& aic,
+						const std::vector<u32>& scenario_results
+   					);
 
 	bool get_gene_data(const ai_key& key,
 					   u32& score,
-					   AI::AI_Core& aic);
+					   AI::AI_Core& aic,
+					   std::vector<u32>& scenario_results);
 
 	const char* get_ai_error() const;
 
