@@ -344,6 +344,8 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 								BasicTank::kill_tank(aic->tc, tid);
 							}
 						}
+					}else{
+						BasicTank::kill_tank(aic->tc, my_tank);
 					}
 				}else if(aic->ai_type[idx] == AI_TYPE_TRAINER){
 					// just fire blindly
