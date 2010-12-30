@@ -21,7 +21,7 @@
 #include "game_core/tankbullet.h"
 #include "types.h"
 
-#define MAX_BODY_RECORD 18000
+#define MAX_BODY_RECORD 1000
 #define NUM_SCENARIOS	(NUM_DISTANCE_STATES * NUM_LOCATION_STATES * NUM_BULLET_VECTORS)
 
 // for the AI records
@@ -42,6 +42,9 @@ struct ai_data{
 struct sim_key{
 	u32 id;
 	u32 generation;
+	u32 dist;
+	u32 sect;
+	u32 vect;
 };
 
 struct sim_data{

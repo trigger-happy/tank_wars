@@ -147,7 +147,10 @@ int main(int argc, char* argv[]){
 	//("use-cuda", "Use CUDA")
 	("generation", po::value<u32>(), "The generation number")
 	("id", po::value<u32>(), "The id of the gene to view")
-	("db", po::value<std::string>(), "The gene database, default is simulation.kch");
+	("db", po::value<std::string>(), "The gene database, default is simulation.kch")
+	("dist", po::value<u32>(), "The distance state")
+	("sect", po::value<u32>(), "The sector state")
+	("vect", po::value<u32>(), "The vector state");
 	
 	po::variables_map vm;
 	po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -166,6 +169,9 @@ int main(int argc, char* argv[]){
 	// set the default values
 	g_sk.id = 0;
 	g_sk.generation = 1;
+	g_sk.dist = 1;
+	g_sk.sect = 0;
+	g_sk.vect = 0;
 	std::string aidb = "genes_cpu.kch";
 	std::string simdb = "simulation_cpu.kch";
 	
@@ -179,6 +185,18 @@ int main(int argc, char* argv[]){
 	
 	if(vm.count("db")){
 		aidb = vm["db"].as<std::string>();
+	}
+
+	if(vm.count("dist")){
+		g_sk.dist = vm["dist"].as<u32>();
+	}
+
+	if(vm.count("sect")){
+		g_sk.sect = vm["sect"].as<u32>();
+	}
+
+	if(vm.count("vect")){
+		g_sk.vect = vm["vect"].as<u32>();
 	}
 	
 	g_db = new DataStore(aidb, simdb);
