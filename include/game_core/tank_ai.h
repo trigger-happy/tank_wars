@@ -53,7 +53,7 @@ namespace AI{
 	// some AI specific info
 	struct AI_Core{
 		u32 frame_count;
-		typedef u8 gene_type;
+		typedef s8 gene_type;
 		BasicTank::TankCollection* tc;
 		TankBullet::BulletCollection* bc;
 		u32 next_slot;

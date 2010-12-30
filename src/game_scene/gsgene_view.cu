@@ -277,7 +277,7 @@ void GSGeneView::onFrameRender(CL_GraphicContext* gc){
 // 	}
 	
 	// Debug info
-	CL_StringFormat fmt("States: %1 %2 %3 %4 | Player pos: %5 %6 | Final Score: %7 | Recorded s_result: %8");
+	CL_StringFormat fmt("States: %1 %2 %3 %4 | Player pos: %5 %6 | Final Score: %7 | s_result: %8 | T: %9 V: %10");
 	fmt.set_arg(1, m_ai.bullet_vector[0]);
 	fmt.set_arg(2, m_ai.tank_vector[0]);
 	fmt.set_arg(3, m_ai.direction_state[0]);
@@ -288,6 +288,8 @@ void GSGeneView::onFrameRender(CL_GraphicContext* gc){
 	fmt.set_arg(6, pos.y);
 	fmt.set_arg(7, m_runningscore);
 	fmt.set_arg(8, m_scenario_results[m_index]);
+	fmt.set_arg(9, static_cast<s32>(m_ai.gene_accel[m_index][0]));
+	fmt.set_arg(10, static_cast<s32>(m_ai.gene_heading[m_index][0]));
 	m_dbgmsg = fmt.get_result();
 	m_debugfont->draw_text(*gc, 1, 12, m_dbgmsg, CL_Colorf::red);
 }
