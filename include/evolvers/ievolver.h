@@ -26,19 +26,20 @@ Boston, MA 02110-1301, USA.
 #include "game_core/tank_ai.h"
 #include "data_store/data_store.h"
 
-// #define SAVE_SIM_DATA
+#define SAVE_SIM_DATA
 
 #ifdef SAVE_SIM_DATA
-#define NUM_INSTANCES 4
+#define TARGET_GENERATION	1
+#define TARGET_ID			167
+#define TARGET_DIST			3
+#define TARGET_SECTOR		15
+#define MAX_GENERATIONS 	1
 #else
+#define MAX_GENERATIONS 	16
+#endif
+
 #define NUM_INSTANCES 1024
-#endif
 
-#ifdef SAVE_SIM_DATA
-#define MAX_GENERATIONS 1
-#else
-#define MAX_GENERATIONS 16
-#endif
 
 // top 5% will be elite
 #define ELITE_COUNT		(NUM_INSTANCES*0.05f)
@@ -65,6 +66,7 @@ public:
 		}
 		
 		m_framecount = 0;
+		m_total_frame_count = 0;
 		m_gen_count = 0;
 		m_scenario_results.resize(NUM_INSTANCES, std::vector<u32>(NUM_SCENARIOS, 0));
 	}
@@ -92,19 +94,20 @@ public:
 
 		#ifdef SAVE_SIM_DATA
 		// save the current frame data
-		for(u32 i = 0; i < NUM_INSTANCES; ++i){
-// 			std::cout << "I: " << i << " F: " << m_framecount << std::endl;
+		if(m_gen_count == TARGET_GENERATION && m_total_frame_count < MAX_BODY_RECORD
+			/*&& TARGET_DIST == m_dist_state && TARGET_SECTOR == m_bullet_loc*/){
 			sim_key sk;
-			sk.id = i;
-			sk.generation = m_gen_count;
+			sk.id = TARGET_ID;
+			sk.generation = TARGET_GENERATION;
 			m_ds->get_sim_data(sk, *m_simd_temp);
 
-			m_simd_temp->bodies[m_framecount] = m_runner[i].bodies;
+			m_simd_temp->bodies[m_total_frame_count] = m_runner[TARGET_ID].bodies;
 			m_ds->save_sim_data(sk, *m_simd_temp);
 		}
 		#endif
 		
 		++m_framecount;
+		++m_total_frame_count;
 	}
 	
 	/*!
@@ -153,21 +156,20 @@ public:
 	void prepare_game_state(){
 		static_cast<Derived*>(this)->prepare_game_state_impl();
 		++m_gen_count;
+		m_total_frame_count = 0;
 		for(int i = 0; i < NUM_INSTANCES; ++i){
 			memset(&m_scenario_results[i][0], 0, NUM_SCENARIOS*sizeof(s32));
 		}
 
 		#ifdef SAVE_SIM_DATA
 		// we're going to save the prepared game state's start
-		for(u32 i = 0; i < NUM_INSTANCES; ++i){
-			sim_key sk;
-			sk.id = i;
-			sk.generation = m_gen_count;
+		sim_key sk;
+		sk.id = TARGET_ID;
+		sk.generation = TARGET_GENERATION;
 
-			m_simd_temp->bc = m_bullets[i];
-			m_simd_temp->tc = m_tanks[i];
-			m_ds->save_sim_data(sk, *m_simd_temp);
-		}
+		m_simd_temp->bc = m_bullets[TARGET_ID];
+		m_simd_temp->tc = m_tanks[TARGET_ID];
+		m_ds->save_sim_data(sk, *m_simd_temp);
 		#endif
 	}
 	
@@ -240,6 +242,7 @@ protected:
 	
 	// frame counter
 	u32 m_framecount;
+	u32 m_total_frame_count;
 
 	// score data
 	std::vector<std::pair<u32, u32> > m_scoredata;

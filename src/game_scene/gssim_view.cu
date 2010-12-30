@@ -69,7 +69,6 @@ m_simd(sd){
 
 	m_playertank = 0;
 	m_player2tank = 1;
-	m_player3tank = 2;
 
 	// get the simulation data
 	m_tanks = m_simd.tc;
@@ -80,53 +79,12 @@ m_simd(sd){
 	BasicTank::reset_pointers(&m_tanks, m_physrunner.get(), &m_bullets);
 	TankBullet::reset_phys_pointer(&m_bullets, m_physrunner.get());
 
-	/*
-	// stuff for cuda
-	if(GameDisplay::s_usecuda){
-		// allocate cuda memory
-		cudaMalloc(reinterpret_cast<void**>(&m_cuda_runner),
-				   sizeof(Physics::PhysRunner::RunnerCore));
-		cudaMalloc(reinterpret_cast<void**>(&m_cuda_bullets),
-				   sizeof(TankBullet::BulletCollection));
-		cudaMalloc(reinterpret_cast<void**>(&m_cuda_tanks),
-				   sizeof(BasicTank::TankCollection));
-		cudaMalloc(reinterpret_cast<void**>(&m_cuda_ai),
-				   sizeof(AI::AI_Core));
-// 		cudaMalloc(reinterpret_cast<void**>(&m_cuda_player_input),
-// 				   sizeof(m_player_input));
-		
-		// reset the pointers
-		BasicTank::reset_pointers(&m_tanks, m_cuda_runner, m_cuda_bullets);
-		TankBullet::reset_phys_pointer(&m_bullets, m_cuda_runner);
-		
-		// copy over the stuff to GPU mem
-		cudaMemcpy(m_cuda_runner, m_physrunner.get(),
-				   sizeof(Physics::PhysRunner::RunnerCore), cudaMemcpyHostToDevice);
-				   
-		cudaMemcpy(m_cuda_bullets, &m_bullets,
-				   sizeof(m_bullets), cudaMemcpyHostToDevice);
-				   
-		cudaMemcpy(m_cuda_tanks, &m_tanks,
-				   sizeof(m_tanks), cudaMemcpyHostToDevice);
-				   
-		m_ai.bc = m_cuda_bullets;
-		m_ai.tc = m_cuda_tanks;
-		cudaMemcpy(m_cuda_ai, &m_ai,
-				   sizeof(m_ai), cudaMemcpyHostToDevice);
-	}
-	*/
 	m_frames_elapsed = 0;
 }
 
 GSSimView::~GSSimView(){
 	BasicTank::destroy(&m_tanks);
 	TankBullet::destroy(&m_bullets);
-	/*
-	cudaFree(m_cuda_tanks);
-	cudaFree(m_cuda_bullets);
-	cudaFree(m_cuda_runner);
-	cudaFree(m_cuda_ai);
-	*/
 }
 
 void GSSimView::onSceneDeactivate(){
@@ -140,15 +98,7 @@ void GSSimView::onSceneActivate(){
 
 using namespace std;
 
-void GSSimView::onFrameRender(CL_GraphicContext* gc){
-	/*
-	if(GameDisplay::s_usecuda){
-		// re-assign the pointer to the CPU version
-		BasicTank::reset_pointers(&m_tanks, m_physrunner.get(), &m_bullets);
-		TankBullet::reset_phys_pointer(&m_bullets, m_physrunner.get());
-	}
-	*/
-	
+void GSSimView::onFrameRender(CL_GraphicContext* gc){	
 	// draw the background
 	Physics::vec2 pos;
 	apply_transform(gc, pos);
@@ -165,29 +115,21 @@ void GSSimView::onFrameRender(CL_GraphicContext* gc){
 	}
 	
 	// draw the tanks
-	if(m_tanks.state[m_playertank] != TANK_STATE_INACTIVE){
+// 	if(m_tanks.state[m_playertank] != TANK_STATE_INACTIVE){
 		pos = BasicTank::get_tank_pos(&m_tanks, m_playertank);
 		apply_transform(gc, pos);
 		f32 rot = BasicTank::get_tank_rot(&m_tanks, m_playertank);
 		m_testtank->set_angle(CL_Angle(-rot, cl_degrees));
 		m_testtank->draw(*gc, pos.x, pos.y);
-	}
+// 	}
 
-	if(m_tanks.state[m_player2tank] != TANK_STATE_INACTIVE){
+// 	if(m_tanks.state[m_player2tank] != TANK_STATE_INACTIVE){
 		pos = BasicTank::get_tank_pos(&m_tanks, m_player2tank);
 		apply_transform(gc, pos);
-		f32 rot = BasicTank::get_tank_rot(&m_tanks, m_player2tank);
+		rot = BasicTank::get_tank_rot(&m_tanks, m_player2tank);
 		m_testtank2->set_angle(CL_Angle(-rot, cl_degrees));
 		m_testtank2->draw(*gc, pos.x, pos.y);
-	}
-	
-	if(m_tanks.state[m_player3tank] != TANK_STATE_INACTIVE){
-		pos = BasicTank::get_tank_pos(&m_tanks, m_player3tank);
-		apply_transform(gc, pos);
-		f32 rot = BasicTank::get_tank_rot(&m_tanks, m_player3tank);
-		m_testtank2->set_angle(CL_Angle(-rot, cl_degrees));
-		m_testtank2->draw(*gc, pos.x, pos.y);
-	}
+// 	}
 	
 	// Debug info
 	CL_StringFormat fmt("States: %1 %2 %3 %4 | Player pos: %5 %6 | Time elapsed: %7");
@@ -204,87 +146,29 @@ void GSSimView::onFrameRender(CL_GraphicContext* gc){
 	m_debugfont->draw_text(*gc, 1, 12, m_dbgmsg, CL_Colorf::red);
 }
 
-/*
-// #if __CUDA_ARCH__
-__global__ void gsgame_step(f32 dt,
-							tank_id player_tank,
-							Physics::PhysRunner::RunnerCore* runner,
-							TankBullet::BulletCollection* bullets,
-							BasicTank::TankCollection* tanks,
-							AI::AI_Core* aic){
-	int idx = threadIdx.x;
-	
-	// AI operations
-	AI::timestep(aic, dt);
-
-	Physics::PhysRunner::timestep(runner, dt);
-	TankBullet::update(bullets, dt);
-	BasicTank::update(tanks, dt);
-	
-	// collision check
-	if(idx < MAX_BULLETS){
-		Collision::bullet_tank_check(bullets, tanks, idx);
-	}
-	if(idx < MAX_TANKS){
-		Collision::tank_tank_check(tanks, idx);
-	}
-}
-// #endif
-*/
-
 void GSSimView::onFrameUpdate(double dt,
 						   CL_InputDevice* keyboard,
 						   CL_InputDevice* mouse){
-	// update the game state
-	/*
-	if(GameDisplay::s_usecuda){
-		// copy over the player input
-// 		cudaMemcpy(m_cuda_player_input, &m_player_input,
-// 				   sizeof(m_player_input), cudaMemcpyHostToDevice);
+	if(m_frames_elapsed < MAX_BODY_RECORD){
 
-		// call the update
-		gsgame_step<<<CUDA_BLOCKS, CUDA_THREADS>>>(dt,
-												   m_playertank,
-												   m_cuda_runner,
-												   m_cuda_bullets,
-												   m_cuda_tanks,
-												   m_cuda_ai);
-						  
-		// copy back the results for rendering
-		cudaMemcpy(&m_bullets, m_cuda_bullets, sizeof(m_bullets),
-				   cudaMemcpyDeviceToHost);
-		cudaMemcpy(&m_tanks, m_cuda_tanks, sizeof(m_tanks),
-				   cudaMemcpyDeviceToHost);
-		cudaMemcpy(m_physrunner.get(), m_cuda_runner,
-				   sizeof(Physics::PhysRunner::RunnerCore),
-				   cudaMemcpyDeviceToHost);
-		// not really needed but for debugging anyway
-		cudaMemcpy(&m_ai, m_cuda_ai,
-				   sizeof(AI::AI_Core),
-				   cudaMemcpyDeviceToHost);
-	}else{*/
-		// process the player input
-		if(m_tanks.state[m_playertank] != TANK_STATE_INACTIVE){
+		// perform all the update
+		//AI::timestep(&m_ai, dt);
+		//Physics::PhysRunner::timestep(m_physrunner.get(), dt);
+		// copy over the timestep data
+		m_physrunner->bodies = m_simd.bodies[m_frames_elapsed];
 
-			// perform all the update
-			//AI::timestep(&m_ai, dt);
-			//Physics::PhysRunner::timestep(m_physrunner.get(), dt);
-			// copy over the timestep data
-			m_physrunner->bodies = m_simd.bodies[m_frames_elapsed];
-			
-			TankBullet::update(&m_bullets, dt);
-			BasicTank::update(&m_tanks, dt);
-			
-			// perform collision detection for the bullets
-			for(int i = 0; i < MAX_BULLETS; ++i){
-				Collision::bullet_tank_check(&m_bullets, &m_tanks, i);
-			}
-			// perform collision detection for tanks
-			for(int i = 0; i < MAX_TANKS; ++i){
-				Collision::tank_tank_check(&m_tanks, i);
-			}
+		TankBullet::update(&m_bullets, dt);
+		BasicTank::update(&m_tanks, dt);
+
+		// perform collision detection for the bullets
+		for(int i = 0; i < MAX_BULLETS; ++i){
+			Collision::bullet_tank_check(&m_bullets, &m_tanks, i);
 		}
-//	}
+		// perform collision detection for tanks
+		for(int i = 0; i < MAX_TANKS; ++i){
+			Collision::tank_tank_check(&m_tanks, i);
+		}
+	}
 	
 	// update the sprites
 	m_background->update();
@@ -292,8 +176,8 @@ void GSSimView::onFrameUpdate(double dt,
 	m_testtank->update();
 // 	if(m_tanks.state[0] != TANK_STATE_INACTIVE){
 	Physics::vec2 pos = BasicTank::get_tank_pos(&m_tanks, m_playertank);
-	if(pos.x != OFFSCREEN_X && pos.y != OFFSCREEN_Y){
+// 	if(pos.x != OFFSCREEN_X && pos.y != OFFSCREEN_Y){
 		++m_frames_elapsed;
-	}
+// 	}
 }
 

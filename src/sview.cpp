@@ -166,8 +166,8 @@ int main(int argc, char* argv[]){
 	// set the default values
 	g_sk.id = 0;
 	g_sk.generation = 1;
-	std::string aidb = "genes.kch";
-	std::string simdb = "simulation.kch";
+	std::string aidb = "genes_cpu.kch";
+	std::string simdb = "simulation_cpu.kch";
 	
 	if(vm.count("generation")){
 		g_sk.generation = vm["generation"].as<u32>();
