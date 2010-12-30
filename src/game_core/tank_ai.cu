@@ -302,9 +302,9 @@ void AI::timestep(AI::AI_Core* aic, f32 dt){
 					cur_rot = util::clamp_dir_360(cur_rot);
 					cur_rot = AI::get_vector(cur_rot);
 					if(aic->desired_heading[idx] != -1 && index != -1){
-						if(aic->desired_heading[idx] < cur_rot){
+						if(aic->desired_heading[idx] > cur_rot){
 							BasicTank::turn_left(aic->tc, my_tank);
-						}else if(aic->desired_heading[idx] > cur_rot){
+						}else if(aic->desired_heading[idx] < cur_rot){
 							BasicTank::turn_right(aic->tc, my_tank);
 						}
 					}
