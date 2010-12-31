@@ -360,6 +360,12 @@ void GSGeneView::onFrameUpdate(double dt,
 				   sizeof(AI::AI_Core),
 				   cudaMemcpyDeviceToHost);
 
+		
+		// additional output
+		Physics::vec2 pos = m_physrunner->bodies.cur_pos.get_vec2(m_tanks.phys_id[0]);
+		f32 rot = m_physrunner->bodies.rotation[m_tanks.phys_id[0]];
+		printf("E.x: %f E.y: %f E.r: %f\n", pos.x, pos.y, rot);
+
 		if(m_tanks.state[m_playertank] == TANK_STATE_INACTIVE){
 			// player tank died, let's reset
 			cout << m_test_dist << " " << m_test_sect << " " << m_test_vect
@@ -415,6 +421,11 @@ void GSGeneView::onFrameUpdate(double dt,
 			for(int i = 0; i < MAX_TANKS; ++i){
 				Collision::tank_tank_check(&m_tanks, i);
 			}
+
+			// additional output
+			Physics::vec2 pos = m_physrunner->bodies.cur_pos.get_vec2(m_tanks.phys_id[0]);
+			f32 rot = m_physrunner->bodies.rotation[m_tanks.phys_id[0]];
+			printf("E.x: %f E.y: %f E.r: %f\n", pos.x, pos.y, rot);
 		}else if(m_tanks.state[m_playertank] == TANK_STATE_INACTIVE){
 			// player tank died, let's reset
 			cout << m_test_dist << " " << m_test_sect << " " << m_test_vect
