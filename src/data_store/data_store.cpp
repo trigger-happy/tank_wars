@@ -67,7 +67,7 @@ bool DataStore::get_gene_data(const ai_key& key,
 	for(u32 i = 0; i < MAX_GENE_DATA; ++i){
 		for(u32 j = 0; j < MAX_AI_EVADERS; ++j){
 			aic.gene_accel[i][j] = aid.gene_accel[i][j];
-			aid.gene_heading[i][j] = aid.gene_heading[i][j];
+			aic.gene_heading[i][j] = aid.gene_heading[i][j];
 		}
 	}
 	score = aid.score;
