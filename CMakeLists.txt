@@ -33,7 +33,7 @@ FIND_PACKAGE(ClanLib REQUIRED)
 FIND_PACKAGE(CUDA)
 FIND_PACKAGE(Threads REQUIRED)
 
-SET(CUDA_NVCC_FLAGS -gencode arch=compute_11,code=sm_11 -gencode arch=compute_20,code=sm_20)
+SET(CUDA_NVCC_FLAGS -gencode arch=compute_11,code=sm_11 -gencode arch=compute_20,code=sm_20 --compiler-options -mpc32 --compiler-options -ffloat-store)
 SET(CUDA_NVCC_FLAGS_DEBUG --ptxas-options=-v)
 
 include_directories("${PROJECT_SOURCE_DIR}/include"
