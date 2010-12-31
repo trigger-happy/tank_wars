@@ -144,10 +144,9 @@ int main(int argc, char* argv[]){
 	po::options_description desc("Gene viewer options");
 	desc.add_options()
 	("help", "Show this help message")
-	//("use-cuda", "Use CUDA")
+	("db", po::value<std::string>(), "The simulation database to use")
 	("generation", po::value<u32>(), "The generation number")
 	("id", po::value<u32>(), "The id of the gene to view")
-	("db", po::value<std::string>(), "The gene database, default is simulation.kch")
 	("dist", po::value<u32>(), "The distance state")
 	("sect", po::value<u32>(), "The sector state")
 	("vect", po::value<u32>(), "The vector state");
@@ -182,10 +181,6 @@ int main(int argc, char* argv[]){
 	if(vm.count("id")){
 		g_sk.id = vm["id"].as<u32>();
 	}
-	
-	if(vm.count("db")){
-		aidb = vm["db"].as<std::string>();
-	}
 
 	if(vm.count("dist")){
 		g_sk.dist = vm["dist"].as<u32>();
@@ -197,6 +192,10 @@ int main(int argc, char* argv[]){
 
 	if(vm.count("vect")){
 		g_sk.vect = vm["vect"].as<u32>();
+	}
+
+	if(vm.count("db")){
+		simdb = vm["db"].as<std::string>();
 	}
 	
 	g_db = new DataStore(aidb, simdb);

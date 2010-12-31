@@ -24,7 +24,14 @@
 
 #define CUDA_BLOCKS		NUM_INSTANCES
 #define CUDA_THREADS	MAX_ARRAY_SIZE
-#define RETRIEVE_INTERVAL	60
+
+#define CHECK_INTERVAL		60
+
+#ifdef SAVE_SIM_DATA
+#define RETRIEVE_INTERVAL	1
+#else
+#define RETRIEVE_INTERVAL	CHECK_INTERVAL
+#endif
 
 using namespace std;
 
@@ -331,7 +338,7 @@ void Evolver_gpu::end_game_scenario_impl(){
 }
 
 bool Evolver_gpu::is_game_over_impl(){
-	if(m_framecount % RETRIEVE_INTERVAL == 0){
+	if(m_framecount % CHECK_INTERVAL == 0){
 // 		bool all_done = true;
 		bool really_done = true;
 		for(int i = 0; i < NUM_INSTANCES; ++i){

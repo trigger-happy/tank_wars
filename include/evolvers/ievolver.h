@@ -26,7 +26,7 @@ Boston, MA 02110-1301, USA.
 #include "game_core/tank_ai.h"
 #include "data_store/data_store.h"
 
-// #define SAVE_SIM_DATA
+#define SAVE_SIM_DATA
 
 #ifdef SAVE_SIM_DATA
 #define TARGET_GENERATION	1
@@ -89,7 +89,15 @@ public:
 	*/
 	void frame_step(float dt){
 		static_cast<Derived*>(this)->frame_step_impl(dt);
-
+// 		++m_total_frame_count;
+	}
+	
+	/*!
+	Retrieve the current game state
+	*/
+	void retrieve_state(){
+		static_cast<Derived*>(this)->retrieve_state_impl();
+		
 		#ifdef SAVE_SIM_DATA
 		// save the current frame data
 		if(m_gen_count == TARGET_GENERATION){
@@ -99,22 +107,14 @@ public:
 			sk.dist = m_dist_state;
 			sk.sect = m_bullet_loc;
 			sk.vect = m_bullet_vec;
-// 			m_ds->get_sim_data(sk, *m_simd_temp);
-
+			// 			m_ds->get_sim_data(sk, *m_simd_temp);
+			
 			m_simd_temp->bodies[m_framecount] = m_runner[TARGET_ID].bodies;
 			m_ds->save_sim_data(sk, *m_simd_temp);
 		}
 		#endif
 		
 		++m_framecount;
-// 		++m_total_frame_count;
-	}
-	
-	/*!
-	Retrieve the current game state
-	*/
-	void retrieve_state(){
-		static_cast<Derived*>(this)->retrieve_state_impl();
 	}
 	
 	/*!
