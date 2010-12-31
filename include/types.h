@@ -16,6 +16,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 #include <boost/cstdint.hpp>
+#include "operations.h"
 
 typedef boost::uint8_t	u8;
 typedef boost::uint16_t	u16;

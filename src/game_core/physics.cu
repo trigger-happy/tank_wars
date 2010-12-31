@@ -83,11 +83,11 @@ CUDA_EXPORT void update_verlet(f32 dt,
 	Physics::vec2 temp = bodies->cur_pos.get_vec2(idx);
 	Physics::vec2 newpos;
 	
-	newpos.x = bodies->cur_pos.x[idx] - bodies->old_pos.x[idx] 
-	+ bodies->acceleration.x[idx] * dt * dt;
+	newpos.x = ADD(bodies->cur_pos.x[idx] - bodies->old_pos.x[idx],
+				   MUL(MUL(bodies->acceleration.x[idx], dt), dt));
 	
-	newpos.y = bodies->cur_pos.y[idx] - bodies->old_pos.y[idx] 
-	+ bodies->acceleration.y[idx] * dt * dt;
+	newpos.y = ADD(bodies->cur_pos.y[idx] - bodies->old_pos.y[idx],
+				   MUL(MUL(bodies->acceleration.y[idx], dt), dt));
 	
 	// don't let the object exceed maximum velocity
 	Physics::vec2 maxvel;

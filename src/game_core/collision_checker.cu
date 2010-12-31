@@ -30,7 +30,6 @@ bool Collision::bullet_tank_check(TankBullet::BulletCollection* bc,
 	Physics::pBody bullet_pid = bc->phys_id[bid];
 	f32 bullet_radius = rc->bodies.dimension.x[bullet_pid];
 	for(unsigned int tid = 0; tid < MAX_TANKS; ++tid){
-		//TODO: check if the tank is of the right faction
 		if(bc->faction[bid] == tc->faction[tid]){
 			// same faction, no friendly fire so ignore
 			continue;

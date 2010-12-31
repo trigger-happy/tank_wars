@@ -107,7 +107,7 @@ void GSSimView::onFrameRender(CL_GraphicContext* gc){
 	// draw the background
 	Physics::vec2 pos;
 	apply_transform(gc, pos);
-	m_background->draw(*gc, pos.x, pos.y);
+	m_background->draw(*gc, (f32)pos.x, (f32)pos.y);
 	
 	// draw the bullets, yes, we're cheating the numbers
 	// OOP can wait another day
@@ -115,7 +115,7 @@ void GSSimView::onFrameRender(CL_GraphicContext* gc){
 		pos = TankBullet::get_bullet_pos(&m_bullets, i);
 		apply_transform(gc, pos);
 // 		if(m_bullets.state[i] != BULLET_STATE_INACTIVE){
-			m_testbullet->draw(*gc, pos.x, pos.y);
+			m_testbullet->draw(*gc, (f32)pos.x, (f32)pos.y);
 // 		}
 	}
 	
@@ -125,7 +125,7 @@ void GSSimView::onFrameRender(CL_GraphicContext* gc){
 		apply_transform(gc, pos);
 		f32 rot = BasicTank::get_tank_rot(&m_tanks, m_playertank);
 		m_testtank->set_angle(CL_Angle(-rot, cl_degrees));
-		m_testtank->draw(*gc, pos.x, pos.y);
+		m_testtank->draw(*gc, (f32)pos.x, (f32)pos.y);
 // 	}
 
 // 	if(m_tanks.state[m_player2tank] != TANK_STATE_INACTIVE){
@@ -133,7 +133,7 @@ void GSSimView::onFrameRender(CL_GraphicContext* gc){
 		apply_transform(gc, pos);
 		rot = BasicTank::get_tank_rot(&m_tanks, m_player2tank);
 		m_testtank2->set_angle(CL_Angle(-rot, cl_degrees));
-		m_testtank2->draw(*gc, pos.x, pos.y);
+		m_testtank2->draw(*gc, (f32)pos.x, (f32)pos.y);
 // 	}
 	
 	// Debug info
@@ -164,7 +164,7 @@ void GSSimView::onFrameUpdate(double dt,
 		Physics::vec2 pos = m_physrunner->bodies.cur_pos.get_vec2(m_tanks.phys_id[0]);
 		f32 rot = m_physrunner->bodies.rotation[m_tanks.phys_id[0]];
 // 		cout << format("E.x: %1 E.y: %2 E.r: %3") % pos.x % pos.y % rot << endl;
-		printf("E.x: %f E.y: %f E.r: %f\n", pos.x, pos.y, rot);
+		printf("E.x: %.12f E.y: %.12f E.r: %.12f\n", pos.x, pos.y, rot);
 
 		TankBullet::update(&m_bullets, dt);
 		BasicTank::update(&m_tanks, dt);
