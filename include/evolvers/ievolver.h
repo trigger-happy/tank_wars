@@ -33,7 +33,7 @@ Boston, MA 02110-1301, USA.
 #define TARGET_ID			167
 #define MAX_GENERATIONS 	1
 #else
-#define MAX_GENERATIONS 	16
+#define MAX_GENERATIONS 	128
 #endif
 
 #define NUM_INSTANCES 1024
