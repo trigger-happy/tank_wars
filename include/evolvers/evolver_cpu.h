@@ -37,7 +37,7 @@ struct frame_updater{
 	u32* scores;
 	u32 start_index;
 	u32 end_index;
-	u32 dt;
+	f32 dt;
 
 	void operator()();
 };
