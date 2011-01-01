@@ -1,5 +1,6 @@
 build/
 docs/
+archive/
 .kdev4/
 Doxyfile~
 *.kdev4
