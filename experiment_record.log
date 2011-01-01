@@ -1,0 +1,11 @@
+gpu_gv to gpu_gv = consistent
+gpu_gv to gpu_sv = consistent
+gpu_sv to gpu_sv = consistent
+
+cpu_gv to cpu_gv = consistent
+cpu_gv to cpu_sv = inconsistent
+cpu_sv to cpu_sv = consistent
+
+gpu_gv to cpu_gv = somewhat inconsistent
+gpu_gv to cpu_sv = inconsistent
+gpu_sv to cpu_sv = inconsistent
