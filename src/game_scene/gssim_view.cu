@@ -164,7 +164,7 @@ void GSSimView::onFrameUpdate(double dt,
 		Physics::vec2 pos = m_physrunner->bodies.cur_pos.get_vec2(m_tanks.phys_id[0]);
 		f32 rot = m_physrunner->bodies.rotation[m_tanks.phys_id[0]];
 // 		cout << format("E.x: %1 E.y: %2 E.r: %3") % pos.x % pos.y % rot << endl;
-		printf("E.x: %.12f E.y: %.12f E.r: %.12f\n", pos.x, pos.y, rot);
+// 		printf("E.x: %.12f E.y: %.12f E.r: %.12f\n", pos.x, pos.y, rot);
 
 		TankBullet::update(&m_bullets, dt);
 		BasicTank::update(&m_tanks, dt);

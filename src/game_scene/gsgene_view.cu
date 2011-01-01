@@ -364,7 +364,7 @@ void GSGeneView::onFrameUpdate(double dt,
 		// additional output
 		Physics::vec2 pos = m_physrunner->bodies.cur_pos.get_vec2(m_tanks.phys_id[0]);
 		f32 rot = m_physrunner->bodies.rotation[m_tanks.phys_id[0]];
-		printf("E.x: %.12f E.y: %.12f E.r: %.12f\n", pos.x, pos.y, rot);
+// 		printf("E.x: %.12f E.y: %.12f E.r: %.12f\n", pos.x, pos.y, rot);
 
 		if(m_tanks.state[m_playertank] == TANK_STATE_INACTIVE){
 			// player tank died, let's reset
