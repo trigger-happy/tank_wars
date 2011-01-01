@@ -85,13 +85,14 @@ void Evolver_cpu::frame_step_impl(float dt){
 	for(u32 i = 0; i < MAX_THREADS; ++i){
 		// setup the updaters and assign them to threads
 		m_updaters[i].dt = dt;
-		m_threads[i] = boost::thread(boost::ref(m_updaters[i]));
+		m_updaters[i]();
+// 		m_threads[i] = boost::thread(boost::ref(m_updaters[i]));
 	}
 
-	for(u32 i = 0; i < MAX_THREADS; ++i){
-		// rejoin the threads
-		m_threads[i].join();
-	}
+// 	for(u32 i = 0; i < MAX_THREADS; ++i){
+// 		// rejoin the threads
+// 		m_threads[i].join();
+// 	}
 }
 
 void Evolver_cpu::retrieve_state_impl(){

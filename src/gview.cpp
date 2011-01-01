@@ -35,7 +35,7 @@
 #include "data_store/data_store.h"
 
 // in milliseconds
-#define FRAME_TIME 1000.0/60.0
+#define FRAME_TIME 1000.0f/60.0f
 
 double					GameDisplay::s_deltatime = 0.0;
 boost::timer			GameDisplay::s_frame_timer;
