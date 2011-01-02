@@ -29,10 +29,12 @@
 namespace po = boost::program_options;
 using namespace std;
 
+static u32 g_randomseed = 0;
+
 template<typename T>
 void perform_evolution(iEvolver<T>& evl, const string& fname = "report.dat"){
 	// consistent random seed
-	srand(0);
+	srand(g_randomseed);
 
 	u32 num_generations = 0;
 	f32 highest_score = 0.0f;
@@ -109,7 +111,8 @@ int main(int argc, char* argv[]){
 	desc.add_options()
 		("help", "display this help message")
 		("cpu", "evolve the AI using the cpu")
-		("gpu", "evolve the AI using the gpu");
+		("gpu", "evolve the AI using the gpu")
+		("seed", po::value<u32>(), "Use this as the initial random seed");
 		
 	po::variables_map vm;
 	po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -118,6 +121,10 @@ int main(int argc, char* argv[]){
 	if(vm.count("help")){
 		std::cout << desc << std::endl;
 		return 0;
+	}
+
+	if(vm.count("seed")){
+		g_randomseed = vm["seed"].as<u32>();
 	}
 	
 	if(vm.count("cpu")){
