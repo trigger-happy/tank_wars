@@ -42,7 +42,6 @@ boost::timer			GameDisplay::s_frame_timer;
 std::stack<iGameScene*>	GameDisplay::s_scene_stack;
 bool					GameDisplay::s_running = true;
 bool					GameDisplay::s_usecuda = false;
-bool					GameDisplay::s_view_gene = false;
 
 DataStore* g_db = NULL;
 ai_key g_aik;
@@ -72,7 +71,8 @@ int GameDisplay::main(){
 	CL_SetupDisplay setup_display;
 	CL_SetupGL setup_gl;
 	
-	boost::scoped_ptr<GSMenu> menu_scene;
+// 	boost::scoped_ptr<GSMenu> menu_scene;
+	boost::scoped_ptr<GSGame> game_scene;
 	
 	try{
 		CL_DisplayWindow window("TankWars", 800, 600);
@@ -82,12 +82,11 @@ int GameDisplay::main(){
 		CL_InputDevice& mouse = window.get_ic().get_mouse();
 		
 		CL_ResourceManager resources("resources/game_resource.xml");
-		if(s_view_gene){
-			s_scene_stack.push(new GSGame(gc, resources));
-		}else{
-			menu_scene.reset(new GSMenu(gc, resources));
-			s_scene_stack.push(menu_scene.get());
-		}
+		
+//		menu_scene.reset(new GSMenu(gc, resources));
+// 		s_scene_stack.push(menu_scene.get());
+		game_scene.reset(new GSGame(gc, resources));
+		s_scene_stack.push(game_scene.get());
 		
 		while(!keyboard.get_keycode(CL_KEY_ESCAPE) && s_running){
 			// restart the frame timer
@@ -127,10 +126,6 @@ int GameDisplay::main(){
 #else
 			//Sleep(FRAME_TIME - s_deltatime);
 #endif
-		}
-		if(s_view_gene){
-			delete s_scene_stack.top();
-			s_scene_stack.pop();
 		}
 	}catch(CL_Exception& e){
 		CL_ConsoleWindow console("error console", 80, 160);
