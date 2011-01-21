@@ -4,6 +4,7 @@ list(APPEND TANKGAME_SRC
 			game_scene/gslobby.cpp
 			game_scene/gsoptions.cpp
 			game_scene/gsgame.cu
+			data_store/data_store.cpp
 			tank_game.cpp)
 
 list(APPEND GVIEW_SRC

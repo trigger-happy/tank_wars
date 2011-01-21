@@ -22,6 +22,8 @@
 #include "game_display.h"
 #include "game_scene/gsgame.h"
 #include "../game_core/twgame.cu"
+#include "data_store/data_store.h"
+#include "data_store/ds_types.h"
 // #include "game_core/physics.h"
 // #include "game_core/tankbullet.h"
 // #include "game_core/basictank.h"
@@ -30,6 +32,9 @@
 
 #define CUDA_BLOCKS 1
 #define CUDA_THREADS MAX_ARRAY_SIZE
+
+extern DataStore* g_db;
+extern ai_key g_aik;
 
 // helper function
 void apply_transform(CL_GraphicContext* gc, Physics::vec2& c){
@@ -90,22 +95,25 @@ m_offscreen_texture(gc, gc.get_width(), gc.get_height()){
 	TankBullet::initialize(&m_bullets, m_physrunner.get());
 	BasicTank::initialize(&m_tanks, m_physrunner.get(), &m_bullets);
 	AI::initialize(&m_ai, &m_tanks, &m_bullets);
+	// set the gene data
+	u32 score = 0;
+	vector<u32> scenario_results;
+	g_db->get_gene_data(g_aik, score, m_ai, scenario_results);
 	
 	// test code
 	Physics::vec2 params;
 	params.x = -25;
-	m_playertank = BasicTank::spawn_tank(&m_tanks, params, 90, 0);
-	params.x = 3;
-	params.y = 12;
-	m_player2tank = BasicTank::spawn_tank(&m_tanks, params, 180, 1);
+	m_playertank = BasicTank::spawn_tank(&m_tanks, params, 0, 0);
+	params.x = 5;
+	m_player2tank = BasicTank::spawn_tank(&m_tanks, params, 90, 1);
 	params.x = 20;
 	params.y = -12;
-	m_player3tank = BasicTank::spawn_tank(&m_tanks, params, 180, 1);
+// 	m_player3tank = BasicTank::spawn_tank(&m_tanks, params, 180, 1);
 	m_player_input = 0;
 	m_player2_input = 0;
 	//AI::add_tank(&m_ai, m_playertank, AI_TYPE_EVADER);
-	AI::add_tank(&m_ai, m_player2tank, AI_TYPE_ATTACKER);
-	AI::add_tank(&m_ai, m_player3tank, AI_TYPE_ATTACKER);
+	AI::add_tank(&m_ai, m_player2tank, AI_TYPE_EVADER);
+// 	AI::add_tank(&m_ai, m_player3tank, AI_TYPE_ATTACKER);
 	
 	// stuff for cuda
 	if(GameDisplay::s_usecuda){
@@ -203,13 +211,13 @@ void GSGame::onFrameRender(CL_GraphicContext* gc){
 		m_testtank2->draw(*gc, (f32)pos.x, (f32)pos.y);
 	}
 	
-	if(m_tanks.state[m_player3tank] != TANK_STATE_INACTIVE){
-		pos = BasicTank::get_tank_pos(&m_tanks, m_player3tank);
-		apply_transform(gc, pos);
-		f32 rot = BasicTank::get_tank_rot(&m_tanks, m_player3tank);
-		m_testtank2->set_angle(CL_Angle(-rot, cl_degrees));
-		m_testtank2->draw(*gc, (f32)pos.x, (f32)pos.y);
-	}
+// 	if(m_tanks.state[m_player3tank] != TANK_STATE_INACTIVE){
+// 		pos = BasicTank::get_tank_pos(&m_tanks, m_player3tank);
+// 		apply_transform(gc, pos);
+// 		f32 rot = BasicTank::get_tank_rot(&m_tanks, m_player3tank);
+// 		m_testtank2->set_angle(CL_Angle(-rot, cl_degrees));
+// 		m_testtank2->draw(*gc, (f32)pos.x, (f32)pos.y);
+// 	}
 	
 	// Debug info
 	CL_StringFormat fmt("States: %1 %2 %3 %4 | Player: %5 %6 %7 | Time elapsed: %8");

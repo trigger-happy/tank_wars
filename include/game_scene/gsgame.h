@@ -84,7 +84,7 @@ private:
 	AI::AI_Core m_ai;
 	tank_id m_playertank;
 	tank_id m_player2tank;
-	tank_id m_player3tank;
+// 	tank_id m_player3tank;
 	u32 m_player_input;
 	u32 m_player2_input;
 	
