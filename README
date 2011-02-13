@@ -1,0 +1,43 @@
+Requirements:
+The project requires the presence of several libraries and tools in order to
+compile. The following is a list of those requirements:
+	-boost 1.44+
+	-NVidia CUDA 3.2
+	-gcc 4.4 or higher
+	-CMake 2.8
+	-ClanLib 2.2.5
+
+Compilation steps:
+The assumption is that the tools are already in path and in standard installation
+locations. CUDA's default installation is in /usr/local/cuda while boost and
+ClanLib may be installed in the /usr or /usr/local prefix. Once these are all in
+place, compiling the application involves the following steps
+
+cd /path/to/project/dir
+mkdir build; cd build
+cmake ..
+make
+
+Assuming there were no errors, the following programs shouls appear in the build
+directory:
+
+evolver - The application that handles the evolutionary process
+genetic_diff - A simple tool to compare 2 gene databases for any differences
+geneview - A tool for evaluating any individual available in the gene database
+query_gene - A small tool used for debugging to check for genetic values in the db
+simview - A tool that shows exactly what happened during the evolution process
+	for a particular individual. This is useless unless the project is compiled
+	with the SAVE_SIM_DATA flag uncommented in ievolver.h
+tank_game - A simple game where you get to try and shoot at any individual in
+	the db yourself.
+
+Running the program is best done from the command line and with the current
+working directory set to the project directory. So if one wants to run the
+tank_game application, the following commands should be done:
+
+cd /path/to/project/dir
+build/tank_game
+
+Each of the tools may accept a --help parameter to show you the available
+arguments. For questions, e-mail me at:
+triggerhappyelite in the gmail.com domain
