@@ -6,6 +6,7 @@ compile. The following is a list of those requirements:
 	-gcc 4.4 or higher
 	-CMake 2.8
 	-ClanLib 2.2.5
+	-kyotocabinet 1.2.25 or higher
 
 Compilation steps:
 The assumption is that the tools are already in path and in standard installation
